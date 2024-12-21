@@ -1,0 +1,75 @@
+name: CI
+
+# プルリク or mainブランチへのpushをトリガーにする
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # pull_requestではなく、mainブランチへpushされたときのみ実行
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to GitHub Pages
+        run: |
+          # デプロイ作業用の一時フォルダを作る
+          mkdir temp_deploy
+          cp -r public/* temp_deploy/
+
+          # GitHub user設定
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          # orphanブランチを作成または切り替え
+          git checkout --orphan gh-pages || true
+
+          # 既存ファイルを削除 (.gitフォルダ等は残る)
+          # find コマンドで .git は除外して削除
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+          # 一時フォルダからコピー
+          cp -r temp_deploy/* .
+
+          git add .
+          git commit -m "Deploy to GitHub Pages"
+          git push --force origin gh-pages
