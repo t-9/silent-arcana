@@ -1,5 +1,3 @@
-// src/app.js
-
 import {
   createDetector,
   SupportedModels
@@ -10,32 +8,44 @@ let detector = null;
 let videoEl = null;
 let running = false;
 
+// 読み込み表示用の要素参照をキャッシュ
+let loadingEl = null;
+
 /** 
  * モデル読み込み
- * ブラウザで WebGL が使える状況を想定 
  */
 export async function loadModel() {
+  // ローディング開始表示
+  loadingEl.textContent = 'モデル読み込み中...';
+
   detector = await createDetector(SupportedModels.MediaPipeHands, {
     runtime: 'tfjs',
     modelType: 'full'
   });
+
   console.log("MediaPipe Handsモデル読み込み完了");
+  // ローディング完了表示を消す
+  loadingEl.textContent = '';
   return detector;
 }
 
 /** 
  * MVP: カメラ開始
- * ブラウザ環境で navigator.mediaDevices がないと動作しない
  */
 async function startCamera() {
   try {
+    loadingEl.textContent = 'カメラを起動しています...';
+
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     videoEl.srcObject = stream;
     await new Promise(resolve => {
       videoEl.onloadedmetadata = () => resolve();
     });
+
     console.log("カメラ開始");
+    loadingEl.textContent = ''; // カメラ起動完了表示を消す
   } catch (err) {
+    loadingEl.textContent = 'カメラの起動に失敗しました';
     console.error("カメラ使用許可が必要です:", err);
   }
 }
@@ -62,16 +72,20 @@ async function detectLoop() {
 /** 
  * メイン初期化 
  */
-async function init() {
+export async function init() {
   videoEl = document.getElementById('video');
   const startBtn = document.getElementById('start-btn');
-  if (!videoEl || !startBtn) {
+  loadingEl = document.getElementById('loading');
+
+  if (!videoEl || !startBtn || !loadingEl) {
     console.error("DOM要素が見つからない");
     return;
   }
 
-  await loadModel();  // カメラ開始前にモデルだけロード
+  // まずモデルを読み込み（画面に「モデル読み込み中...」表示）
+  await loadModel();
 
+  // startBtnのクリックでカメラ開始＆ループ開始
   startBtn.addEventListener('click', async () => {
     if (!running) {
       await startCamera();
@@ -81,7 +95,7 @@ async function init() {
   });
 }
 
-// もし実際のブラウザならinit()呼び出し
+// ブラウザ実行時のみ自動呼び出し
 if (typeof window !== 'undefined') {
   init();
 }
