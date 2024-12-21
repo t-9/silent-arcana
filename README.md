@@ -9,7 +9,7 @@
 - **軽量ホスティング**: GitHub Pagesで無料・容易に公開可能
 
 ## デモ
-[Live Demo](https://t-9.io.github.io/silent-arcana/)
+[Live Demo](https://t-9.github.io/silent-arcana/)
 
 ## 開発環境のセットアップ
 ```bash
