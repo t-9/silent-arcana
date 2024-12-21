@@ -59,7 +59,7 @@ http://localhost:8080
 docker run -it --rm silent-arcana npm test
 ```
 
-## 技術スタック
+## 主要技術スタック
 - Node.js
 - Webpack
 - [TensorFlow.js](https://www.tensorflow.org/js)
@@ -68,6 +68,9 @@ docker run -it --rm silent-arcana npm test
 - [GitHub Pages](https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages)
 - [Jest](https://jestjs.io/)
 - [serve](https://github.com/vercel/serve)
+- TypeScript
+- ESLint + @typescript-eslint
+- Codecov
 
 ## CI/CD
 - **GitHub Actions**: プルリク・push時に自動テスト (npm test)、ビルド (npm run build) を実施
