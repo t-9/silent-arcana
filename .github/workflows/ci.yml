@@ -35,6 +35,16 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Run coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage to GitHub artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+      
+
   # 2) mainブランチへのpush時にのみビルド＆Pagesデプロイを行うジョブ
   build_and_deploy:
     name: Build and Deploy to GitHub Pages
