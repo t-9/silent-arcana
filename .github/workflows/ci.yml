@@ -32,6 +32,9 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Run lint
+        run: npm run lint
+
   # 2) mainブランチへのpush時にのみビルド＆Pagesデプロイを行うジョブ
   build_and_deploy:
     name: Build and Deploy to GitHub Pages
