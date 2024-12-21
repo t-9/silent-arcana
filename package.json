@@ -1,0 +1,36 @@
+{
+  "name": "silent-arcana",
+  "version": "0.1.0",
+  "description": "A web-based sign language learning platform that uses gamification to foster inclusive workplace communication.",
+  "main": "src/app.js",
+  "scripts": {
+    "build": "webpack",
+    "start": "serve public -l 8080",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/t-9/silent-arcana.git"
+  },
+  "keywords": [
+    "sign-language",
+    "hand-gesture",
+    "learning",
+    "gamification"
+  ],
+  "author": "Chikage",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/t-9/silent-arcana/issues"
+  },
+  "homepage": "https://github.com/t-9/silent-arcana#readme",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "serve": "^14.2.4",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@tensorflow/tfjs": "^4.22.0"
+  }
+}
