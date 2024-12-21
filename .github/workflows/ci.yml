@@ -52,24 +52,23 @@ jobs:
 
       - name: Deploy to GitHub Pages
         run: |
-          # デプロイ作業用の一時フォルダを作る
-          mkdir temp_deploy
-          cp -r public/* temp_deploy/
-
-          # GitHub user設定
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
           # orphanブランチを作成または切り替え
           git checkout --orphan gh-pages || true
 
-          # 既存ファイルを削除 (.gitフォルダ等は残る)
-          # find コマンドで .git は除外して削除
-          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          # .git と public は削除対象から除外
+          find . -mindepth 1 -maxdepth 1 \
+            ! -name '.git' \
+            ! -name 'public' \
+            -exec rm -rf {} +
 
-          # 一時フォルダからコピー
-          cp -r temp_deploy/* .
+          # publicディレクトリ内の成果物をルートにコピー
+          cp -r public/* .
 
+          # public自体を残したくない場合は、ここで削除
+          rm -rf public
+
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
           git add .
           git commit -m "Deploy to GitHub Pages"
           git push --force origin gh-pages
