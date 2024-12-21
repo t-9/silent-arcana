@@ -1,17 +1,21 @@
 name: CI
 
-# プルリク or mainブランチへのpushをトリガーにする
 on:
   pull_request:
+    branches: [ "main" ]
   push:
     branches: [ "main" ]
 
 permissions:
-  contents: write
+  # Pagesデプロイに必要な権限（push時のdeployで使う）
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  # 1) テストだけ行うジョブ
+  test:
+    name: Test (both PR and push)
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -28,15 +32,14 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Build
-        run: npm run build
-
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build-and-test
+  # 2) mainブランチへのpush時にのみビルド＆Pagesデプロイを行うジョブ
+  build_and_deploy:
+    name: Build and Deploy to GitHub Pages
+    needs: [test]  # テストジョブに成功してから続行
     runs-on: ubuntu-latest
-    # pull_requestではなく、mainブランチへpushされたときのみ実行
+    # pull_requestではなく、mainブランチにpushされた時だけ実行
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -52,25 +55,13 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Webpack等のビルド成果物がpublic/に出力される想定
+      - name: Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: public
+
       - name: Deploy to GitHub Pages
-        run: |
-          # orphanブランチを作成または切り替え
-          git checkout --orphan gh-pages || true
-
-          # .git と public は削除対象から除外
-          find . -mindepth 1 -maxdepth 1 \
-            ! -name '.git' \
-            ! -name 'public' \
-            -exec rm -rf {} +
-
-          # publicディレクトリ内の成果物をルートにコピー
-          cp -r public/* .
-
-          # public自体を残したくない場合は、ここで削除
-          rm -rf public
-
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add .
-          git commit -m "Deploy to GitHub Pages"
-          git push --force origin gh-pages
+        uses: actions/deploy-pages@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
