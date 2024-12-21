@@ -1,28 +1,31 @@
+// src/app.js
+
 import {
   createDetector,
   SupportedModels
 } from '@tensorflow-models/hand-pose-detection';
-
-// WebGLバックエンドを使用 (必要に応じてCPUなど他のバックエンドを選択可)
 import '@tensorflow/tfjs-backend-webgl';
 
 let detector = null;
 let videoEl = null;
 let running = false;
 
-/**
+/** 
  * モデル読み込み
+ * ブラウザで WebGL が使える状況を想定 
  */
-async function loadModel() {
+export async function loadModel() {
   detector = await createDetector(SupportedModels.MediaPipeHands, {
     runtime: 'tfjs',
-    modelType: 'full' // 'lite' or 'full'
+    modelType: 'full'
   });
   console.log("MediaPipe Handsモデル読み込み完了");
+  return detector;
 }
 
-/**
- * カメラ開始
+/** 
+ * MVP: カメラ開始
+ * ブラウザ環境で navigator.mediaDevices がないと動作しない
  */
 async function startCamera() {
   try {
@@ -37,17 +40,15 @@ async function startCamera() {
   }
 }
 
-/**
- * 推定ループ
+/** 
+ * 推定ループ 
  */
 async function detectLoop() {
   if (!running || !detector) return;
-
   const hands = await detector.estimateHands(videoEl);
   const messageEl = document.getElementById('message');
 
   if (hands.length > 0) {
-    // hands[0].keypoints: 21点 (x, y, z, name)
     const keypoints = hands[0].keypoints;
     const info = keypoints.map(k => `${k.name}: (${k.x.toFixed(2)}, ${k.y.toFixed(2)})`);
     messageEl.textContent = `検出された手: ${info.join(", ")}`;
@@ -58,15 +59,18 @@ async function detectLoop() {
   requestAnimationFrame(detectLoop);
 }
 
-/**
- * 初期化
+/** 
+ * メイン初期化 
  */
 async function init() {
   videoEl = document.getElementById('video');
   const startBtn = document.getElementById('start-btn');
+  if (!videoEl || !startBtn) {
+    console.error("DOM要素が見つからない");
+    return;
+  }
 
-  // モデル読み込み
-  await loadModel();
+  await loadModel();  // カメラ開始前にモデルだけロード
 
   startBtn.addEventListener('click', async () => {
     if (!running) {
@@ -77,4 +81,7 @@ async function init() {
   });
 }
 
-init();
+// もし実際のブラウザならinit()呼び出し
+if (typeof window !== 'undefined') {
+  init();
+}

@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "description": "A web-based sign language learning platform that uses gamification to foster inclusive workplace communication.",
   "main": "src/app.js",
+  "type": "module",
   "scripts": {
     "build": "webpack",
     "start": "serve public -l 8080",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,8 @@
   "homepage": "https://github.com/t-9/silent-arcana#readme",
   "devDependencies": {
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "node-fetch": "^3.3.2",
     "serve": "^14.2.4",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1"
