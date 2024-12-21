@@ -3,9 +3,11 @@ name: CI
 # プルリク or mainブランチへのpushをトリガーにする
 on:
   pull_request:
-    branches: [ "main" ]
   push:
     branches: [ "main" ]
+
+permissions:
+  contents: write
 
 jobs:
   build-and-test:
