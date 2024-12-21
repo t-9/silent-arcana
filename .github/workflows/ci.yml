@@ -1,12 +1,15 @@
 name: CI
 
+# プルリク or mainブランチへのpushをトリガーにする
 on:
+  pull_request:
+    branches: [ "main" ]
   push:
     branches: [ "main" ]
-  pull_request:
 
 jobs:
   build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -23,17 +26,15 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Build for Production
+      - name: Build
         run: npm run build
-      
-      - name: Build Docker image (Optional)
-        # Dockerを利用する場合に実行
-        run: |
-          docker build -t silent-arcana .
 
   deploy:
+    name: Deploy to GitHub Pages
     needs: build-and-test
     runs-on: ubuntu-latest
+    # pull_requestではなく、mainブランチへpushされたときのみ実行
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -46,18 +47,29 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build for Production
+      - name: Build
         run: npm run build
 
       - name: Deploy to GitHub Pages
         run: |
+          # デプロイ作業用の一時フォルダを作る
+          mkdir temp_deploy
+          cp -r public/* temp_deploy/
+
+          # GitHub user設定
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          # gh-pagesブランチを作成
-          git checkout --orphan gh-pages
-          git rm -rf .
-          # publicディレクトリをコピー（bundle.js含む）
-          cp -r public/* .
+
+          # orphanブランチを作成または切り替え
+          git checkout --orphan gh-pages || true
+
+          # 既存ファイルを削除 (.gitフォルダ等は残る)
+          # find コマンドで .git は除外して削除
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+          # 一時フォルダからコピー
+          cp -r temp_deploy/* .
+
           git add .
           git commit -m "Deploy to GitHub Pages"
           git push --force origin gh-pages
