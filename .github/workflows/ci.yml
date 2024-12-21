@@ -44,6 +44,11 @@ jobs:
           name: coverage-report
           path: coverage
       
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          # Jest で作成された coverage 場所が coverage/
+          files: ./coverage/**/clover.xml
 
   # 2) mainブランチへのpush時にのみビルド＆Pagesデプロイを行うジョブ
   build_and_deploy:
