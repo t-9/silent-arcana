@@ -1,5 +1,7 @@
 # Silent Arcana
 
+[![codecov](https://codecov.io/github/t-9/silent-arcana/graph/badge.svg?token=MUEH7QLSJK)](https://codecov.io/github/t-9/silent-arcana)
+
 **Silent Arcana** は、手話学習をゲーム化することで、多様な人材が自然にコミュニケーションスキルを身につけられるWebプラットフォームです。  
 このプロジェクトは、ろう者・難聴者と健聴者が共に働く職場環境で、言語バリアを解消することを目指します。
 
