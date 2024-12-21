@@ -7,8 +7,7 @@ on:
     branches: [ "main" ]
 
 permissions:
-  # Pagesデプロイに必要な権限（push時のdeployで使う）
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -61,6 +60,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -69,6 +70,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Run Semantic Release
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
         run: npm run build
