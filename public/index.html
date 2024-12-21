@@ -2,16 +2,21 @@
 <html lang="ja">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Silent Arcana MVP</title>
+  <meta charset="UTF-8" />
+  <title>Silent Arcana - Hands MVP</title>
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
-  <h1>Silent Arcana (Webpack Bundled)</h1>
-  <p>このページはWebpackによりバンドルされたJSを読み込みます。</p>
+  <h1>Silent Arcana - Hand Tracking MVP</h1>
 
-  <!-- ここでbundle.jsを読み込む -->
+  <div class="container">
+    <video id="video" width="320" height="240" autoplay playsinline muted></video>
+    <button id="start-btn">カメラ開始</button>
+    <div id="message"></div>
+  </div>
+
+  <!-- バンドル後のJS -->
   <script src="./bundle.js"></script>
 </body>
 
