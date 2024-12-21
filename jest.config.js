@@ -1,6 +1,10 @@
 // jest.config.js
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 export default {
-  testEnvironment: 'jest-environment-jsdom',
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest'
+  },
+  testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
     "<rootDir>/jest.setup.js"
   ]
