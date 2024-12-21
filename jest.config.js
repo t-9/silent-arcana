@@ -8,12 +8,12 @@ export default {
   setupFilesAfterEnv: [
     "<rootDir>/jest.setup.js"
   ],
-  collectCoverage: false,
+  collectCoverage: true,
   collectCoverageFrom: [
     "src/**/*.{ts,js}",
     "!src/**/index.{ts,js}",        // 除外したいものがあれば
     "!src/test/**"                  // テストファイルは除外
   ],
   coverageDirectory: "coverage",
-  coverageReporters: ["text", "lcov"], // 画面表示＋lcovなど
+  coverageReporters: ["text", "lcov", "clover"]
 };
