@@ -6,17 +6,22 @@ import '@tensorflow/tfjs-backend-webgl';
 
 let detector = null;
 let videoEl = null;
+let loadingEl = null;
 let running = false;
 
-// 読み込み表示用の要素参照をキャッシュ
-let loadingEl = null;
+// テスト環境などで loadingEl が無い場合に備え、
+// メッセージ更新を安全に行う別関数を定義
+function setLoadingText(text) {
+  if (loadingEl) {
+    loadingEl.textContent = text;
+  }
+}
 
-/** 
+/**
  * モデル読み込み
  */
 export async function loadModel() {
-  // ローディング開始表示
-  loadingEl.textContent = 'モデル読み込み中...';
+  setLoadingText('モデル読み込み中...');
 
   detector = await createDetector(SupportedModels.MediaPipeHands, {
     runtime: 'tfjs',
@@ -24,34 +29,33 @@ export async function loadModel() {
   });
 
   console.log("MediaPipe Handsモデル読み込み完了");
-  // ローディング完了表示を消す
-  loadingEl.textContent = '';
+  setLoadingText(''); // 読み込み完了後、表示を消す
+
   return detector;
 }
 
-/** 
- * MVP: カメラ開始
+/**
+ * カメラ開始
  */
 async function startCamera() {
-  try {
-    loadingEl.textContent = 'カメラを起動しています...';
+  setLoadingText('カメラを起動しています...');
 
+  try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
     videoEl.srcObject = stream;
     await new Promise(resolve => {
       videoEl.onloadedmetadata = () => resolve();
     });
-
     console.log("カメラ開始");
-    loadingEl.textContent = ''; // カメラ起動完了表示を消す
+    setLoadingText('');
   } catch (err) {
-    loadingEl.textContent = 'カメラの起動に失敗しました';
     console.error("カメラ使用許可が必要です:", err);
+    setLoadingText('カメラの起動に失敗しました');
   }
 }
 
-/** 
- * 推定ループ 
+/**
+ * 推定ループ
  */
 async function detectLoop() {
   if (!running || !detector) return;
@@ -69,23 +73,23 @@ async function detectLoop() {
   requestAnimationFrame(detectLoop);
 }
 
-/** 
- * メイン初期化 
+/**
+ * メイン初期化
  */
 export async function init() {
   videoEl = document.getElementById('video');
   const startBtn = document.getElementById('start-btn');
-  loadingEl = document.getElementById('loading');
+  loadingEl = document.getElementById('loading'); // ローディング表示用要素
 
-  if (!videoEl || !startBtn || !loadingEl) {
+  if (!videoEl || !startBtn) {
     console.error("DOM要素が見つからない");
     return;
   }
 
-  // まずモデルを読み込み（画面に「モデル読み込み中...」表示）
+  // モデル読み込み
   await loadModel();
 
-  // startBtnのクリックでカメラ開始＆ループ開始
+  // カメラ開始ボタン
   startBtn.addEventListener('click', async () => {
     if (!running) {
       await startCamera();
@@ -95,7 +99,7 @@ export async function init() {
   });
 }
 
-// ブラウザ実行時のみ自動呼び出し
+// ブラウザ実行時のみinit()呼び出し
 if (typeof window !== 'undefined') {
   init();
 }
