@@ -9,7 +9,9 @@
     "start": "serve public -l 8080",
     "lint": "eslint 'src/**/*.{ts,js}'",
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
-    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage"
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'"
   },
   "repository": {
     "type": "git",
@@ -43,6 +45,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "jest-mock": "^29.7.0",
     "node-fetch": "^3.3.2",
+    "prettier": "^3.4.2",
     "semantic-release": "^24.2.0",
     "serve": "^14.2.4",
     "ts-jest": "^29.2.5",

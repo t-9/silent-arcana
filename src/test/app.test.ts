@@ -7,11 +7,13 @@ import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
 class MockHandDetector implements HandDetector {
   estimateHands(): Promise<Hand[]> {
     // Handインターフェースに合わせる
-    return Promise.resolve([{
-      keypoints: [{ name: 'thumb', x: 0.5, y: 0.5 }],
-      handedness: 'Left', // または 'Right'
-      score: 0.9 // 適当なスコアを設定
-    }]);
+    return Promise.resolve([
+      {
+        keypoints: [{ name: 'thumb', x: 0.5, y: 0.5 }],
+        handedness: 'Left', // または 'Right'
+        score: 0.9, // 適当なスコアを設定
+      },
+    ]);
   }
 
   dispose(): void {
@@ -39,8 +41,12 @@ interface MockMediaStreamTrack {
 class MockMediaStream {
   public active = false;
   public id = 'mock-id';
-  public onaddtrack: ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null = null;
-  public onremovetrack: ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null = null;
+  public onaddtrack:
+    | ((this: MediaStream, ev: MediaStreamTrackEvent) => void)
+    | null = null;
+  public onremovetrack:
+    | ((this: MediaStream, ev: MediaStreamTrackEvent) => void)
+    | null = null;
   private tracks: MockMediaStreamTrack[] = [];
 
   constructor(tracks: MockMediaStreamTrack[] = []) {
@@ -56,7 +62,7 @@ class MockMediaStream {
   }
 
   removeTrack(track: MockMediaStreamTrack): void {
-    this.tracks = this.tracks.filter(t => t !== track);
+    this.tracks = this.tracks.filter((t) => t !== track);
   }
 
   clone(): MockMediaStream {
@@ -64,39 +70,55 @@ class MockMediaStream {
   }
 
   getAudioTracks(): MockMediaStreamTrack[] {
-    return this.tracks.filter(track => track.kind === 'audio');
+    return this.tracks.filter((track) => track.kind === 'audio');
   }
 
   getTrackById(trackId: string): MockMediaStreamTrack | null {
-    return this.tracks.find(track => track.id === trackId) || null;
+    return this.tracks.find((track) => track.id === trackId) || null;
   }
 
   getVideoTracks(): MockMediaStreamTrack[] {
-    return this.tracks.filter(track => track.kind === 'video');
+    return this.tracks.filter((track) => track.kind === 'video');
   }
 
-  get addtrack(): ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null {
+  get addtrack():
+    | ((this: MediaStream, ev: MediaStreamTrackEvent) => void)
+    | null {
     return this.onaddtrack;
   }
 
-  set addtrack(listener: ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null) {
+  set addtrack(
+    listener: ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null,
+  ) {
     this.onaddtrack = listener;
   }
 
-  get removetrack(): ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null {
+  get removetrack():
+    | ((this: MediaStream, ev: MediaStreamTrackEvent) => void)
+    | null {
     return this.onremovetrack;
   }
 
-  set removetrack(listener: ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null) {
+  set removetrack(
+    listener: ((this: MediaStream, ev: MediaStreamTrackEvent) => void) | null,
+  ) {
     this.onremovetrack = listener;
   }
 
   // EventTargetのメソッドを追加
-  addEventListener(_type: string, _listener: EventListenerOrEventListenerObject, _options?: boolean | AddEventListenerOptions): void {
+  addEventListener(
+    _type: string,
+    _listener: EventListenerOrEventListenerObject,
+    _options?: boolean | AddEventListenerOptions,
+  ): void {
     // モック実装
   }
 
-  removeEventListener(_type: string, _listener: EventListenerOrEventListenerObject, _options?: boolean | EventListenerOptions): void {
+  removeEventListener(
+    _type: string,
+    _listener: EventListenerOrEventListenerObject,
+    _options?: boolean | EventListenerOptions,
+  ): void {
     // モック実装
   }
 
@@ -115,7 +137,7 @@ describe('app.ts', () => {
     mockVideoElement = {
       srcObject: null,
       onloadedmetadata: jest.fn(() => {
-        console.log("Mock onloadedmetadata fired");
+        console.log('Mock onloadedmetadata fired');
       }),
       play: jest.fn(),
       addEventListener: jest.fn(),
@@ -135,26 +157,32 @@ describe('app.ts', () => {
       Object.defineProperty(global.navigator, 'mediaDevices', {
         value: {},
         writable: true,
-        configurable: true
+        configurable: true,
       });
     }
 
     // getUserMedia をモックして、カメラストリームをシミュレート
-    global.navigator.mediaDevices.getUserMedia = jest.fn().mockImplementation(() => {
-      return Promise.resolve(new global.MediaStream());
-    });
+    global.navigator.mediaDevices.getUserMedia = jest
+      .fn()
+      .mockImplementation(() => {
+        return Promise.resolve(new global.MediaStream());
+      });
 
     // ここでvideoElが正しく設定されることを保証
     document.getElementById = jest.fn((id: string) => {
       switch (id) {
         case 'video':
           // videoElは使用しないのでコメントアウト
-          // videoEl = mockVideoElement; 
+          // videoEl = mockVideoElement;
           return mockVideoElement;
-        case 'loading': return mockLoadingElement;
-        case 'start-btn': return { addEventListener: jest.fn() } as unknown as HTMLElement;
-        case 'message': return { textContent: '' } as unknown as HTMLElement;
-        default: return null;
+        case 'loading':
+          return mockLoadingElement;
+        case 'start-btn':
+          return { addEventListener: jest.fn() } as unknown as HTMLElement;
+        case 'message':
+          return { textContent: '' } as unknown as HTMLElement;
+        default:
+          return null;
       }
     });
 
@@ -170,7 +198,7 @@ describe('app.ts', () => {
     // 元のcreateDetectorに戻す
     setCreateDetector(createHandDetector);
     // videoElは使用しないのでコメントアウト
-    // videoEl = null; 
+    // videoEl = null;
   });
 
   test('loadModel sets loading text and calls createHandDetector', async () => {
@@ -184,7 +212,10 @@ describe('app.ts', () => {
     // 現在 mockVideoElement に onloadedmetadata: jest.fn() が入っている
     // それを差し替えて、実際にイベントが呼ばれたか確かめる
     const originalOnloadedmetadata = mockVideoElement.onloadedmetadata;
-    mockVideoElement.onloadedmetadata = function (this: GlobalEventHandlers, _event: Event) {
+    mockVideoElement.onloadedmetadata = function (
+      this: GlobalEventHandlers,
+      _event: Event,
+    ) {
       if (originalOnloadedmetadata) {
         originalOnloadedmetadata.call(this, _event);
       }
@@ -202,6 +233,9 @@ describe('app.ts', () => {
 
     await init();
     expect(mockCreateDetector).toHaveBeenCalled();
-    expect(mockStartBtn.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
+    expect(mockStartBtn.addEventListener).toHaveBeenCalledWith(
+      'click',
+      expect.any(Function),
+    );
   });
 });

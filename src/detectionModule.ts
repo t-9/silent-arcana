@@ -11,7 +11,6 @@ const defaultConfig = {
   modelType: 'full' as const,
 };
 
-
 /**
  * 依存注入用の変数。初期値は本物の createDetector
  */
@@ -29,6 +28,9 @@ export function setCreateDetector(fn: typeof realCreateDetector) {
  * app.ts からはこれを呼ぶだけ
  */
 export async function createHandDetector(): Promise<HandDetector> {
-  const detector = await createDetector(SupportedModels.MediaPipeHands, defaultConfig);
+  const detector = await createDetector(
+    SupportedModels.MediaPipeHands,
+    defaultConfig,
+  );
   return detector;
 }
