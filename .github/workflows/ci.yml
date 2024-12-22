@@ -66,18 +66,8 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303
         with:
+          # Jest で作成された coverage 場所が coverage/
           files: ./coverage/**/clover.xml
-      
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v4
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.SONAR_ORG }}
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   # 2) mainブランチへのpush時にのみビルド＆Pagesデプロイを行うジョブ
   build_and_deploy:
