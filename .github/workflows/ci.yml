@@ -83,7 +83,7 @@ jobs:
 
       # Webpack等のビルド成果物がpublic/に出力される想定
       - name: Upload artifact for Pages
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: public
 
