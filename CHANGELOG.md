@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/t-9/silent-arcana/compare/v1.2.1...v1.2.2) (2024-12-22)
+
+
+### Bug Fixes
+
+* fetch depth を 0にする ([d516a86](https://github.com/t-9/silent-arcana/commit/d516a865f593099bc06e6a409d8c14ccf09b7d93))
+
 ## [1.2.1](https://github.com/t-9/silent-arcana/compare/v1.2.0...v1.2.1) (2024-12-22)
 
 
