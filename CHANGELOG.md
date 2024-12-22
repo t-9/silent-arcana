@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/t-9/silent-arcana/compare/v1.2.2...v1.2.3) (2024-12-22)
+
+
+### Bug Fixes
+
+* fix dockerfile security ([35ac04f](https://github.com/t-9/silent-arcana/commit/35ac04f8d7dd540002e1c623166cf02f30ac71d8))
+
 ## [1.2.2](https://github.com/t-9/silent-arcana/compare/v1.2.1...v1.2.2) (2024-12-22)
 
 
