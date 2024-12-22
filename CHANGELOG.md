@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/t-9/silent-arcana/compare/v1.2.5...v1.2.6) (2024-12-22)
+
+
+### Bug Fixes
+
+* fix issue [#29](https://github.com/t-9/silent-arcana/issues/29) SonarQube Issue: Exporting mutable 'let' binding, use 'const' instead. ([610ed6c](https://github.com/t-9/silent-arcana/commit/610ed6c02b2f143700133575b86a535ac1c74871))
+
 ## [1.2.5](https://github.com/t-9/silent-arcana/compare/v1.2.4...v1.2.5) (2024-12-22)
 
 
