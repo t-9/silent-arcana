@@ -71,7 +71,7 @@ jobs:
           files: ./coverage/**/clover.xml
       
       - name: SonarCloud Scan
-        uses: SonarSource/sonarqube-scan-action@v4.1.0
+        uses: SonarSource/sonarqube-scan-action@bfd4e558cda28cda6b5defafb9232d191be8c203
         with:
           projectBaseDir: .
           args: >
