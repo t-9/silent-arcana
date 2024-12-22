@@ -12,15 +12,22 @@ const defaultConfig = {
 };
 
 /**
- * 依存注入用の変数。初期値は本物の createDetector
+ * 依存注入用の内部変数。初期値は本物の createDetector
  */
-export let createDetector = realCreateDetector;
+let _createDetector = realCreateDetector;
+
+/**
+ * getter関数: 外部から現在の createDetector を取得する
+ */
+export function getCreateDetector(): typeof realCreateDetector {
+  return _createDetector;
+}
 
 /**
  * setter関数: テスト時などにモック版 createDetector を差し替える
  */
 export function setCreateDetector(fn: typeof realCreateDetector) {
-  createDetector = fn;
+  _createDetector = fn;
 }
 
 /**
@@ -28,7 +35,7 @@ export function setCreateDetector(fn: typeof realCreateDetector) {
  * app.ts からはこれを呼ぶだけ
  */
 export async function createHandDetector(): Promise<HandDetector> {
-  const detector = await createDetector(
+  const detector = await getCreateDetector()(
     SupportedModels.MediaPipeHands,
     defaultConfig,
   );
