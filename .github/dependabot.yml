@@ -4,8 +4,23 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # npm
+  - package-ecosystem: npm
+    directory: "/"
     schedule:
-      interval: "daily"
+      interval: weekly
+      time: "02:00"
+      day: "sunday"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "lodash"
+        versions: [">=4.17.21"]
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 3
