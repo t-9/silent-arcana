@@ -81,6 +81,83 @@ jobs:
             -Dsonar.coverage.exclusions=**/*.test.ts,**/jest.setup.js,**/webpack.config.js
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        
+      - name: Retrieve SonarQube Issues and Create GitHub Issues
+        run: |
+          curl -u ${{ secrets.SONAR_TOKEN }}: \
+              "https://sonarcloud.io/api/issues/search?componentKeys=${{ secrets.SONAR_PROJECT_KEY }}&types=BUG,VULNERABILITY,CODE_SMELL" \
+              -o sonar_issues.json
+
+          python <<EOF
+          import json
+          import requests
+          import os
+
+          GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+          REPO = "${{ github.repository }}"
+          SONAR_ISSUES_FILE = "sonar_issues.json"
+
+          def get_existing_open_issues():
+              """Fetch all open GitHub issues using pagination."""
+              issues = {}
+              page = 1
+              while True:
+                  url = f"https://api.github.com/repos/{REPO}/issues?state=open&per_page=100&page={page}"
+                  headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+                  response = requests.get(url, headers=headers)
+                  response.raise_for_status()
+                  data = response.json()
+                  if not data:
+                      break
+                  for issue in data:
+                      issues[issue["title"]] = issue
+                  page += 1
+              return issues
+
+          def create_github_issue(title, body):
+              """Create a new GitHub issue."""
+              url = f"https://api.github.com/repos/{REPO}/issues"
+              headers = {
+                  "Authorization": f"token {GITHUB_TOKEN}",
+                  "Accept": "application/vnd.github.v3+json"
+              }
+              payload = {"title": title, "body": body, "labels": ["SonarQube"]}
+              response = requests.post(url, headers=headers, json=payload)
+              response.raise_for_status()
+
+          def main():
+              """Main script to sync SonarQube issues with GitHub."""
+              # Load SonarQube issues
+              with open(SONAR_ISSUES_FILE) as f:
+                  sonar_issues = json.load(f)["issues"]
+              
+              # Fetch all existing open GitHub issues
+              existing_issues = get_existing_open_issues()
+              
+              # Process and create new issues
+              for issue in sonar_issues:
+                  title = f"SonarQube Issue: {issue['message']}"
+                  if title in existing_issues:
+                      print(f"Skipping existing open issue: {title}")
+                      continue
+
+                  body = f"""
+                  **Details**
+                  - Severity: {issue['severity']}
+                  - Type: {issue['type']}
+                  - Rule: {issue['rule']}
+                  - Component: {issue['component']}
+                  
+                  [View in SonarCloud](https://sonarcloud.io/project/issues?id=${{ secrets.SONAR_PROJECT_KEY }}&open={issue['key']})
+                  """
+                  create_github_issue(title, body)
+
+          if __name__ == "__main__":
+              main()
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   # 2) mainブランチへのpush時にのみビルド＆Pagesデプロイを行うジョブ
   build_and_deploy:
