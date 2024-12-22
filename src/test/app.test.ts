@@ -1,5 +1,5 @@
 // src/test/app.test.ts
-import { loadModel, /* startCamera, */ init } from '../app'; // startCameraは使用しないのでコメントアウト
+import { loadModel, init } from '../app'; // startCameraは使用しないのでコメントアウト
 import { createHandDetector, setCreateDetector } from '../detectionModule';
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
 
@@ -172,8 +172,6 @@ describe('app.ts', () => {
     document.getElementById = jest.fn((id: string) => {
       switch (id) {
         case 'video':
-          // videoElは使用しないのでコメントアウト
-          // videoEl = mockVideoElement;
           return mockVideoElement;
         case 'loading':
           return mockLoadingElement;
@@ -197,8 +195,6 @@ describe('app.ts', () => {
     jest.clearAllMocks();
     // 元のcreateDetectorに戻す
     setCreateDetector(createHandDetector);
-    // videoElは使用しないのでコメントアウト
-    // videoEl = null;
   });
 
   test('loadModel sets loading text and calls createHandDetector', async () => {
@@ -207,7 +203,6 @@ describe('app.ts', () => {
     expect(mockCreateDetector).toHaveBeenCalled();
   });
 
-  // TODO: テストをちゃんと書く
   test('startCamera sets up video stream', () => {
     // 現在 mockVideoElement に onloadedmetadata: jest.fn() が入っている
     // それを差し替えて、実際にイベントが呼ばれたか確かめる
