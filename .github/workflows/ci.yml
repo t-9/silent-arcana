@@ -142,7 +142,11 @@ jobs:
                       continue
 
                   # Generate labels based on severity and type
-                  labels = [issue["severity"].capitalize(), issue["type"].replace("_", " ").capitalize()]
+                  labels = [
+                    issue["severity"].capitalize(),
+                    issue["type"].replace("_", " ").capitalize(),
+                    f"SonarQube-{issue['key']}"
+                  ]
 
                   body = f"""
                   **Details**
@@ -203,3 +207,79 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Close Resolved SonarQube Issues in GitHub
+        run: |
+          # 解決済みのSonarQube Issueを取得
+          curl -u ${{ secrets.SONAR_TOKEN }}: \
+              "https://sonarcloud.io/api/issues/search?componentKeys=${{ secrets.SONAR_PROJECT_KEY }}&statuses=RESOLVED,CLOSED&resolutions=FIXED" \
+              -o resolved_sonar_issues.json
+
+          python <<EOF
+          import json
+          import requests
+          import os
+
+          GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+          REPO = "${{ github.repository }}"
+          SONAR_ISSUES_FILE = "resolved_sonar_issues.json"
+
+          def get_open_github_issues():
+              """Fetch all open GitHub issues using pagination."""
+              issues = {}
+              page = 1
+              while True:
+                  url = f"https://api.github.com/repos/{REPO}/issues?state=open&per_page=100&page={page}"
+                  headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+                  response = requests.get(url, headers=headers)
+                  response.raise_for_status()
+                  data = response.json()
+                  if not data:
+                      break
+                  for issue in data:
+                      labels = [label["name"] for label in issue["labels"]]
+                      issues[issue["title"]] = {
+                          "number": issue["number"],
+                          "labels": labels,
+                      }
+                  page += 1
+              return issues
+
+          def close_github_issue(issue_number):
+              """Close an open GitHub issue."""
+              url = f"https://api.github.com/repos/{REPO}/issues/{issue_number}"
+              headers = {
+                  "Authorization": f"token {GITHUB_TOKEN}",
+                  "Accept": "application/vnd.github.v3+json"
+              }
+              payload = {"state": "closed"}
+              response = requests.patch(url, headers=headers, json=payload)
+              response.raise_for_status()
+
+          def main():
+              """Main script to close resolved SonarQube issues in GitHub."""
+              # Load resolved SonarQube issues
+              with open(SONAR_ISSUES_FILE) as f:
+                  resolved_sonar_issues = json.load(f)["issues"]
+
+              # Fetch all open GitHub issues
+              open_issues = get_open_github_issues()
+
+              # Close GitHub issues corresponding to resolved SonarQube issues
+              for issue in resolved_sonar_issues:
+                  # Use SonarQube Issue Key as a unique identifier
+                  title = f"SonarQube Issue: {issue['message']}"
+                  sonar_issue_key = issue["key"]
+
+                  for existing_title, data in open_issues.items():
+                      if f"SonarQube-{sonar_issue_key}" in data["labels"]:
+                          print(f"Closing GitHub issue for resolved SonarQube issue: {title}")
+                          close_github_issue(data["number"])
+                          break
+
+          if __name__ == "__main__":
+              main()
+          EOF
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
