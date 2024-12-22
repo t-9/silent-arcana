@@ -24,7 +24,7 @@ export async function loadModel(): Promise<HandDetector> {
   setLoadingText('モデル読み込み中...');
 
   detector = await createHandDetector();
-  console.log("MediaPipe Handsモデル読み込み完了");
+  console.log('MediaPipe Handsモデル読み込み完了');
 
   setLoadingText('');
   return detector;
@@ -37,24 +37,24 @@ export async function startCamera(): Promise<void> {
   setLoadingText('カメラを起動しています...');
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    console.log("Stream obtained:", stream); // デバッグログ
+    console.log('Stream obtained:', stream); // デバッグログ
     if (videoEl) {
-      console.log("Setting srcObject to videoEl", stream);
+      console.log('Setting srcObject to videoEl', stream);
       videoEl.srcObject = stream;
-      console.log("srcObject after setting:", videoEl.srcObject);
+      console.log('srcObject after setting:', videoEl.srcObject);
       await new Promise<void>((resolve) => {
         videoEl!.onloadedmetadata = () => {
-          console.log("onloadedmetadata event fired");
+          console.log('onloadedmetadata event fired');
           resolve();
         };
       });
     } else {
-      console.error("videoEl is null or undefined");
+      console.error('videoEl is null or undefined');
     }
-    console.log("カメラ開始");
+    console.log('カメラ開始');
     setLoadingText('');
   } catch (err) {
-    console.error("カメラ使用許可が必要です:", err);
+    console.error('カメラ使用許可が必要です:', err);
     setLoadingText('カメラの起動に失敗しました');
   }
 }
@@ -73,20 +73,22 @@ async function detectLoop(): Promise<void> {
   if (hands.length > 0) {
     // 最初の手の keypoints を文字列化
     const keypoints = hands[0].keypoints;
-    const info = keypoints.map(k => {
+    const info = keypoints.map((k) => {
       // name, x, y が undefinedの場合対策
       const nm = k.name ?? 'point';
       const xCoord = k.x?.toFixed(2) ?? '0.00';
       const yCoord = k.y?.toFixed(2) ?? '0.00';
       return `${nm}: (${xCoord}, ${yCoord})`;
     });
-    messageEl.textContent = `検出された手: ${info.join(", ")}`;
+    messageEl.textContent = `検出された手: ${info.join(', ')}`;
   } else {
-    messageEl.textContent = "手が検出されていません";
+    messageEl.textContent = '手が検出されていません';
   }
 
   // ループ継続
-  requestAnimationFrame(() => { detectLoop(); });
+  requestAnimationFrame(() => {
+    detectLoop();
+  });
 }
 
 /**
@@ -98,7 +100,7 @@ export async function init(): Promise<void> {
   loadingEl = document.getElementById('loading');
 
   if (!videoEl || !startBtn) {
-    console.error("DOM要素が見つからない");
+    console.error('DOM要素が見つからない');
     return;
   }
 

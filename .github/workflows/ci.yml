@@ -30,6 +30,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Run Prettier check
+        id: prettier-check
+        run: npm run format:check
+        continue-on-error: true
+      
+      - name: Auto-fix formatting issues
+        if: failure() && steps.prettier-check.outcome == 'failure'
+        run: |
+          npm run format
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: auto-fix formatting issues with Prettier"
+          git push
+
       - name: Run tests
         run: npm test
 
