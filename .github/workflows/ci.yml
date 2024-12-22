@@ -84,8 +84,9 @@ jobs:
         
       - name: Retrieve SonarQube Issues and Create GitHub Issues
         run: |
+          # SonarQubeで status=OPEN の Issue を取得
           curl -u ${{ secrets.SONAR_TOKEN }}: \
-              "https://sonarcloud.io/api/issues/search?componentKeys=${{ secrets.SONAR_PROJECT_KEY }}&statuses=RESOLVED&resolutions=FIXED" \
+              "https://sonarcloud.io/api/issues/search?componentKeys=${{ secrets.SONAR_PROJECT_KEY }}&statuses=OPEN" \
               -o sonar_issues.json
 
           python <<EOF
@@ -140,8 +141,8 @@ jobs:
 
               # Process and create new issues
               for issue in sonar_issues:
-                  # Only process issues with status=RESOLVED and resolution=FIXED
-                  if issue.get("status") != "RESOLVED" or issue.get("resolution") != "FIXED":
+                  # Only process issues with status=OPEN
+                  if issue.get("status") != "OPEN":
                       continue
 
                   title = f"SonarQube Issue: {issue['message']}"
