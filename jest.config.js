@@ -10,9 +10,11 @@ export default {
   ],
   collectCoverage: true,
   collectCoverageFrom: [
-    "src/**/*.{ts,js}",
-    "!src/**/index.{ts,js}",        // 除外したいものがあれば
-    "!src/test/**"                  // テストファイルは除外
+    "src/**/*.{ts,js,tsx}",
+    '!src/**/*.test.ts',
+    '!src/**/*.spec.ts',
+    '!src/jest.setup.js',
+    '!webpack.config.js',
   ],
   coverageDirectory: "coverage",
   coverageReporters: ["text", "lcov", "clover"]
