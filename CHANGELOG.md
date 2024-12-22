@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/t-9/silent-arcana/compare/v1.2.8...v1.2.9) (2024-12-22)
+
+
+### Bug Fixes
+
+* [#36](https://github.com/t-9/silent-arcana/issues/36) Fix code scanning alert - Unpinned tag for a non-immutable Action in workflow ([23042e0](https://github.com/t-9/silent-arcana/commit/23042e0ccfbab5217367064df4c6405b75f80407))
+
 ## [1.2.8](https://github.com/t-9/silent-arcana/compare/v1.2.7...v1.2.8) (2024-12-22)
 
 
