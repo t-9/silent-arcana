@@ -1,3 +1,10 @@
+## [1.2.7](https://github.com/t-9/silent-arcana/compare/v1.2.6...v1.2.7) (2024-12-22)
+
+
+### Bug Fixes
+
+* sonarqube issue auto close ([e3bc2ce](https://github.com/t-9/silent-arcana/commit/e3bc2ce531a140880b6e205cd256e683dfd7552b))
+
 ## [1.2.6](https://github.com/t-9/silent-arcana/compare/v1.2.5...v1.2.6) (2024-12-22)
 
 
