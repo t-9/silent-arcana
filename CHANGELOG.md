@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/t-9/silent-arcana/compare/v1.2.4...v1.2.5) (2024-12-22)
+
+
+### Bug Fixes
+
+* issueをラベル付けする ([14d7520](https://github.com/t-9/silent-arcana/commit/14d7520e7ff736e82651f6f2044b6a25506451b3))
+
 ## [1.2.4](https://github.com/t-9/silent-arcana/compare/v1.2.3...v1.2.4) (2024-12-22)
 
 
