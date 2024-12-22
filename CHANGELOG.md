@@ -1,3 +1,11 @@
+## [1.2.8](https://github.com/t-9/silent-arcana/compare/v1.2.7...v1.2.8) (2024-12-22)
+
+
+### Bug Fixes
+
+* closedのissueが登録されないようにする ([80f493f](https://github.com/t-9/silent-arcana/commit/80f493ffc9b43af39f10217893b0283fa3c06b49))
+* status openのもののみissueに登録するようにする ([0f4721b](https://github.com/t-9/silent-arcana/commit/0f4721b0adbf4854e2f4ad7d2c4f19b78bf15620))
+
 ## [1.2.7](https://github.com/t-9/silent-arcana/compare/v1.2.6...v1.2.7) (2024-12-22)
 
 
