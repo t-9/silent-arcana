@@ -1,3 +1,11 @@
+## [1.2.1](https://github.com/t-9/silent-arcana/compare/v1.2.0...v1.2.1) (2024-12-22)
+
+
+### Bug Fixes
+
+* settings coverage exclusions ([4d559ae](https://github.com/t-9/silent-arcana/commit/4d559ae729cff23ab685337b3ffe2632977638bf))
+* update ci ([e64be90](https://github.com/t-9/silent-arcana/commit/e64be906f9fd2912bbf40980f5ae7f67d4e3f2d1))
+
 # [1.2.0](https://github.com/t-9/silent-arcana/compare/v1.1.0...v1.2.0) (2024-12-22)
 
 
