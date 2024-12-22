@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/t-9/silent-arcana/compare/v1.0.2...v1.1.0) (2024-12-22)
+
+
+### Features
+
+* add prettier ([cd7efa9](https://github.com/t-9/silent-arcana/commit/cd7efa9d24f369d32e6a0afe06aba81d7000d9ad))
+
 ## [1.0.2](https://github.com/t-9/silent-arcana/compare/v1.0.1...v1.0.2) (2024-12-22)
 
 
