@@ -85,7 +85,7 @@ jobs:
       - name: Retrieve SonarQube Issues and Create GitHub Issues
         run: |
           curl -u ${{ secrets.SONAR_TOKEN }}: \
-              "https://sonarcloud.io/api/issues/search?componentKeys=${{ secrets.SONAR_PROJECT_KEY }}&types=BUG,VULNERABILITY,CODE_SMELL" \
+              "https://sonarcloud.io/api/issues/search?componentKeys=${{ secrets.SONAR_PROJECT_KEY }}&statuses=RESOLVED&resolutions=FIXED" \
               -o sonar_issues.json
 
           python <<EOF
@@ -110,7 +110,11 @@ jobs:
                   if not data:
                       break
                   for issue in data:
-                      issues[issue["title"]] = issue
+                      labels = [label["name"] for label in issue["labels"]]
+                      issues[issue["title"]] = {
+                          "number": issue["number"],
+                          "labels": labels,
+                      }
                   page += 1
               return issues
 
@@ -130,22 +134,29 @@ jobs:
               # Load SonarQube issues
               with open(SONAR_ISSUES_FILE) as f:
                   sonar_issues = json.load(f)["issues"]
-              
+
               # Fetch all existing open GitHub issues
-              existing_issues = get_existing_open_issues()
-              
+              open_issues = get_existing_open_issues()
+
               # Process and create new issues
               for issue in sonar_issues:
+                  # Only process issues with status=RESOLVED and resolution=FIXED
+                  if issue.get("status") != "RESOLVED" or issue.get("resolution") != "FIXED":
+                      continue
+
                   title = f"SonarQube Issue: {issue['message']}"
-                  if title in existing_issues:
+                  sonar_issue_key = issue["key"]
+
+                  # Skip if the issue is already registered
+                  if title in open_issues:
                       print(f"Skipping existing open issue: {title}")
                       continue
 
-                  # Generate labels based on severity and type
+                  # Generate labels based on severity, type, and unique identifier
                   labels = [
-                    issue["severity"].capitalize(),
-                    issue["type"].replace("_", " ").capitalize(),
-                    f"SonarQube-{issue['key']}"
+                      issue["severity"].capitalize(),
+                      issue["type"].replace("_", " ").capitalize(),
+                      f"SonarQube-{sonar_issue_key}",
                   ]
 
                   body = f"""
