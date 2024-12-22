@@ -14,9 +14,6 @@ updates:
       time: "02:00"
       day: "sunday"
     open-pull-requests-limit: 5
-    ignore:
-      - dependency-name: "lodash"
-        versions: [">=4.17.21"]
 
   # GitHub Actions
   - package-ecosystem: github-actions
