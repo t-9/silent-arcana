@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/t-9/silent-arcana/compare/v1.1.0...v1.2.0) (2024-12-22)
+
+
+### Bug Fixes
+
+* add npm audit ([46ee7b1](https://github.com/t-9/silent-arcana/commit/46ee7b19b9341df27a0986fa28f5c3e165a320f5))
+* update sonarqube uses ([fc5209f](https://github.com/t-9/silent-arcana/commit/fc5209faa3e2d9c008c672bffb9b7a588b396d5d))
+
+
+### Features
+
+* add SonarCloud Scan ([6fb6a70](https://github.com/t-9/silent-arcana/commit/6fb6a70cc0a5c9af17394042771a8ada76350a22))
+
 # [1.1.0](https://github.com/t-9/silent-arcana/compare/v1.0.2...v1.1.0) (2024-12-22)
 
 
