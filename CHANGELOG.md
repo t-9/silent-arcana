@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/t-9/silent-arcana/compare/v1.2.3...v1.2.4) (2024-12-22)
+
+
+### Bug Fixes
+
+* Retrieve SonarQube Issues and Create GitHub Issues ([089a740](https://github.com/t-9/silent-arcana/commit/089a74021aba301a5dd3fdbba91201ef91fc3c6a))
+
 ## [1.2.3](https://github.com/t-9/silent-arcana/compare/v1.2.2...v1.2.3) (2024-12-22)
 
 
