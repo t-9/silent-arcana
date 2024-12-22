@@ -46,7 +46,7 @@ jobs:
           path: coverage
       
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@1e68e06f1dbfde0e4cefc87efeba9e4643565303
         with:
           # Jest で作成された coverage 場所が coverage/
           files: ./coverage/**/clover.xml
