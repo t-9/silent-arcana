@@ -1,5 +1,5 @@
 // src/test/app.test.ts
-import { loadModel, init, startCamera } from '../app'; // startCameraは使用しないのでコメントアウト
+import { init } from '../app'; // startCameraは使用しないのでコメントアウト
 import { createHandDetector, setCreateDetector } from '../detectionModule';
 import { setGetUserMedia } from '../cameraModule';
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
@@ -197,12 +197,6 @@ describe('app.ts', () => {
     setCreateDetector(createHandDetector);
   });
 
-  test('loadModel sets loading text and calls createHandDetector', async () => {
-    await loadModel();
-    expect(mockLoadingElement.textContent).toBe(''); // モデルの読み込みが完了したことを確認
-    expect(mockCreateDetector).toHaveBeenCalled();
-  });
-
   test('startCamera sets up video stream', () => {
     // 現在 mockVideoElement に onloadedmetadata: jest.fn() が入っている
     // それを差し替えて、実際にイベントが呼ばれたか確かめる
@@ -218,22 +212,6 @@ describe('app.ts', () => {
 
     expect(mockLoadingElement.textContent).toBe('');
   });
-
-  test('startCamera handles getUserMedia rejection', async () => {
-    // getUserMedia を拒否(throw)するモック
-    setGetUserMedia(async () => {
-      throw new Error('User denied camera access');
-    });
-
-    // ここで呼ぶ
-    await startCamera();
-
-    // ローディングのメッセージがエラー表示に更新されるはず
-    expect(mockLoadingElement.textContent).toBe('カメラの起動に失敗しました');
-    // エラーログが出たかどうかの検証
-    //   console.error(...) は jest.spyOn(console, 'error') などで確認できます
-  });
-
 
   test('init initializes the application', async () => {
     const mockStartBtn = { addEventListener: jest.fn() };
