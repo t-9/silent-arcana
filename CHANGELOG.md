@@ -1,3 +1,14 @@
+## [1.2.10](https://github.com/t-9/silent-arcana/compare/v1.2.9...v1.2.10) (2024-12-24)
+
+
+### Bug Fixes
+
+* add dockerfile ([1eb3ad7](https://github.com/t-9/silent-arcana/commit/1eb3ad796e42574a7e77b1ebaa44680ad3eba08c))
+* Make sure no write permissions are assigned to the copied resource. ([638b233](https://github.com/t-9/silent-arcana/commit/638b2336c6373503b6b2d661d5085ddcbc0163ad))
+* Make sure no write permissions are assigned to the copied resource. ([05e3890](https://github.com/t-9/silent-arcana/commit/05e3890c961eb8b9bdd1e5424ab6a0f32a2654ee))
+* update Dockerfile ([4b55405](https://github.com/t-9/silent-arcana/commit/4b55405ca79e6a8771da2aeadeb16b79443876e1))
+* update Dockerfile ([1924dca](https://github.com/t-9/silent-arcana/commit/1924dcaae178890c16d6f33b97864223390a4f7d))
+
 ## [1.2.9](https://github.com/t-9/silent-arcana/compare/v1.2.8...v1.2.9) (2024-12-22)
 
 
