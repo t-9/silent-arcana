@@ -1,3 +1,10 @@
+## [1.2.14](https://github.com/t-9/silent-arcana/compare/v1.2.13...v1.2.14) (2024-12-24)
+
+
+### Bug Fixes
+
+* This assertion is unnecessary since it does not change the type of the expression. ([0901a65](https://github.com/t-9/silent-arcana/commit/0901a650d86ae4a40f4eb69fa80c1f3220517e25))
+
 ## [1.2.13](https://github.com/t-9/silent-arcana/compare/v1.2.12...v1.2.13) (2024-12-24)
 
 
