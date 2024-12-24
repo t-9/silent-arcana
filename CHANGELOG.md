@@ -1,3 +1,10 @@
+## [1.2.12](https://github.com/t-9/silent-arcana/compare/v1.2.11...v1.2.12) (2024-12-24)
+
+
+### Bug Fixes
+
+* add tests ([f6697ad](https://github.com/t-9/silent-arcana/commit/f6697adfb3cad9e552f8256df7681c79dabd2a78))
+
 ## [1.2.11](https://github.com/t-9/silent-arcana/compare/v1.2.10...v1.2.11) (2024-12-24)
 
 
