@@ -22,7 +22,7 @@ RUN chown -R nginx:nginx /var/run /var/cache/nginx /var/log/nginx \
   && chmod -R 770 /var/run /var/cache/nginx /var/log/nginx
 
 # 4) ビルド成果物コピー
-COPY --chown=nginx:nginx --chmod=755 --from=builder /app/public /usr/share/nginx/html
+COPY --chown=root:root --chmod=555 --from=builder /app/public /usr/share/nginx/html
 
 # (オプション) pidファイルを /tmp に出す場合
 RUN sed -i 's@pid\s*/var/run/nginx.pid;@pid /tmp/nginx.pid;@' /etc/nginx/nginx.conf
