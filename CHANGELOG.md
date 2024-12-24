@@ -1,3 +1,10 @@
+## [1.2.11](https://github.com/t-9/silent-arcana/compare/v1.2.10...v1.2.11) (2024-12-24)
+
+
+### Bug Fixes
+
+* update Dockerfile ([8508a1d](https://github.com/t-9/silent-arcana/commit/8508a1dc7403df2477282c9b39a942d884820d25))
+
 ## [1.2.10](https://github.com/t-9/silent-arcana/compare/v1.2.9...v1.2.10) (2024-12-24)
 
 
