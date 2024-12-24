@@ -1,3 +1,11 @@
+## [1.2.13](https://github.com/t-9/silent-arcana/compare/v1.2.12...v1.2.13) (2024-12-24)
+
+
+### Bug Fixes
+
+* lint対応 ([db4321b](https://github.com/t-9/silent-arcana/commit/db4321b4fdb134c2f79c0c475c4bfd72eaf28550))
+* ファイル分割 ([d818d72](https://github.com/t-9/silent-arcana/commit/d818d7286976c5b563d3bff5453e5543a4b470a0))
+
 ## [1.2.12](https://github.com/t-9/silent-arcana/compare/v1.2.11...v1.2.12) (2024-12-24)
 
 
