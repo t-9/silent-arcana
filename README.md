@@ -33,7 +33,7 @@ npm start
 
 1. Dockerイメージのビルド:
 ``` bash
-docker build -t silent-arcana .
+DOCKER_BUILDKIT=1 docker build -t silent-arcana .
 ```
 
 Dockerfileに基づいてコンテナイメージが作成されます。
