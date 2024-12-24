@@ -1,9 +1,12 @@
 # ========== Build stage ==========
 FROM node:22-alpine AS builder
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
+COPY ./package-lock.json ./
+COPY ./package.json ./
+RUN npm install --ignore-scripts
+COPY ./public ./public
+COPY ./src ./src
+COPY ./tsconfig.json ./
 RUN npm run build  # => /app/public に成果物
 
 # ========== Production stage (nginx) ==========
