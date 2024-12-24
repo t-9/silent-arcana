@@ -3,6 +3,7 @@ import { loadModel, init, startCamera } from '../app'; // startCameraは使用�
 import { createHandDetector, setCreateDetector } from '../detectionModule';
 import { setGetUserMedia } from '../cameraModule';
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
+import { jest } from "@jest/globals";
 
 // モックのHandDetector
 class MockHandDetector implements HandDetector {
