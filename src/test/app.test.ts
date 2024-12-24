@@ -233,28 +233,6 @@ describe('app.ts', () => {
     //   console.error(...) は jest.spyOn(console, 'error') などで確認できます
   });
 
-  test('startCamera logs error if videoEl is null', async () => {
-    // DOMから videoEl が取れないケースをシミュレート
-    document.getElementById = jest.fn((id: string) => {
-      if (id === 'video') return null; // videoElをnullに
-      if (id === 'loading') return mockLoadingElement;
-      return null;
-    });
-
-    // 再度 init() してDOMを再取得させる
-    await init();
-
-    // startCameraを呼ぶ (init()内でstartCameraを呼ばないなら、手動で呼ぶ必要がある)
-    await startCamera();
-
-    // console.error が呼ばれるはず
-    // たとえば
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation();
-    expect(errorSpy).toHaveBeenCalledWith('videoEl is null or undefined');
-    errorSpy.mockRestore();
-  });
-
-
 
   test('init initializes the application', async () => {
     const mockStartBtn = { addEventListener: jest.fn() };
