@@ -2,6 +2,7 @@
 import '@tensorflow/tfjs-backend-webgl';
 import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 import { createHandDetector } from './detectionModule';
+import { getGetUserMedia } from './cameraModule';
 
 let videoEl: HTMLVideoElement | null = null;
 let loadingEl: HTMLElement | null = null;
@@ -36,7 +37,7 @@ export async function loadModel(): Promise<HandDetector> {
 export async function startCamera(): Promise<void> {
   setLoadingText('カメラを起動しています...');
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    const stream = await getGetUserMedia()({ video: true });
     console.log('Stream obtained:', stream); // デバッグログ
     if (videoEl) {
       console.log('Setting srcObject to videoEl', stream);

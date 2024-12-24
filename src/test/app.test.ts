@@ -1,6 +1,7 @@
 // src/test/app.test.ts
-import { loadModel, init } from '../app'; // startCameraは使用しないのでコメントアウト
+import { loadModel, init, startCamera } from '../app'; // startCameraは使用しないのでコメントアウト
 import { createHandDetector, setCreateDetector } from '../detectionModule';
+import { setGetUserMedia } from '../cameraModule';
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
 
 // モックのHandDetector
@@ -161,13 +162,6 @@ describe('app.ts', () => {
       });
     }
 
-    // getUserMedia をモックして、カメラストリームをシミュレート
-    global.navigator.mediaDevices.getUserMedia = jest
-      .fn()
-      .mockImplementation(() => {
-        return Promise.resolve(new global.MediaStream());
-      });
-
     // ここでvideoElが正しく設定されることを保証
     document.getElementById = jest.fn((id: string) => {
       switch (id) {
@@ -184,11 +178,16 @@ describe('app.ts', () => {
       }
     });
 
-    // モックのcreateDetectorをセット
+    setGetUserMedia(async () => {
+      // 実際のストリームを返す必要がなければ空のオブジェクトでもOK
+      return new MockMediaStream() as unknown as MediaStream;
+    });
+
+    // モックの createDetector をセット
     setCreateDetector(mockCreateDetector);
 
-    // init関数を実行して、videoElを初期化
-    init(); // この行を追加
+    // init関数を実行して、videoEl を初期化
+    init();
   });
 
   afterEach(() => {
@@ -218,6 +217,44 @@ describe('app.ts', () => {
 
     expect(mockLoadingElement.textContent).toBe('');
   });
+
+  test('startCamera handles getUserMedia rejection', async () => {
+    // getUserMedia を拒否(throw)するモック
+    setGetUserMedia(async () => {
+      throw new Error('User denied camera access');
+    });
+
+    // ここで呼ぶ
+    await startCamera();
+
+    // ローディングのメッセージがエラー表示に更新されるはず
+    expect(mockLoadingElement.textContent).toBe('カメラの起動に失敗しました');
+    // エラーログが出たかどうかの検証
+    //   console.error(...) は jest.spyOn(console, 'error') などで確認できます
+  });
+
+  test('startCamera logs error if videoEl is null', async () => {
+    // DOMから videoEl が取れないケースをシミュレート
+    document.getElementById = jest.fn((id: string) => {
+      if (id === 'video') return null; // videoElをnullに
+      if (id === 'loading') return mockLoadingElement;
+      return null;
+    });
+
+    // 再度 init() してDOMを再取得させる
+    await init();
+
+    // startCameraを呼ぶ (init()内でstartCameraを呼ばないなら、手動で呼ぶ必要がある)
+    await startCamera();
+
+    // console.error が呼ばれるはず
+    // たとえば
+    const errorSpy = jest.spyOn(console, 'error').mockImplementation();
+    expect(errorSpy).toHaveBeenCalledWith('videoEl is null or undefined');
+    errorSpy.mockRestore();
+  });
+
+
 
   test('init initializes the application', async () => {
     const mockStartBtn = { addEventListener: jest.fn() };
