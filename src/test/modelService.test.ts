@@ -1,22 +1,6 @@
 // src/test/modelService.test.ts
-import { loadModel, startDetection, detectLoop } from '../modelService';
-import { jest } from '@jest/globals';
-import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
+import { startDetection } from '../modelService';
 
-// モックの HandDetector
-class MockHandDetector implements HandDetector {
-  estimateHands(): Promise<Hand[]> {
-    return Promise.resolve([
-      {
-        keypoints: [{ name: 'thumb', x: 0.5, y: 0.5 }],
-        handedness: 'Left',
-        score: 0.9,
-      },
-    ]);
-  }
-  dispose(): void { }
-  reset(): void { }
-}
 
 describe('modelService', () => {
   it('startDetection sets running = true (implicit)', () => {

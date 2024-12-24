@@ -53,9 +53,22 @@ describe('cameraService', () => {
 
     typedMock.mockRejectedValue(new Error('User denied camera access'));
 
-    (global.navigator as any).mediaDevices = {
-      getUserMedia: typedMock,
-    };
+    if (!navigator.mediaDevices) {
+      // definePropertyでプロパティを新規作成
+      Object.defineProperty(navigator, 'mediaDevices', {
+        value: {},
+        writable: true,
+        configurable: true,
+      });
+    }
+
+    // 5) 既存の mediaDevices を上書き可能にして、getUserMedia を差し替え
+    Object.defineProperty(navigator.mediaDevices as MediaDevices, 'getUserMedia', {
+      value: mockGetUserMedia,
+      writable: true,
+      configurable: true,
+    });
+
 
     await startCamera(mockVideoEl, mockSetLoading);
 
