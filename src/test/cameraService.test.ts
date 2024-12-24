@@ -63,7 +63,7 @@ describe('cameraService', () => {
     }
 
     // 5) 既存の mediaDevices を上書き可能にして、getUserMedia を差し替え
-    Object.defineProperty(navigator.mediaDevices as MediaDevices, 'getUserMedia', {
+    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
       value: mockGetUserMedia,
       writable: true,
       configurable: true,
