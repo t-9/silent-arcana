@@ -54,9 +54,6 @@ export async function detectLoop(
   // 手の推定
   const hands = await detector.estimateHands(videoEl);
 
-  // 既存ロジック: keypointsをメッセージに表示
-  // messageEl.textContent = handsToMessage(hands);
-
   // ここに手話判定を追加
   if (hands && hands.length > 0) {
     // 手はひとまず1つだけ処理
