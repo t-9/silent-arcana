@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/t-9/silent-arcana/compare/v1.4.2...v1.4.3) (2024-12-25)
+
+
+### Bug Fixes
+
+* prettier write ([f8faf35](https://github.com/t-9/silent-arcana/commit/f8faf355016afeadf03a5a59c70341ef3a5f9273))
+
 ## [1.4.2](https://github.com/t-9/silent-arcana/compare/v1.4.1...v1.4.2) (2024-12-25)
 
 
