@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/t-9/silent-arcana/compare/v1.2.17...v1.3.0) (2024-12-25)
+
+
+### Features
+
+* 手話認識追加 ([046d4f0](https://github.com/t-9/silent-arcana/commit/046d4f03bf1ea3e8ea334892fd58d28d0801d8dc))
+
 ## [1.2.17](https://github.com/t-9/silent-arcana/compare/v1.2.16...v1.2.17) (2024-12-25)
 
 
