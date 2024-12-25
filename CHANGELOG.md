@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/t-9/silent-arcana/compare/v1.4.4...v1.4.5) (2024-12-25)
+
+
+### Bug Fixes
+
+* Dockerfile to reduce vulnerabilities ([f36d8b0](https://github.com/t-9/silent-arcana/commit/f36d8b0acba49630164ce734b6cdbdfca1a53567))
+
 ## [1.4.4](https://github.com/t-9/silent-arcana/compare/v1.4.3...v1.4.4) (2024-12-25)
 
 
