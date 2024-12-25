@@ -76,6 +76,16 @@ docker run -it --rm silent-arcana npm test
 - **GitHub Actions**: プルリク・push時に自動テスト (npm test)、ビルド (npm run build) を実施
 - **Pagesデプロイ**: メインブランチへのpush後、public/配下をgh-pagesブランチへ自動反映し、GitHub Pagesで公開
 
+## ツール
+
+### list_src_files.py
+
+srcの中身をクリップボードにコピー
+
+```bash
+cd utils && python3 ./list_src_files.py && cd ..
+```
+
 ## コントリビューション
 IssueやPull Requestでの改善提案やバグ報告を歓迎します。
 
