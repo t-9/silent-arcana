@@ -1,3 +1,11 @@
+## [1.4.2](https://github.com/t-9/silent-arcana/compare/v1.4.1...v1.4.2) (2024-12-25)
+
+
+### Bug Fixes
+
+* $54 SonarQube Issue: Function 'setupStartButton' has too many parameters (8). Maximum allowed is 7. ([12638b8](https://github.com/t-9/silent-arcana/commit/12638b8cb7d4546e90063c7bbb8ae543edd91fad))
+* src/eventHandlers.ts:24:14 - error TS7015: Element implicitly has an 'any' type because index expression is not of type 'number'. ([a8b0aae](https://github.com/t-9/silent-arcana/commit/a8b0aae1ac435e1a6ac43beb5ba9645edb32dabd))
+
 ## [1.4.1](https://github.com/t-9/silent-arcana/compare/v1.4.0...v1.4.1) (2024-12-25)
 
 
