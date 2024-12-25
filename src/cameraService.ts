@@ -1,7 +1,10 @@
 // src/cameraService.ts
 import { getGetUserMedia } from './cameraModule';
 
-export async function startCamera(videoEl: HTMLVideoElement, setLoading: (text: string) => void) {
+export async function startCamera(
+  videoEl: HTMLVideoElement,
+  setLoading: (text: string) => void,
+) {
   setLoading('カメラを起動しています...');
   try {
     const stream = await getGetUserMedia()({ video: true });
@@ -12,10 +15,13 @@ export async function startCamera(videoEl: HTMLVideoElement, setLoading: (text: 
       videoEl.onloadedmetadata = () => {
         console.log('onloadedmetadata event fired');
         // 再生開始
-        videoEl.play().then(() => {
-          console.log('video started playing');
-          resolve();
-        }).catch(reject);
+        videoEl
+          .play()
+          .then(() => {
+            console.log('video started playing');
+            resolve();
+          })
+          .catch(reject);
       };
     });
 

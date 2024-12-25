@@ -33,7 +33,7 @@ export async function init(): Promise<void> {
     setLoadingText: (text: string) => setLoadingText(loadingEl, text),
     startCameraFn: startCamera,
     startDetectionFn: startDetection,
-    detectLoopFn: detectLoop
+    detectLoopFn: detectLoop,
   });
 
   setupCaptureButton(captureBtn, videoEl);

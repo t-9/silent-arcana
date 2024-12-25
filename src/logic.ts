@@ -26,7 +26,7 @@ export function handsToMessage(hands: Hand[]): string {
  */
 export async function detectHandsOnce(
   detector: HandDetector,
-  video: HTMLVideoElement
+  video: HTMLVideoElement,
 ): Promise<string> {
   const hands = await detector.estimateHands(video);
   if (!hands || hands.length === 0) {
@@ -74,7 +74,7 @@ const KEYPOINT_ORDER = [
  * かつ keypoint の順序 (KEYPOINT_ORDER) を揃えて返す
  */
 export function convertHandKeypointsToArray(
-  detectedKeypoints: { x: number; y: number; name?: string }[]
+  detectedKeypoints: { x: number; y: number; name?: string }[],
 ): number[][] {
   const result: number[][] = [];
 
@@ -97,7 +97,7 @@ export function convertHandKeypointsToArray(
  * さらに値を "ある程度" 正規化して小さくしたいなら、SCALE などで割る。
  */
 export function toRelativeLandmarks(
-  keypoints: Array<{ x: number; y: number; name?: string }>
+  keypoints: Array<{ x: number; y: number; name?: string }>,
 ): number[][] {
   // wristを探す
   const wrist = keypoints.find((pt) => pt.name === 'wrist');

@@ -13,7 +13,7 @@ type EstimateHandsFn = (
   input: HandDetectorInput,
   estimationConfig?:
     | MediaPipeHandsMediaPipeEstimationConfig
-    | MediaPipeHandsTfjsEstimationConfig
+    | MediaPipeHandsTfjsEstimationConfig,
 ) => Promise<Hand[]>;
 
 describe('handsToMessage', () => {

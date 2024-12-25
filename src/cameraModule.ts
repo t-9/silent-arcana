@@ -4,7 +4,9 @@
  * 依存注入用の getUserMedia 関数。
  * 本番では navigator.mediaDevices.getUserMedia を使うが、テスト時には差し替え可能。
  */
-let _getUserMedia = async (constraints: MediaStreamConstraints): Promise<MediaStream> => {
+let _getUserMedia = async (
+  constraints: MediaStreamConstraints,
+): Promise<MediaStream> => {
   return navigator.mediaDevices.getUserMedia(constraints);
 };
 

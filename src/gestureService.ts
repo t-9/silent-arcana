@@ -10,15 +10,15 @@ export interface Gesture {
 
 /**
  * JSONの "gestures" 配列だけ抜き出して返す関数
- * 
+ *
  * 環境によっては下記のような "fetch" を使った読み込みが必要です:
- * 
+ *
  *  export async function loadGestureData(url: string): Promise<Gesture[]> {
  *    const res = await fetch(url);
  *    const data = await res.json();
  *    return data.gestures;
  *  }
- * 
+ *
  * あるいは "import gestureData from '../templates/dummyGestures.json'"
  * で済む環境なら不要です。
  */
@@ -34,7 +34,7 @@ export async function loadGestureData(url: string): Promise<Gesture[]> {
  * 「(0, 0) 基準にシフト」する簡単な正規化サンプル
  */
 function normalizeKeypoints(
-  keypoints: { x: number; y: number }[]
+  keypoints: { x: number; y: number }[],
 ): [number, number][] {
   const points = keypoints.map((k) => [k.x ?? 0, k.y ?? 0]);
 
@@ -53,7 +53,7 @@ function normalizeKeypoints(
  */
 function calcDistance(
   ptsA: [number, number][],
-  ptsB: [number, number][]
+  ptsB: [number, number][],
 ): number {
   let sum = 0;
   for (let i = 0; i < ptsA.length; i++) {
@@ -67,14 +67,14 @@ function calcDistance(
 /**
  * 推定された手(21 keypoints) と、あらかじめ用意したジェスチャー一覧(複数)を比較し、
  * 最も近いジェスチャーの name を返す。
- * 
+ *
  * - distanceThreshold より小さい場合のみ「該当ジェスチャー」とみなす。
  * - それを超える場合は null を返す。
  */
 export function detectGesture(
   keypoints: { x: number; y: number }[],
   gestureList: Gesture[],
-  distanceThreshold = 1000
+  distanceThreshold = 1000,
 ): string | null {
   if (!keypoints || keypoints.length < 21) {
     return null;
@@ -89,7 +89,7 @@ export function detectGesture(
   for (const gesture of gestureList) {
     // gesture.landmarksも同じ正規化手順を踏むなら必要
     const gestureNorm = normalizeKeypoints(
-      gesture.landmarks.map(([x, y]) => ({ x, y }))
+      gesture.landmarks.map(([x, y]) => ({ x, y })),
     );
 
     const dist = calcDistance(normalized, gestureNorm);

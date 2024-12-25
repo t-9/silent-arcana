@@ -2,7 +2,9 @@ import { getGetUserMedia, setGetUserMedia } from '../cameraModule';
 // ここが重要 (TSバージョンやJestバージョンによっては @jest/globals ではなく 'jest' からの場合も)
 import { jest } from '@jest/globals';
 
-type GetUserMediaType = (constraints: MediaStreamConstraints) => Promise<MediaStream>;
+type GetUserMediaType = (
+  constraints: MediaStreamConstraints,
+) => Promise<MediaStream>;
 
 if (typeof global.navigator === 'undefined') {
   Object.defineProperty(global, 'navigator', {
@@ -18,7 +20,6 @@ if (typeof global.navigator.mediaDevices === 'undefined') {
     configurable: true,
   });
 }
-
 
 describe('cameraModule', () => {
   let originalGetUserMedia: typeof navigator.mediaDevices.getUserMedia;
@@ -40,7 +41,8 @@ describe('cameraModule', () => {
 
   test('デフォルト状態では本物の getUserMedia を呼ぶ', async () => {
     // モック関数を「(constraints) => Promise<MediaStream>」型として作る
-    const mockNativeGetUserMedia: jest.MockedFunction<GetUserMediaType> = jest.fn();
+    const mockNativeGetUserMedia: jest.MockedFunction<GetUserMediaType> =
+      jest.fn();
 
     // 返却するダミーの MediaStream
     const fakeStream = { id: 'fakeStream' } as MediaStream;
@@ -70,12 +72,16 @@ describe('cameraModule', () => {
     const getUserMediaFn = getGetUserMedia();
     const result = await getUserMediaFn({ video: false, audio: true });
 
-    expect(mockGetUserMedia).toHaveBeenCalledWith({ video: false, audio: true });
+    expect(mockGetUserMedia).toHaveBeenCalledWith({
+      video: false,
+      audio: true,
+    });
     expect(result).toBe(mockStream);
   });
 
   test('モックした getUserMedia がエラーを投げる場合', async () => {
-    const mockGetUserMediaError: jest.MockedFunction<GetUserMediaType> = jest.fn();
+    const mockGetUserMediaError: jest.MockedFunction<GetUserMediaType> =
+      jest.fn();
     // reject時は「Promise.reject」なので型的には OK
     mockGetUserMediaError.mockRejectedValue(new Error('Mock error'));
 
