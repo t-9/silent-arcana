@@ -39,19 +39,8 @@ export async function detectHandsOnce(
   // [ [x,y], [x,y], ... ] に変換
   const arr = convertHandKeypointsToArray(keypoints);
 
-  // dummyGestures.json とマッチするか
-  const gestureName = findGestureName(arr);
-
-  if (gestureName) {
-    return `「${gestureName}」が検出されました`;
-  } else {
-    return '該当する手話が見つかりません';
-  }
+  return `検出された手: ${JSON.stringify(arr)}`;
 }
-
-// 1) dummyGestures.json をimport (要: TS 4.7+ か、あるいはwebpack等でjson-loader設定)
-//   もし上手く読み込めない場合は fetch で読み込む方法にするなど適宜対応
-import dummyData from './templates/dummyGestures.json' assert { type: 'json' };
 
 // 2) dummyGestures.json の 21 keypoints 順序に対応したキー名一覧を定義
 //    MediaPipeHands が出す name と揃っていることが重要です
@@ -100,65 +89,6 @@ export function convertHandKeypointsToArray(
     }
   }
   return result;
-}
-
-/**
- * wrist(landmarks[0]) を原点にずらすなどして座標を小さく正規化する
- * （必要に応じてスケーリングなども行う）
- */
-function normalizeLandmarks(landmarks: number[][]): number[][] {
-  if (landmarks.length !== 21) return landmarks; // 21個なければそのまま
-  const [wristX, wristY] = landmarks[0];
-  return landmarks.map(([x, y]) => [x - wristX, y - wristY]);
-}
-
-/**
- * 距離の2乗和が一定以下なら同じジェスチャー、とする簡易的な判定
- * （実際はもっと賢い方法が必要かもしれません）
- */
-function calcDistanceSq(a: number[][], b: number[][]): number {
-  let sum = 0;
-  for (let i = 0; i < a.length; i++) {
-    const dx = a[i][0] - b[i][0];
-    const dy = a[i][1] - b[i][1];
-    sum += dx * dx + dy * dy;
-  }
-  return sum;
-}
-
-/**
- * キャプチャした手の landmarks(21個) と dummyGestures.json の各「name」との
- * 距離を計算して、閾値以下であれば「該当の手話名」を返す
- * 見つからなければ null
- */
-export function findGestureName(landmarks: number[][]): string | null {
-  // dummyGestures.json の "gestures" を参照
-  const gestures = dummyData.gestures; // [{ name, landmarks: number[][] }, ...]
-
-  // あらかじめ取得した landmarks を正規化
-  const normalized = normalizeLandmarks(landmarks);
-
-  let bestMatch = null;
-  let minDist = Infinity;
-
-  for (const g of gestures) {
-    // dummyGestures.jsonのほうも wrist を(0,0)としている想定であれば
-    // そのまま比較でOK。ただし念のため正規化が必要な場合は同様に計算
-    const distSq = calcDistanceSq(normalized, g.landmarks);
-    if (distSq < minDist) {
-      minDist = distSq;
-      bestMatch = g.name;
-    }
-  }
-
-  // 距離がある程度小さいならマッチと判断する
-  // 例えばしきい値を 0.05 など、適当な値にする (実際は座標スケール次第)
-  const THRESHOLD = 1000;
-  if (minDist < THRESHOLD) {
-    return bestMatch;
-  } else {
-    return null;
-  }
 }
 
 /**
