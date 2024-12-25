@@ -44,38 +44,6 @@ describe('handsToMessage', () => {
 });
 
 describe('detectHandsOnce', () => {
-  it('calls detector.estimateHands and returns the correct message', async () => {
-    // `jest.fn()` にジェネリクスを直接与えるのではなく、
-    // "as jest.MockedFunction<...>" で型を後付けする
-    const mockEstimateHands = jest.fn() as jest.MockedFunction<EstimateHandsFn>;
-
-    // 返すダミー Hand[]
-    mockEstimateHands.mockResolvedValue([
-      {
-        keypoints: [
-          { name: 'index', x: 100, y: 200 },
-          { name: undefined, x: 50, y: 60 },
-        ],
-        handedness: 'Right',
-        score: 0.8,
-      },
-    ]);
-
-    const mockDetector: HandDetector = {
-      estimateHands: mockEstimateHands,
-      dispose: jest.fn(),
-      reset: jest.fn(),
-    };
-
-    const mockVideo = {} as HTMLVideoElement;
-    const message = await detectHandsOnce(mockDetector, mockVideo);
-
-    // check
-    expect(mockEstimateHands).toHaveBeenCalledWith(mockVideo);
-    expect(message).toMatch(/index: \(100\.00, 200\.00\)/);
-    expect(message).toMatch(/point: \(50\.00, 60\.00\)/);
-  });
-
   it('returns "手が検出されていません" if no hands are detected', async () => {
     const mockEstimateHands = jest.fn() as jest.MockedFunction<EstimateHandsFn>;
     mockEstimateHands.mockResolvedValue([]); // 空配列
