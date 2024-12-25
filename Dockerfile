@@ -10,7 +10,7 @@ COPY ./tsconfig.json ./
 RUN npm run build  # => /app/public に成果物
 
 # ========== Production stage (nginx) ==========
-FROM nginx:stable-alpine
+FROM nginx:1.27.3-alpine3.20-slim
 
 # 1) user行コメントアウト (root前提の設定を無効化)
 # 2) listen 80 → listen 8080 (default.confが無い場合はスキップ or 別ファイル書き換え)
