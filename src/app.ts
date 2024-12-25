@@ -25,16 +25,16 @@ export async function init(): Promise<void> {
   await loadModel((text: string) => setLoadingText(loadingEl, text));
 
   // スタートボタンの設定
-  setupStartButton(
+  setupStartButton({
     startBtn,
-    captureBtn as HTMLButtonElement,
+    captureBtn: captureBtn as HTMLButtonElement,
     videoEl,
     messageEl,
-    (text: string) => setLoadingText(loadingEl, text),
-    startCamera,
-    startDetection,
-    detectLoop
-  );
+    setLoadingText: (text: string) => setLoadingText(loadingEl, text),
+    startCameraFn: startCamera,
+    startDetectionFn: startDetection,
+    detectLoopFn: detectLoop
+  });
 
   setupCaptureButton(captureBtn, videoEl);
 }
