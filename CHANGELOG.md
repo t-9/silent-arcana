@@ -1,3 +1,11 @@
+## [1.4.1](https://github.com/t-9/silent-arcana/compare/v1.4.0...v1.4.1) (2024-12-25)
+
+
+### Bug Fixes
+
+* [#51](https://github.com/t-9/silent-arcana/issues/51) SonarQube Issue: Remove this commented out code. ([45e57b4](https://github.com/t-9/silent-arcana/commit/45e57b4f1f60a986c6ca2f74ce812a9d45d13033))
+* skipLibCheckをtrueにする ([7262110](https://github.com/t-9/silent-arcana/commit/7262110981219ce7c4b39b70fb1ef9bdfd510c32))
+
 # [1.4.0](https://github.com/t-9/silent-arcana/compare/v1.3.0...v1.4.0) (2024-12-25)
 
 
