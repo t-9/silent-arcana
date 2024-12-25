@@ -10,6 +10,11 @@ let running = false;
 // ★ 追加: ロードしたジェスチャーデータを保持しておく
 let loadedGestures: Gesture[] = [];
 
+// Detectorを外から取得するためのゲッター
+export function getDetector(): HandDetector | null {
+  return detector;
+}
+
 /**
  * モデルの読み込みと、手話用ジェスチャーデータの読み込み
  */
