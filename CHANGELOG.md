@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/t-9/silent-arcana/compare/v1.3.0...v1.4.0) (2024-12-25)
+
+
+### Bug Fixes
+
+* 不要処理、ファイル削除 ([e149617](https://github.com/t-9/silent-arcana/commit/e149617082ad96b271981de5dc776563bbd078e1))
+* 仕様変更部分テスト削除 ([dc19889](https://github.com/t-9/silent-arcana/commit/dc198899720646f6d445b71cd21cd89d8d17fd59))
+
+
+### Features
+
+* 手話認識できるようにする ([f3612b0](https://github.com/t-9/silent-arcana/commit/f3612b0d686354cf19d85c53ce23a0aa48f08f8c))
+
 # [1.3.0](https://github.com/t-9/silent-arcana/compare/v1.2.17...v1.3.0) (2024-12-25)
 
 
