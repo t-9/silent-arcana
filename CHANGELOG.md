@@ -1,3 +1,10 @@
+## [1.2.15](https://github.com/t-9/silent-arcana/compare/v1.2.14...v1.2.15) (2024-12-25)
+
+
+### Bug Fixes
+
+* ファイル分割 ([1e00b6c](https://github.com/t-9/silent-arcana/commit/1e00b6c8f30a938b9b3fd5bd20673d1d9de12a4d))
+
 ## [1.2.14](https://github.com/t-9/silent-arcana/compare/v1.2.13...v1.2.14) (2024-12-24)
 
 
