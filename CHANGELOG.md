@@ -1,3 +1,10 @@
+## [1.2.17](https://github.com/t-9/silent-arcana/compare/v1.2.16...v1.2.17) (2024-12-25)
+
+
+### Bug Fixes
+
+* add list_src_files.py ([ff0d36d](https://github.com/t-9/silent-arcana/commit/ff0d36d32b738b9e73b250b7a9268540b23097c9))
+
 ## [1.2.16](https://github.com/t-9/silent-arcana/compare/v1.2.15...v1.2.16) (2024-12-25)
 
 
