@@ -1,3 +1,5 @@
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';
 import { loadModel, startDetection, detectLoop } from './modelService';
 import { getElement } from './domUtils';
 import { setupStartButton } from './eventHandlers';
@@ -5,6 +7,9 @@ import { setLoadingText } from './uiUtils';
 import { startCamera } from './cameraService';
 
 export async function init(): Promise<void> {
+  await tf.setBackend('webgl');
+  await tf.ready();
+
   const videoEl = getElement<HTMLVideoElement>('video');
   const loadingEl = getElement<HTMLElement>('loading');
   const messageEl = getElement<HTMLElement>('message');
