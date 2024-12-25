@@ -5,7 +5,7 @@
   "main": "src/app.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "webpack --mode production",
     "dev": "webpack serve",
     "start": "serve public -l 8080",
     "lint": "eslint 'src/**/*.{ts,js}'",
