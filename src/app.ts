@@ -1,8 +1,7 @@
-import { loadModel } from './modelService';
+import { loadModel, startDetection, detectLoop } from './modelService';
 import { getElement } from './domUtils';
 import { setupStartButton } from './eventHandlers';
 import { setLoadingText } from './uiUtils';
-import { startDetection, detectLoop } from './modelService';
 import { startCamera } from './cameraService';
 
 export async function init(): Promise<void> {
