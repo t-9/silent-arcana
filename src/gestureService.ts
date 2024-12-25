@@ -74,7 +74,7 @@ function calcDistance(
 export function detectGesture(
   keypoints: { x: number; y: number }[],
   gestureList: Gesture[],
-  distanceThreshold = 0.3
+  distanceThreshold = 1000
 ): string | null {
   if (!keypoints || keypoints.length < 21) {
     return null;

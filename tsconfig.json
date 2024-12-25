@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ES2022",
+    "target": "esnext",
+    "module": "esnext",
     "moduleResolution": "Node",
     // strictモードなど型チェック強化
     "strict": true,
@@ -9,7 +9,8 @@
     // ソースマップ
     "sourceMap": true,
     // 出力ディレクトリ
-    "outDir": "dist"
+    "outDir": "dist",
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*"
