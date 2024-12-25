@@ -10,7 +10,8 @@
     "sourceMap": true,
     // 出力ディレクトリ
     "outDir": "dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
   },
   "include": [
     "src/**/*"
