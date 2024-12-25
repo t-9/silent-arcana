@@ -1,3 +1,10 @@
+## [1.2.16](https://github.com/t-9/silent-arcana/compare/v1.2.15...v1.2.16) (2024-12-25)
+
+
+### Bug Fixes
+
+* ./modelService' imported multiple times. ([7ecc0a5](https://github.com/t-9/silent-arcana/commit/7ecc0a59557d6d37a1b5262c2c90a519fcc88fdc))
+
 ## [1.2.15](https://github.com/t-9/silent-arcana/compare/v1.2.14...v1.2.15) (2024-12-25)
 
 
