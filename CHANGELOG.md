@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/t-9/silent-arcana/compare/v1.4.3...v1.4.4) (2024-12-25)
+
+
+### Bug Fixes
+
+* buildをwebpackにする ([15f549b](https://github.com/t-9/silent-arcana/commit/15f549b8cda302a2bcbb342c1fc263dd98be968f))
+
 ## [1.4.3](https://github.com/t-9/silent-arcana/compare/v1.4.2...v1.4.3) (2024-12-25)
 
 
