@@ -2,7 +2,9 @@
 import { startCamera } from '../cameraService';
 import { jest } from '@jest/globals';
 
-type GetUserMediaFn = (constraints: MediaStreamConstraints) => Promise<MediaStream>;
+type GetUserMediaFn = (
+  constraints: MediaStreamConstraints,
+) => Promise<MediaStream>;
 const mockGetUserMedia = jest.fn();
 const typedMock = mockGetUserMedia as jest.MockedFunction<GetUserMediaFn>;
 typedMock.mockResolvedValue({} as MediaStream);
@@ -69,10 +71,11 @@ describe('cameraService', () => {
       configurable: true,
     });
 
-
     await startCamera(mockVideoEl, mockSetLoading);
 
     expect(mockSetLoading).toHaveBeenCalledWith('カメラを起動しています...');
-    expect(mockSetLoading).toHaveBeenLastCalledWith('カメラの起動に失敗しました');
+    expect(mockSetLoading).toHaveBeenLastCalledWith(
+      'カメラの起動に失敗しました',
+    );
   });
 });

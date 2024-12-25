@@ -1,7 +1,6 @@
 // src/test/modelService.test.ts
 import { startDetection } from '../modelService';
 
-
 describe('modelService', () => {
   it('startDetection sets running = true (implicit)', () => {
     startDetection();

@@ -4,7 +4,9 @@ import { convertHandKeypointsToArray } from './logic';
 // ↑ modelService.ts 側に getDetector() など、今使っている HandDetector を返す関数を作っておくと便利
 //   例: export function getDetector() { return detector; }
 
-export async function captureHandPose(videoEl: HTMLVideoElement): Promise<void> {
+export async function captureHandPose(
+  videoEl: HTMLVideoElement,
+): Promise<void> {
   const detector = getDetector();
   if (!detector) {
     console.warn('Detector not loaded yet!');

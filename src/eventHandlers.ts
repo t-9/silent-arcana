@@ -10,7 +10,7 @@ import { detectHandsOnce, toRelativeLandmarks } from './logic';
  */
 export function setupCaptureButton(
   captureBtn: HTMLElement,
-  videoEl: HTMLVideoElement
+  videoEl: HTMLVideoElement,
 ) {
   captureBtn.addEventListener('click', async () => {
     // 1回だけ推定を呼んでみる
@@ -22,7 +22,7 @@ export function setupCaptureButton(
       // ここでは裏で動いている想定として単純例にします
       // -----------------------------------------------------
       window['detector'], // or from modelService
-      videoEl
+      videoEl,
     );
 
     console.log('detectHandsOnce message:', message);

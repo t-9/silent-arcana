@@ -18,7 +18,9 @@ export function getDetector(): HandDetector | null {
 /**
  * モデルの読み込みと、手話用ジェスチャーデータの読み込み
  */
-export async function loadModel(setLoading: (text: string) => void): Promise<HandDetector> {
+export async function loadModel(
+  setLoading: (text: string) => void,
+): Promise<HandDetector> {
   setLoading('モデル読み込み中...');
   detector = await createHandDetector();
   console.log('MediaPipe Handsモデル読み込み完了');
@@ -47,7 +49,7 @@ export async function loadModel(setLoading: (text: string) => void): Promise<Han
  */
 export async function detectLoop(
   videoEl: HTMLVideoElement,
-  messageEl: HTMLElement
+  messageEl: HTMLElement,
 ): Promise<void> {
   if (!running || !detector) return;
 
