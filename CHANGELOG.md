@@ -1,3 +1,10 @@
+## [1.4.6](https://github.com/t-9/silent-arcana/compare/v1.4.5...v1.4.6) (2024-12-26)
+
+
+### Bug Fixes
+
+* Update modelService.ts ([72c9115](https://github.com/t-9/silent-arcana/commit/72c9115772f35dbba502e91ec821a3d35d3b6845))
+
 ## [1.4.5](https://github.com/t-9/silent-arcana/compare/v1.4.4...v1.4.5) (2024-12-25)
 
 
