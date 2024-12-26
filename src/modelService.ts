@@ -35,7 +35,7 @@ export async function loadModel(
   //   loadedGestures = gestureData.gestures;
   // のようにセットしてもOK
   try {
-    loadedGestures = await loadGestureData('/templates/dummyGestures.json');
+    loadedGestures = await loadGestureData('./templates/dummyGestures.json');
     console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
   } catch (e) {
     console.error('ジェスチャーデータの読み込みに失敗:', e);
