@@ -1,46 +1,29 @@
 // src/eventHandlers.ts
 import { startCamera } from './cameraService';
-import { startDetection, detectLoop } from './modelService';
+import { startDetection, detectLoop, getDetector } from './modelService';
 import { detectHandsOnce, toRelativeLandmarks } from './logic';
 
 /**
- * キャプチャボタンを押したら、推定結果を1回取って console.log するサンプル
- * - detectorは modelService.ts で作ったグローバル変数 "detector" を利用してもよいが、
- *   ここでは簡単のため detectHandsOnce を呼んでしまう。
+ * キャプチャボタンを押したら、推定結果を1回取って console.log する
  */
 export function setupCaptureButton(
   captureBtn: HTMLElement,
   videoEl: HTMLVideoElement,
 ) {
   captureBtn.addEventListener('click', async () => {
-    // 1回だけ推定を呼んでみる
-    const message = await detectHandsOnce(
-      // detectHandsOnceの第一引数はHandDetector
-      // modelServiceの中で detector が export されているならそれをimportして使う、あるいは別の方法でもOK
-      // 例: import { detector } from './modelService';
-      // ただしdetectorがnullの場合があるので注意
-      // ここでは裏で動いている想定として単純例にします
-      // -----------------------------------------------------
-      window['detector'], // or from modelService
-      videoEl,
-    );
-
-    console.log('detectHandsOnce message:', message);
-
-    // ここで "手が検出されていません" の場合は弾く
-    if (message.includes('手が検出されていません')) {
-      console.warn('No hand detected');
+    const detector = getDetector(); // getDetector を使用
+    if (!detector) {
+      console.warn('No HandDetector is available yet.');
       return;
     }
 
-    // すでに modelService.ts の "detectHandsOnce" は "handsToMessage(hands)" を返すだけ。
-    // 実際は "hands" を丸ごと取得したい。
-    // なので detectHandsOnce の実装を少し変える or 自前で estimateHands を呼んでもOKです。
-    // -----------------------------------------------------
-    // 例: detector.estimateHands(videoEl) を直接呼ぶ
-    const detector = window['detector']; // or however you get it
-    if (!detector) {
-      console.warn('No HandDetector is available yet.');
+    // 1回だけ推定を呼んでみる
+    const message = await detectHandsOnce(detector, videoEl);
+
+    console.log('detectHandsOnce message:', message);
+
+    if (message.includes('手が検出されていません')) {
+      console.warn('No hand detected');
       return;
     }
 
@@ -50,7 +33,6 @@ export function setupCaptureButton(
       return;
     }
 
-    // 1つ目の手の keypoints を相対座標に
     const rel = toRelativeLandmarks(hands[0].keypoints);
 
     console.log('相対座標( [ [dx, dy], ... ] ):', rel);
