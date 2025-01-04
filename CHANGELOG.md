@@ -1,3 +1,12 @@
+## [1.4.9](https://github.com/t-9/silent-arcana/compare/v1.4.8...v1.4.9) (2025-01-04)
+
+
+### Bug Fixes
+
+* データ追加 ([30afaac](https://github.com/t-9/silent-arcana/commit/30afaac09881b6a65525457a42ee7ba5c59be38c))
+* 検出の精度を上げる ([3b83965](https://github.com/t-9/silent-arcana/commit/3b83965efceaf8d673b551dd64418a7d379c664b))
+* 正規化する ([4f7197c](https://github.com/t-9/silent-arcana/commit/4f7197ca6d785adb206de7dbc8fd72318a417bb3))
+
 ## [1.4.8](https://github.com/t-9/silent-arcana/compare/v1.4.7...v1.4.8) (2025-01-04)
 
 
