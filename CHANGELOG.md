@@ -1,3 +1,11 @@
+## [1.4.7](https://github.com/t-9/silent-arcana/compare/v1.4.6...v1.4.7) (2025-01-04)
+
+
+### Bug Fixes
+
+* Dockerfile修正 ([4eae6af](https://github.com/t-9/silent-arcana/commit/4eae6af2847d4723a1e1d11701538a9e47920db5))
+* hand detection ([e26237f](https://github.com/t-9/silent-arcana/commit/e26237f3da8deefb9a71363bd8b166b67e844367))
+
 ## [1.4.6](https://github.com/t-9/silent-arcana/compare/v1.4.5...v1.4.6) (2024-12-26)
 
 
