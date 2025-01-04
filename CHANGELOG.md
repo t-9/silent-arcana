@@ -1,3 +1,10 @@
+## [1.4.8](https://github.com/t-9/silent-arcana/compare/v1.4.7...v1.4.8) (2025-01-04)
+
+
+### Bug Fixes
+
+* package update ([876b88a](https://github.com/t-9/silent-arcana/commit/876b88ab3ef71eea90fc25269e131b5fea69aa3b))
+
 ## [1.4.7](https://github.com/t-9/silent-arcana/compare/v1.4.6...v1.4.7) (2025-01-04)
 
 
