@@ -3,11 +3,8 @@ import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 import { createHandDetector } from './detectionModule';
 import { Gesture, loadGestureData, detectGesture } from './gestureService';
 
-// (既存)
 let detector: HandDetector | null = null;
 let running = false;
-
-// ★ 追加: ロードしたジェスチャーデータを保持しておく
 let loadedGestures: Gesture[] = [];
 
 // Detectorを外から取得するためのゲッター
@@ -26,14 +23,7 @@ export async function loadModel(
   console.log('MediaPipe Handsモデル読み込み完了');
   setLoading('');
 
-  // ★ 追加: ジェスチャーデータを読み込む
-  // fetch で読み込む場合:
-  //   loadedGestures = await loadGestureData('/templates/dummyGestures.json');
-  // もし import で取得できる環境なら、gestureService.ts 内で
-  //   import gestureData from '../templates/dummyGestures.json';
-  // としておき、ここで
-  //   loadedGestures = gestureData.gestures;
-  // のようにセットしてもOK
+  // ジェスチャーデータの読み込み
   try {
     loadedGestures = await loadGestureData('./templates/dummyGestures.json');
     console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
