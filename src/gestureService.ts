@@ -1,8 +1,5 @@
 // src/gestureService.ts
 
-// ↓ 環境によっては assert が必要な場合があります
-// import gestureData from '../templates/dummyGestures.json' assert { type: 'json' };
-
 export interface Gesture {
   name: string;
   landmarks: [number, number][]; // 21点ぶんの (x, y) 座標
@@ -10,22 +7,10 @@ export interface Gesture {
 
 /**
  * JSONの "gestures" 配列だけ抜き出して返す関数
- *
- * 環境によっては下記のような "fetch" を使った読み込みが必要です:
- *
- *  export async function loadGestureData(url: string): Promise<Gesture[]> {
- *    const res = await fetch(url);
- *    const data = await res.json();
- *    return data.gestures;
- *  }
- *
- * あるいは "import gestureData from '../templates/dummyGestures.json'"
- * で済む環境なら不要です。
  */
 export async function loadGestureData(url: string): Promise<Gesture[]> {
   const res = await fetch(url);
   const data = await res.json();
-  // dataは { gestures: [ { name, landmarks: [...] }, ... ] } の想定
   return data.gestures;
 }
 
