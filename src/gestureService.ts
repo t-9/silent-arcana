@@ -1,4 +1,5 @@
 // src/gestureService.ts
+import { toRelativeLandmarks } from './logic';
 
 export interface Gesture {
   name: string;
@@ -21,16 +22,15 @@ export async function loadGestureData(url: string): Promise<Gesture[]> {
 function normalizeKeypoints(
   keypoints: { x: number; y: number }[],
 ): [number, number][] {
-  const points = keypoints.map((k) => [k.x ?? 0, k.y ?? 0]);
-
-  // 例：最初の点(手首)を(0,0)とする
-  const [baseX, baseY] = points[0];
-  const shifted = points.map(([x, y]) => [x - baseX, y - baseY]);
-
-  // 必要に応じてバウンディングボックスや全体の長さでスケール調整も可能
-  // ここでは省略
-
-  return shifted as [number, number][];
+  const keypointsWithName = keypoints.map((pt, i) => ({
+    x: pt.x,
+    y: pt.y,
+    name: i === 0 ? 'wrist' : undefined,
+    // 本来はきちんと name をつけるのが望ましいが、
+    // wrist さえ見つかればスケーリングはできるので暫定的に
+  }));
+  const rel = toRelativeLandmarks(keypointsWithName);
+  return rel as [number, number][];
 }
 
 /**
