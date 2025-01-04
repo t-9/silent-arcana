@@ -17,7 +17,6 @@ export function setupCaptureButton(
       return;
     }
 
-    // 1回だけ推定を呼んでみる
     const message = await detectHandsOnce(detector, videoEl);
 
     console.log('detectHandsOnce message:', message);
@@ -35,8 +34,7 @@ export function setupCaptureButton(
 
     const rel = toRelativeLandmarks(hands[0].keypoints);
 
-    console.log('相対座標( [ [dx, dy], ... ] ):', rel);
-    console.log('JSON形式で出すなら:', JSON.stringify(rel));
+    console.log(JSON.stringify(rel));
   });
 }
 

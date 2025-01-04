@@ -12,7 +12,8 @@
     "test": "node --experimental-vm-modules node_modules/.bin/jest",
     "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
     "format": "prettier --write 'src/**/*.ts'",
-    "format:check": "prettier --check 'src/**/*.ts'"
+    "format:check": "prettier --check 'src/**/*.ts'",
+    "normalize": "node --loader ts-node/esm src/normalizeGestures.ts"
   },
   "repository": {
     "type": "git",
@@ -51,6 +52,7 @@
     "serve": "^14.2.4",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "webpack": "^5.97.1",
@@ -60,6 +62,7 @@
   "dependencies": {
     "@tensorflow-models/hand-pose-detection": "^2.0.1",
     "@tensorflow/tfjs": "^4.22.0",
-    "@tensorflow/tfjs-backend-webgl": "^4.22.0"
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "mime": "^4.0.6"
   }
 }

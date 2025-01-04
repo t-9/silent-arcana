@@ -1,7 +1,5 @@
 // src/gestureService.ts
-
-// ↓ 環境によっては assert が必要な場合があります
-// import gestureData from '../templates/dummyGestures.json' assert { type: 'json' };
+import { toRelativeLandmarks } from './logic';
 
 export interface Gesture {
   name: string;
@@ -10,22 +8,10 @@ export interface Gesture {
 
 /**
  * JSONの "gestures" 配列だけ抜き出して返す関数
- *
- * 環境によっては下記のような "fetch" を使った読み込みが必要です:
- *
- *  export async function loadGestureData(url: string): Promise<Gesture[]> {
- *    const res = await fetch(url);
- *    const data = await res.json();
- *    return data.gestures;
- *  }
- *
- * あるいは "import gestureData from '../templates/dummyGestures.json'"
- * で済む環境なら不要です。
  */
 export async function loadGestureData(url: string): Promise<Gesture[]> {
   const res = await fetch(url);
   const data = await res.json();
-  // dataは { gestures: [ { name, landmarks: [...] }, ... ] } の想定
   return data.gestures;
 }
 
@@ -36,16 +22,15 @@ export async function loadGestureData(url: string): Promise<Gesture[]> {
 function normalizeKeypoints(
   keypoints: { x: number; y: number }[],
 ): [number, number][] {
-  const points = keypoints.map((k) => [k.x ?? 0, k.y ?? 0]);
-
-  // 例：最初の点(手首)を(0,0)とする
-  const [baseX, baseY] = points[0];
-  const shifted = points.map(([x, y]) => [x - baseX, y - baseY]);
-
-  // 必要に応じてバウンディングボックスや全体の長さでスケール調整も可能
-  // ここでは省略
-
-  return shifted as [number, number][];
+  const keypointsWithName = keypoints.map((pt, i) => ({
+    x: pt.x,
+    y: pt.y,
+    name: i === 0 ? 'wrist' : undefined,
+    // 本来はきちんと name をつけるのが望ましいが、
+    // wrist さえ見つかればスケーリングはできるので暫定的に
+  }));
+  const rel = toRelativeLandmarks(keypointsWithName);
+  return rel as [number, number][];
 }
 
 /**
