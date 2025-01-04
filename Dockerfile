@@ -7,6 +7,7 @@ RUN npm install --ignore-scripts
 COPY ./public ./public
 COPY ./src ./src
 COPY ./tsconfig.json ./
+COPY ./webpack.config.js ./
 RUN npm run build  # => /app/public に成果物
 
 # ========== Production stage (nginx) ==========
