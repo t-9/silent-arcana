@@ -39,7 +39,7 @@ export default {
   },
 
   // Webpackが生成する最終バンドルの互換性
-  target: ['web', 'esnext'],
+  target: ['web', 'es2025'],
 
   // 開発用サーバ設定
   devServer: {
