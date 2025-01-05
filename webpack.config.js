@@ -12,7 +12,7 @@ export default {
   // "production" or "development" を環境変数から切り替え
   mode: isProduction ? 'production' : 'development',
 
-  // ソースマップ (開発時は "inline-source-map" などにしてもOK)
+  // ソースマップ
   devtool: isProduction ? 'source-map' : 'inline-source-map',
 
   // エントリーポイント
@@ -39,7 +39,7 @@ export default {
   },
 
   // Webpackが生成する最終バンドルの互換性
-  target: ['web', 'es2022'],
+  target: ['web', 'esnext'],
 
   // 開発用サーバ設定
   devServer: {
