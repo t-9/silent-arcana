@@ -1,3 +1,11 @@
+## [1.4.11](https://github.com/t-9/silent-arcana/compare/v1.4.10...v1.4.11) (2025-01-05)
+
+
+### Bug Fixes
+
+* add test ([94107d6](https://github.com/t-9/silent-arcana/commit/94107d60583b116b76b3ff0da29eeb3b19bc8b5e))
+* webpackの設定をesnextにする ([954c552](https://github.com/t-9/silent-arcana/commit/954c552e8b09437c559546b6c828d081ca1673e0))
+
 ## [1.4.10](https://github.com/t-9/silent-arcana/compare/v1.4.9...v1.4.10) (2025-01-05)
 
 
