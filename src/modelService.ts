@@ -25,7 +25,9 @@ export async function loadModel(
 
   // ジェスチャーデータの読み込み
   try {
-    loadedGestures = await loadGestureData('./templates/normalizedGestures.json');
+    loadedGestures = await loadGestureData(
+      './templates/normalizedGestures.json',
+    );
     console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
   } catch (e) {
     console.error('ジェスチャーデータの読み込みに失敗:', e);

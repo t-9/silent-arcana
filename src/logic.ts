@@ -100,18 +100,20 @@ export function toRelativeLandmarks(
   keypoints: Array<{ x: number; y: number; name?: string }>,
 ): number[][] {
   // 'wrist' を大文字小文字無視で探す
-  const wrist = keypoints.find(pt => pt.name && pt.name.toLowerCase() === 'wrist');
+  const wrist = keypoints.find(
+    (pt) => pt.name && pt.name.toLowerCase() === 'wrist',
+  );
   if (!wrist) {
     console.warn('Wrist keypoint not found. Returning absolute coordinates.');
-    return keypoints.map(pt => [pt.x, pt.y]);
+    return keypoints.map((pt) => [pt.x, pt.y]);
   }
 
   const baseX = wrist.x;
   const baseY = wrist.y;
 
   // 手のバウンディングボックスを計算
-  const xs = keypoints.map(pt => pt.x);
-  const ys = keypoints.map(pt => pt.y);
+  const xs = keypoints.map((pt) => pt.x);
+  const ys = keypoints.map((pt) => pt.y);
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
   const minY = Math.min(...ys);
@@ -123,7 +125,7 @@ export function toRelativeLandmarks(
   const SCALE = Math.max(width, height) / 2;
 
   // 手の中心点を基準に正規化
-  return keypoints.map(pt => {
+  return keypoints.map((pt) => {
     const dx = (pt.x - baseX) / SCALE;
     const dy = (pt.y - baseY) / SCALE;
     return [dx, dy];
