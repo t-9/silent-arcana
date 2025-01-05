@@ -1,3 +1,10 @@
+## [1.4.12](https://github.com/t-9/silent-arcana/compare/v1.4.11...v1.4.12) (2025-01-05)
+
+
+### Bug Fixes
+
+* webpack target version ([fd0021c](https://github.com/t-9/silent-arcana/commit/fd0021cf2b651fd5e4bd86cba43b23a4413fa8a2))
+
 ## [1.4.11](https://github.com/t-9/silent-arcana/compare/v1.4.10...v1.4.11) (2025-01-05)
 
 
