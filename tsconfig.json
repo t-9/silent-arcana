@@ -1,15 +1,20 @@
 {
   "compilerOptions": {
+    // Basic
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "Node",
-    // strictモードなど型チェック強化
-    "strict": true,
-    "esModuleInterop": true,
-    // ソースマップ
     "sourceMap": true,
-    // 出力ディレクトリ
     "outDir": "dist",
+    "removeComments": true,
+    // Strict Type Checks
+    "strict": true,
+    // Additional Checks
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    // Module Resolution
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    // Advanced
     "resolveJsonModule": true,
     "skipLibCheck": true,
   },
