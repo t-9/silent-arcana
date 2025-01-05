@@ -48,43 +48,47 @@ const normalizedGesturesPath = resolve(
   '../public/templates/normalizedGestures.json',
 );
 
-console.log('Dummy Gestures Path:', dummyGesturesPath);
-console.log('Normalized Gestures Path:', normalizedGesturesPath);
+export function normalizeGestures(): void {
+  console.log('Dummy Gestures Path:', dummyGesturesPath);
+  console.log('Normalized Gestures Path:', normalizedGesturesPath);
 
-// ジェスチャーデータの読み込み
-const rawData = readFileSync(dummyGesturesPath, 'utf-8');
-const data = JSON.parse(rawData);
-const gestures: Gesture[] = data.gestures;
+  // ジェスチャーデータの読み込み
+  const rawData = readFileSync(dummyGesturesPath, 'utf-8');
+  const data = JSON.parse(rawData);
+  const gestures: Gesture[] = data.gestures;
 
-// 正規化処理
-const normalizedGestures = gestures.map((gesture) => {
-  // ランドマークに名前を割り当てる
-  const keypoints = gesture.landmarks.map(([x, y], index) => ({
-    x,
-    y,
-    name: KEYPOINT_ORDER[index] || `point_${index}`,
-  }));
+  // 正規化処理
+  const normalizedGestures = gestures.map((gesture) => {
+    // ランドマークに名前を割り当てる
+    const keypoints = gesture.landmarks.map(([x, y], index) => ({
+      x,
+      y,
+      name: KEYPOINT_ORDER[index] || `point_${index}`,
+    }));
 
-  // 正規化
-  const normalized = toRelativeLandmarks(keypoints);
+    // 正規化
+    const normalized = toRelativeLandmarks(keypoints);
 
-  // 'wrist' が見つかったかどうかを確認
-  const hasWrist = keypoints.some((pt) => pt.name === 'wrist');
-  console.log(`Gesture "${gesture.name}": wrist found = ${hasWrist}`);
+    // 'wrist' が見つかったかどうかを確認
+    const hasWrist = keypoints.some((pt) => pt.name === 'wrist');
+    console.log(`Gesture "${gesture.name}": wrist found = ${hasWrist}`);
 
-  if (!hasWrist) {
-    console.warn(`Gesture "${gesture.name}" does not have a wrist keypoint.`);
-  }
+    if (!hasWrist) {
+      console.warn(`Gesture "${gesture.name}" does not have a wrist keypoint.`);
+    }
 
-  return {
-    name: gesture.name,
-    landmarks: normalized as [number, number][],
-  };
-});
+    return {
+      name: gesture.name,
+      landmarks: normalized as [number, number][],
+    };
+  });
 
-// 正規化されたデータを保存
-writeFileSync(
-  normalizedGesturesPath,
-  JSON.stringify({ gestures: normalizedGestures }, null, 2),
-);
-console.log('ジェスチャーデータを正規化して保存しました。');
+  // 正規化されたデータを保存
+  writeFileSync(
+    normalizedGesturesPath,
+    JSON.stringify({ gestures: normalizedGestures }, null, 2),
+  );
+  console.log('ジェスチャーデータを正規化して保存しました。');
+}
+
+normalizeGestures();
