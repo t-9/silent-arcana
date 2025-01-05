@@ -39,8 +39,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // パスの解決
-const dummyGesturesPath = resolve(__dirname, '../public/templates/dummyGestures.json');
-const normalizedGesturesPath = resolve(__dirname, '../public/templates/normalizedGestures.json');
+const dummyGesturesPath = resolve(
+  __dirname,
+  '../public/templates/dummyGestures.json',
+);
+const normalizedGesturesPath = resolve(
+  __dirname,
+  '../public/templates/normalizedGestures.json',
+);
 
 console.log('Dummy Gestures Path:', dummyGesturesPath);
 console.log('Normalized Gestures Path:', normalizedGesturesPath);
@@ -51,7 +57,7 @@ const data = JSON.parse(rawData);
 const gestures: Gesture[] = data.gestures;
 
 // 正規化処理
-const normalizedGestures = gestures.map(gesture => {
+const normalizedGestures = gestures.map((gesture) => {
   // ランドマークに名前を割り当てる
   const keypoints = gesture.landmarks.map(([x, y], index) => ({
     x,
@@ -63,7 +69,7 @@ const normalizedGestures = gestures.map(gesture => {
   const normalized = toRelativeLandmarks(keypoints);
 
   // 'wrist' が見つかったかどうかを確認
-  const hasWrist = keypoints.some(pt => pt.name === 'wrist');
+  const hasWrist = keypoints.some((pt) => pt.name === 'wrist');
   console.log(`Gesture "${gesture.name}": wrist found = ${hasWrist}`);
 
   if (!hasWrist) {
@@ -77,5 +83,8 @@ const normalizedGestures = gestures.map(gesture => {
 });
 
 // 正規化されたデータを保存
-writeFileSync(normalizedGesturesPath, JSON.stringify({ gestures: normalizedGestures }, null, 2));
+writeFileSync(
+  normalizedGesturesPath,
+  JSON.stringify({ gestures: normalizedGestures }, null, 2),
+);
 console.log('ジェスチャーデータを正規化して保存しました。');
