@@ -1,3 +1,11 @@
+## [1.4.10](https://github.com/t-9/silent-arcana/compare/v1.4.9...v1.4.10) (2025-01-05)
+
+
+### Bug Fixes
+
+* prettier write ([d14890d](https://github.com/t-9/silent-arcana/commit/d14890d3538052ca7e01b0f0588212c262a230b3))
+* refector tsconfig.json ([b7caa81](https://github.com/t-9/silent-arcana/commit/b7caa8137a0bc31b24a56396f5781782dc2ddd6b))
+
 ## [1.4.9](https://github.com/t-9/silent-arcana/compare/v1.4.8...v1.4.9) (2025-01-04)
 
 
