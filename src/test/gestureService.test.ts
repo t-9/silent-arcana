@@ -1,115 +1,44 @@
 // src/test/gestureService.test.ts
 import { detectGesture, Gesture } from '../gestureService';
 
-describe('detectGesture', () => {
+/**
+ * テストデータを共通化する関数
+ */
+function setupTestData() {
   const gestures: Gesture[] = [
     {
       name: 'ありがとう',
-      landmarks: [
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [0, 0],
-        [1, 1],
-        [2, 2],
-        [0, 0],
-        [1, 1],
-        [2, 2],
-      ],
+      landmarks: Array(21)
+        .fill([0, 0])
+        .map(([x, y], i) => [x + (i % 3), y + (i % 3)]),
     },
     {
       name: 'hello',
-      landmarks: [
-        [3, 3],
-        [4, 4],
-        [5, 5],
-        [3, 3],
-        [4, 4],
-        [5, 5],
-        [3, 3],
-        [4, 4],
-        [5, 5],
-        [3, 3],
-        [4, 4],
-        [5, 5],
-        [3, 3],
-        [4, 4],
-        [5, 5],
-        [3, 3],
-        [4, 4],
-        [5, 5],
-        [3, 3],
-        [4, 4],
-        [5, 5],
-      ],
+      landmarks: Array(21)
+        .fill([3, 3])
+        .map(([x, y], i) => [x + (i % 3), y + (i % 3)]),
     },
   ];
 
+  const keypointsMatch = Array(21)
+    .fill({ x: 0, y: 0 })
+    .map(({ x, y }, i) => ({ x: x + (i % 3), y: y + (i % 3) }));
+
+  const keypointsNoMatch = Array(21).fill({ x: 10000, y: 10000 });
+
+  return { gestures, keypointsMatch, keypointsNoMatch };
+}
+
+describe('detectGesture', () => {
+  const { gestures, keypointsMatch, keypointsNoMatch } = setupTestData();
+
   it('returns the correct gesture when a match is found', () => {
-    const keypoints = [
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-      { x: 0, y: 0 },
-      { x: 1, y: 1 },
-      { x: 2, y: 2 },
-    ];
-    const result = detectGesture(keypoints, gestures, 10);
+    const result = detectGesture(keypointsMatch, gestures, 10);
     expect(result).toBe('ありがとう');
   });
 
   it('returns null when no match is found', () => {
-    const keypoints = [
-      { x: 10000, y: 10000 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-      { x: 10, y: 10 },
-      { x: 20, y: 20 },
-      { x: 30, y: 30 },
-    ];
-    const result = detectGesture(keypoints, gestures, 10);
+    const result = detectGesture(keypointsNoMatch, gestures, 10);
     expect(result).toBeNull();
   });
 });
