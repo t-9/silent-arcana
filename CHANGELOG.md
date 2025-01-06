@@ -1,3 +1,10 @@
+## [1.4.14](https://github.com/t-9/silent-arcana/compare/v1.4.13...v1.4.14) (2025-01-06)
+
+
+### Bug Fixes
+
+* add tests ([8050400](https://github.com/t-9/silent-arcana/commit/80504007dd7b850c7510295c235e3a0057c4e49f))
+
 ## [1.4.13](https://github.com/t-9/silent-arcana/compare/v1.4.12...v1.4.13) (2025-01-06)
 
 
