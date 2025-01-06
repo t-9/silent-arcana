@@ -7,7 +7,7 @@ jest.mock('fs', () => {
   // requireActual で本物の fs を呼び出して、必要なものだけスプレッドして使う
   const originalFs = jest.requireActual('fs');
   return {
-    ...originalFs as typeof import('fs'),
+    ...(originalFs as typeof import('fs')),
     readFileSync: jest.fn(),
     writeFileSync: jest.fn(),
   };
@@ -18,7 +18,7 @@ describe('normalizeGestures script', () => {
 
   beforeEach(() => {
     // console.log などをモック
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
+    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
   });
 
   afterEach(() => {
