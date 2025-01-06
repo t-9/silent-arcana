@@ -1,3 +1,10 @@
+## [1.4.15](https://github.com/t-9/silent-arcana/compare/v1.4.14...v1.4.15) (2025-01-06)
+
+
+### Bug Fixes
+
+* duplications ([a4cf4df](https://github.com/t-9/silent-arcana/commit/a4cf4dfc45bd07ac4cb70aa372f29f4de8a47edf))
+
 ## [1.4.14](https://github.com/t-9/silent-arcana/compare/v1.4.13...v1.4.14) (2025-01-06)
 
 
