@@ -1,3 +1,10 @@
+## [1.4.13](https://github.com/t-9/silent-arcana/compare/v1.4.12...v1.4.13) (2025-01-06)
+
+
+### Bug Fixes
+
+* issue [#69](https://github.com/t-9/silent-arcana/issues/69) to [#75](https://github.com/t-9/silent-arcana/issues/75) ([f42ade7](https://github.com/t-9/silent-arcana/commit/f42ade79996059331c93288fcc04017e2c1a94eb))
+
 ## [1.4.12](https://github.com/t-9/silent-arcana/compare/v1.4.11...v1.4.12) (2025-01-05)
 
 
