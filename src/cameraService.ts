@@ -10,21 +10,22 @@ export async function startCamera(
     const stream = await getGetUserMedia()({ video: true });
     videoEl.srcObject = stream;
 
-    // メタデータ(解像度など)が読み込まれるまで待つ
+    // メタデータが読み込まれるのを待つ
     await new Promise<void>((resolve, reject) => {
       videoEl.onloadedmetadata = () => {
         console.log('onloadedmetadata event fired');
-        // 再生開始
-        videoEl
-          .play()
-          .then(() => {
-            console.log('video started playing');
-            resolve();
-          })
-          .catch(reject);
+        if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) {
+          reject(new Error('カメラのビデオ解像度が不正です'));
+        } else {
+          console.log(`ビデオ解像度: ${videoEl.videoWidth}x${videoEl.videoHeight}`);
+          resolve();
+        }
       };
+      videoEl.onerror = () => reject(new Error('ビデオの読み込みに失敗しました'));
     });
 
+    // ビデオ再生
+    await videoEl.play();
     setLoading('');
   } catch (err) {
     console.error('カメラ使用許可が必要です:', err);

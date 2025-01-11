@@ -7,7 +7,24 @@
 let _getUserMedia = async (
   constraints: MediaStreamConstraints,
 ): Promise<MediaStream> => {
-  return navigator.mediaDevices.getUserMedia(constraints);
+  // constraints が未定義の場合や video が未設定の場合にデフォルト値を適用
+  const defaultConstraints: MediaStreamConstraints = {
+    video: {
+      width: { ideal: 960 },
+      height: { ideal: 600 },
+    },
+  };
+
+  // constraints をマージしてデフォルトを上書き
+  const mergedConstraints: MediaStreamConstraints = {
+    ...defaultConstraints,
+    video: {
+      ...(defaultConstraints.video as MediaTrackConstraints),
+      ...(constraints.video as MediaTrackConstraints),
+    },
+  };
+
+  return navigator.mediaDevices.getUserMedia(mergedConstraints);
 };
 
 /**

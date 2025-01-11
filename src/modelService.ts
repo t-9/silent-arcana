@@ -45,12 +45,18 @@ export async function detectLoop(
 ): Promise<void> {
   if (!running || !detector) return;
 
+  // ビデオ要素が正しく設定されているか確認
+  if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) {
+    console.error('ビデオが適切に初期化されていません');
+    messageEl.textContent = 'ビデオの初期化に失敗しました';
+    return;
+  }
+
   // 手の推定
   const hands = await detector.estimateHands(videoEl);
 
-  // ここに手話判定を追加
+  // 手話判定
   if (hands && hands.length > 0) {
-    // 手はひとまず1つだけ処理
     const gestureName = detectGesture(hands[0].keypoints, loadedGestures);
     if (gestureName) {
       messageEl.textContent = `検出された手話: ${gestureName}`;
@@ -66,6 +72,7 @@ export async function detectLoop(
     detectLoop(videoEl, messageEl);
   });
 }
+
 
 /** 推定を開始する */
 export function startDetection() {
