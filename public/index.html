@@ -11,11 +11,25 @@
   <h1>Silent Arcana - Hand Tracking MVP</h1>
 
   <div class="container">
+    <!-- ゲームの読み込みやメッセージ表示 -->
     <div id="loading"></div>
+
+    <!-- カメラ映像 -->
     <video id="video" width="960" height="600" autoplay playsinline muted></video>
+
+    <!-- カメラとキャプチャ -->
     <button id="start-btn">カメラ開始</button>
     <button id="capture-btn" disabled>キャプチャ</button>
     <div id="message"></div>
+  </div>
+
+  <!-- ゲーム用のUI -->
+  <div id="game-ui" class="game-container">
+    <h2>手話学習ゲーム</h2>
+    <div id="score-display">スコア: 0</div>
+    <div id="gesture-display">手話を実行してください: </div>
+    <div id="timer-display">残り時間: 60 秒</div>
+    <button id="start-game-btn">ゲーム開始</button>
   </div>
 
   <!-- バンドル後のJS -->

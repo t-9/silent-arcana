@@ -48,15 +48,61 @@ h1 {
   min-height: 2rem;
 }
 
-/* style.css */
 #loading {
   font-weight: bold;
   color: #cc0000;
 }
 
-/* スピナーを使うなら */
-#loading-spinner {
-  display: none;
-  /* 通常は非表示 */
-  /* spinner用のCSS */
+/* ゲームUIのスタイル */
+#game-ui {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+#game-ui h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #007bff;
+}
+
+#score-display,
+#gesture-display,
+#timer-display {
+  margin: 1rem 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#timer-display {
+  color: #e74c3c;
+}
+
+#gesture-display {
+  color: #2ecc71;
+}
+
+#start-game-btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.3s ease;
+}
+
+#start-game-btn:hover {
+  background: #218838;
+}
+
+button:disabled {
+  background: #ddd;
+  cursor: not-allowed;
 }
