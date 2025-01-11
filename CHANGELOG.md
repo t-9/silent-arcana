@@ -1,3 +1,10 @@
+## [1.4.16](https://github.com/t-9/silent-arcana/compare/v1.4.15...v1.4.16) (2025-01-11)
+
+
+### Bug Fixes
+
+* 通らなくなったテストを一旦削除する ([f5b69a9](https://github.com/t-9/silent-arcana/commit/f5b69a9e5994dbd202ce1df982aae3334122076c))
+
 ## [1.4.15](https://github.com/t-9/silent-arcana/compare/v1.4.14...v1.4.15) (2025-01-06)
 
 
