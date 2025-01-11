@@ -1,7 +1,9 @@
-// src/modelService.ts
+// modelService.ts
 import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 import { createHandDetector } from './detectionModule';
 import { Gesture, loadGestureData, detectGesture } from './gestureService';
+import { getGameState } from './gameService'; // ★追加: ゲーム状態を参照
+import { handleGestureDetection } from './gameHandlers'; // ★追加: ゲーム用ハンドラを呼ぶ
 
 let detector: HandDetector | null = null;
 let running = false;
@@ -52,27 +54,31 @@ export async function detectLoop(
     return;
   }
 
-  // 手の推定
-  const hands = await detector.estimateHands(videoEl);
-
-  // 手話判定
-  if (hands && hands.length > 0) {
-    const gestureName = detectGesture(hands[0].keypoints, loadedGestures);
-    if (gestureName) {
-      messageEl.textContent = `検出された手話: ${gestureName}`;
-    } else {
-      messageEl.textContent = '該当する手話が見つかりません';
-    }
+  // ゲームが進行中かどうかを判定
+  const gameState = getGameState();
+  if (gameState.isRunning) {
+    // ゲーム中ならゲームハンドラの検出処理を呼ぶ
+    await handleGestureDetection(videoEl, messageEl, loadedGestures);
   } else {
-    messageEl.textContent = '手が検出されていません';
+    // ゲーム外の場合は、従来どおり手話名を表示するだけ
+    const hands = await detector.estimateHands(videoEl);
+    if (hands && hands.length > 0) {
+      const gestureName = detectGesture(hands[0].keypoints, loadedGestures);
+      if (gestureName) {
+        messageEl.textContent = `検出された手話: ${gestureName}`;
+      } else {
+        messageEl.textContent = '該当する手話が見つかりません';
+      }
+    } else {
+      messageEl.textContent = '手が検出されていません';
+    }
   }
 
-  // 再帰的に呼び出してループ
+  // 再帰的に呼び出してループ継続
   requestAnimationFrame(() => {
     detectLoop(videoEl, messageEl);
   });
 }
-
 
 /** 推定を開始する */
 export function startDetection() {
