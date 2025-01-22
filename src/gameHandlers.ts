@@ -21,7 +21,9 @@ declare global {
 function showGameOverDialog(score: number) {
   const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
   const finalScore = document.getElementById('final-score') as HTMLElement;
-  const finalHighScore = document.getElementById('final-high-score') as HTMLElement;
+  const finalHighScore = document.getElementById(
+    'final-high-score',
+  ) as HTMLElement;
   const restartBtn = document.getElementById('restart-btn') as HTMLElement;
 
   const state = getGameState();
@@ -107,14 +109,16 @@ export function updateGameUI(
 /**
  * 手話の検出を処理 (ゲーム中はこちらを呼ぶ)
  */
-export async function handleGestureDetection(landmarks: number[][]): Promise<void> {
+export async function handleGestureDetection(
+  landmarks: number[][],
+): Promise<void> {
   const state = getGameState();
   if (!state.isRunning || !state.currentGesture) return;
 
   // ランドマークデータを{x, y}形式に変換
-  const formattedLandmarks = landmarks.map(point => ({
+  const formattedLandmarks = landmarks.map((point) => ({
     x: point[0],
-    y: point[1]
+    y: point[1],
   }));
 
   const gestures = getGestures();
