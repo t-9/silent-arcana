@@ -113,24 +113,16 @@ h1 {
 
 /* 水晶の光沢効果 */
 .video-container::before {
-  content: '';
+  content: "";
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background:
-    radial-gradient(circle at 30% 30%,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.1) 15%,
-      transparent 60%),
-    radial-gradient(circle at 70% 70%,
-      rgba(201, 160, 220, 0.1) 0%,
-      transparent 60%);
-  z-index: 2;
+  inset: 0;
   pointer-events: none;
-  animation: crystalShine 15s infinite linear;
+  background: radial-gradient(circle at 50% 50%,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.7) 100%);
+  z-index: 2;
 }
+
 
 /* 水晶の縁の輝き */
 .video-container::after {
@@ -203,22 +195,15 @@ h1 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
   transform: scale(1.1);
+
+  /* 順番: まず歪ませて、その後に明るさ/コントラスト上げる例 */
   filter:
-    brightness(1.1) contrast(1.1) url('data:image/svg+xml,\
-      <svg xmlns="http://www.w3.org/2000/svg">\
-        <filter id="sphere">\
-          <feGaussianBlur stdDeviation="2" />\
-          <feColorMatrix type="matrix" values="\
-            1.1 0 0 0 0\
-            0 1.1 0 0 0\
-            0 0 1.1 0 0\
-            0 0 0 1 0"/>\
-        </filter>\
-      </svg>#sphere');
+    url(#crystalSphereEffect) brightness(1.1) contrast(1.1) saturate(1.1);
+
   z-index: 1;
 }
+
 
 /* 水晶玉のホバーエフェクト */
 .video-container:hover {
@@ -252,6 +237,26 @@ h1 {
 
   .video-container:hover {
     transform: perspective(1000px) rotateX(0deg) scale(1.02);
+  }
+}
+
+@keyframes crystalShine {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes crystalBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
   }
 }
 
