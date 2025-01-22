@@ -5,40 +5,63 @@
 }
 
 body {
-  font-family: sans-serif;
-  background: #f5f5f5;
-  color: #333;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  background-image: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+  min-height: 100vh;
 }
 
 .container {
   max-width: 1000px;
   margin: 2rem auto;
-  padding: 1rem;
-  background: #fff;
+  padding: 1.5rem;
+  background: rgba(20, 20, 25, 0.95);
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(128, 0, 128, 0.2);
+  border: 1px solid rgba(128, 0, 128, 0.2);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  color: #c9a0dc;
+  font-size: 2.5rem;
+  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3);
+  letter-spacing: 2px;
 }
 
 #video {
   display: block;
   margin: 1rem auto;
   background: #000;
+  border: 2px solid rgba(128, 0, 128, 0.3);
+  box-shadow: 0 0 20px rgba(128, 0, 128, 0.2);
 }
 
-#start-btn {
+#start-btn,
+#capture-btn {
   display: block;
   margin: 0.5rem auto;
-  padding: 0.6rem 1.2rem;
-  background: #007bff;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(45deg, #4a0080, #800080);
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(128, 0, 128, 0.3);
+}
+
+#start-btn:hover,
+#capture-btn:hover {
+  background: linear-gradient(45deg, #600080, #9a0080);
+  box-shadow: 0 2px 15px rgba(128, 0, 128, 0.5);
+  transform: translateY(-2px);
 }
 
 #message {
@@ -46,11 +69,12 @@ h1 {
   text-align: center;
   font-size: 1.2rem;
   min-height: 2rem;
+  color: #c9a0dc;
 }
 
 #loading {
   font-weight: bold;
-  color: #cc0000;
+  color: #ff4081;
 }
 
 /* ゲームUIのスタイル */
@@ -58,51 +82,63 @@ h1 {
   max-width: 800px;
   margin: 2rem auto;
   padding: 1.5rem;
-  background: #fff;
+  background: rgba(20, 20, 25, 0.95);
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(128, 0, 128, 0.2);
   text-align: center;
+  border: 1px solid rgba(128, 0, 128, 0.2);
 }
 
 #game-ui h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #007bff;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #c9a0dc;
+  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3);
 }
 
 #score-display,
 #gesture-display,
 #timer-display {
-  margin: 1rem 0;
-  font-size: 1.2rem;
+  margin: 1.2rem 0;
+  font-size: 1.3rem;
   font-weight: bold;
+  text-shadow: 0 0 5px rgba(201, 160, 220, 0.3);
 }
 
 #timer-display {
-  color: #e74c3c;
+  color: #ff4081;
 }
 
 #gesture-display {
-  color: #2ecc71;
+  color: #9c27b0;
 }
 
 #start-game-btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  background: #28a745;
+  padding: 0.8rem 1.5rem;
+  font-size: 1.1rem;
+  background: linear-gradient(45deg, #4a0080, #800080);
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: background 0.3s ease;
+  margin-top: 1.5rem;
+  transition: all 0.3s ease;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 10px rgba(128, 0, 128, 0.3);
 }
 
 #start-game-btn:hover {
-  background: #218838;
+  background: linear-gradient(45deg, #600080, #9a0080);
+  box-shadow: 0 2px 15px rgba(128, 0, 128, 0.5);
+  transform: translateY(-2px);
 }
 
 button:disabled {
-  background: #ddd;
+  background: #333 !important;
   cursor: not-allowed;
+  box-shadow: none;
+  color: #666;
 }
