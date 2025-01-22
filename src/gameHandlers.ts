@@ -8,6 +8,13 @@ import {
 } from './gameService';
 import { detectGesture, Gesture, getGestures } from './gestureService';
 
+// windowオブジェクトの型を拡張
+declare global {
+  interface Window {
+    updateScore: (score: number) => void;
+  }
+}
+
 /**
  * ゲーム終了時のダイアログを表示
  */
@@ -117,9 +124,8 @@ export async function handleGestureDetection(landmarks: number[][]): Promise<voi
     updateScore(10);
 
     // 称号システムの更新
-    const updateScoreUI = (window as any).updateScore;
-    if (typeof updateScoreUI === 'function') {
-      updateScoreUI(state.score);
+    if (typeof window.updateScore === 'function') {
+      window.updateScore(state.score);
     }
 
     // 次のジェスチャーを選択
@@ -141,9 +147,8 @@ export function handleGestureSuccess(): void {
   updateScore(10);
 
   // 称号システムの更新
-  const updateScoreUI = (window as any).updateScore;
-  if (typeof updateScoreUI === 'function') {
-    updateScoreUI(state.score);
+  if (typeof window.updateScore === 'function') {
+    window.updateScore(state.score);
   }
 
   // 次のジェスチャーを選択
