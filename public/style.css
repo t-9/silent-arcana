@@ -364,7 +364,7 @@ button:disabled {
   top: 0;
   left: 0;
   z-index: 9999;
-  transform-origin: 25px 25px;
+  transform-origin: 37px 37px;
   transition: transform 0.1s ease;
 }
 
@@ -373,8 +373,8 @@ button:disabled {
 .cursor-wrapper::after {
   content: '';
   position: absolute;
-  top: 25px;
-  left: 25px;
+  top: 37px;
+  left: 37px;
   width: 4px;
   height: 4px;
   border-radius: 50%;
@@ -419,8 +419,8 @@ button:disabled {
 /* 粒子要素 */
 .particle {
   position: absolute;
-  top: 25px;
-  left: 25px;
+  top: 37px;
+  left: 37px;
   width: 3px;
   height: 3px;
   border-radius: 50%;
@@ -442,8 +442,8 @@ button:disabled {
 }
 
 .magic-wand {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   position: absolute;
   top: 0;
   left: 0;
