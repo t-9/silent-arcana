@@ -29,6 +29,28 @@ async function getHandKeypoints(videoEl: HTMLVideoElement) {
 }
 
 /**
+ * ゲーム終了時のダイアログを表示
+ */
+function showGameOverDialog(score: number) {
+  const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
+  const finalScore = document.getElementById('final-score') as HTMLElement;
+  const restartBtn = document.getElementById('restart-btn') as HTMLElement;
+
+  finalScore.textContent = score.toString();
+  overlay.style.display = 'flex';
+
+  // リスタートボタンのイベントリスナー
+  restartBtn.onclick = () => {
+    overlay.style.display = 'none';
+    // ゲームの状態をリセット
+    const startGameBtn = document.getElementById('start-game-btn');
+    if (startGameBtn) {
+      startGameBtn.click();
+    }
+  };
+}
+
+/**
  * ゲームのUIを設定し、開始ボタンの動作を実装
  */
 export function setupGameUI(
@@ -42,6 +64,10 @@ export function setupGameUI(
 
   // ゲーム開始ボタンの動作
   startGameBtn.addEventListener('click', () => {
+    // ダイアログが表示されている場合は非表示にする
+    const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
+    overlay.style.display = 'none';
+
     startGame(gestures); // ゲームロジックの初期化
     updateGameUI(scoreDisplay, gestureDisplay); // UIの初期更新
 
@@ -56,7 +82,7 @@ export function setupGameUI(
       if (timeRemaining <= 0) {
         clearInterval(timerInterval); // タイマー停止
         stopGame(); // ゲーム終了ロジック
-        alert(`ゲーム終了！ スコア: ${getGameState().score}`);
+        showGameOverDialog(getGameState().score);
       }
     }, 1000);
   });
