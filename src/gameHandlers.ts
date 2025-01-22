@@ -14,9 +14,12 @@ import { detectGesture, Gesture, getGestures } from './gestureService';
 function showGameOverDialog(score: number) {
   const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
   const finalScore = document.getElementById('final-score') as HTMLElement;
+  const finalHighScore = document.getElementById('final-high-score') as HTMLElement;
   const restartBtn = document.getElementById('restart-btn') as HTMLElement;
 
+  const state = getGameState();
   finalScore.textContent = score.toString();
+  finalHighScore.textContent = state.highScore.toString();
   overlay.style.display = 'flex';
 
   // リスタートボタンのイベントリスナー
@@ -79,6 +82,12 @@ export function updateGameUI(
 
   // スコア表示を更新
   scoreDisplay.textContent = `スコア: ${state.score}`;
+
+  // ハイスコア表示を更新
+  const highScoreDisplay = document.getElementById('high-score-display');
+  if (highScoreDisplay) {
+    highScoreDisplay.textContent = `ハイスコア: ${state.highScore}`;
+  }
 
   // 次のジェスチャー表示を更新
   if (state.currentGesture) {
