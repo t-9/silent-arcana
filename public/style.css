@@ -2,107 +2,702 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  cursor: none;
+  /* デフォルトカーソルを非表示 */
 }
 
 body {
-  font-family: sans-serif;
-  background: #f5f5f5;
-  color: #333;
-}
-
-.container {
-  max-width: 1000px;
-  margin: 2rem auto;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  background: #1a1a1a;
+  color: #e0e0e0;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(128, 0, 128, 0.1) 0%, transparent 60%),
+    linear-gradient(to bottom, #1a1a1a, #2a2a2a);
+  min-height: 100vh;
   padding: 1rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
 }
 
 h1 {
   text-align: center;
   margin-bottom: 1rem;
+  color: #c9a0dc;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3),
+    0 0 20px rgba(128, 0, 128, 0.2);
+  letter-spacing: 3px;
+  font-weight: 700;
 }
 
+.main-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  flex: 1;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .container,
+  #game-ui {
+    height: auto;
+    min-height: auto;
+  }
+
+  body {
+    padding: 0.5rem;
+  }
+
+  h1 {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.container {
+  padding: 1.5rem;
+  background: rgba(20, 20, 25, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(128, 0, 128, 0.2);
+  border: 1px solid rgba(128, 0, 128, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: calc(100vh - 6rem);
+}
+
+/* 水晶玉と台座のコンテナ */
+.video-container-wrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+/* 水晶玉のコンテナ */
+.crystal-container {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  aspect-ratio: 1;
+}
+
+.video-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(201, 160, 220, 0.3);
+  box-shadow:
+    inset 0 0 50px rgba(201, 160, 220, 0.2),
+    inset 0 0 100px rgba(128, 0, 128, 0.2),
+    0 0 30px rgba(201, 160, 220, 0.4),
+    0 0 60px rgba(128, 0, 128, 0.2);
+  transform: perspective(1000px) rotateX(5deg);
+  transition: all 0.3s ease;
+}
+
+/* 水晶の光沢効果 */
+.video-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.7) 100%);
+  z-index: 2;
+}
+
+
+/* 水晶の縁の輝き */
+.video-container::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(201, 160, 220, 0.3) 45%,
+      rgba(201, 160, 220, 0.5) 50%,
+      rgba(201, 160, 220, 0.3) 55%,
+      transparent 70%);
+  z-index: 1;
+  animation: crystalBorder 8s infinite linear;
+}
+
+.crystal-base {
+  position: absolute;
+  bottom: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54%;
+  height: 4rem;
+  background: linear-gradient(to bottom,
+      #4a0080,
+      #2a0048);
+  clip-path: polygon(20% 0%,
+      80% 0%,
+      100% 100%,
+      0% 100%);
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(128, 0, 128, 0.2);
+}
+
+.crystal-base::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1rem;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(201, 160, 220, 0.3) 30%,
+      rgba(201, 160, 220, 0.5) 50%,
+      rgba(201, 160, 220, 0.3) 70%,
+      transparent 100%);
+  animation: baseShine 4s infinite linear;
+}
+
+@keyframes baseShine {
+  0% {
+    opacity: 0.3;
+    transform: translateX(-100%);
+  }
+
+  100% {
+    opacity: 0.7;
+    transform: translateX(100%);
+  }
+}
+
+/* 球体の3D効果を強調 */
 #video {
-  display: block;
-  margin: 1rem auto;
-  background: #000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.1);
+
+  /* 順番: まず歪ませて、その後に明るさ/コントラスト上げる例 */
+  filter:
+    url(#crystalSphereEffect) brightness(1.1) contrast(1.1) saturate(1.1);
+
+  z-index: 1;
 }
 
-#start-btn {
-  display: block;
-  margin: 0.5rem auto;
-  padding: 0.6rem 1.2rem;
-  background: #007bff;
+
+/* 水晶玉のホバーエフェクト */
+.video-container:hover {
+  transform: perspective(1000px) rotateX(5deg) scale(1.02);
+  box-shadow:
+    inset 0 0 70px rgba(201, 160, 220, 0.3),
+    inset 0 0 120px rgba(128, 0, 128, 0.3),
+    0 0 40px rgba(201, 160, 220, 0.5),
+    0 0 80px rgba(128, 0, 128, 0.3);
+}
+
+@media (max-width: 1024px) {
+  .video-container-wrapper {
+    min-height: 300px;
+  }
+
+  .crystal-container {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .crystal-base {
+    width: 80%;
+    height: 3rem;
+    bottom: -1.5rem;
+  }
+
+  .video-container {
+    transform: perspective(1000px) rotateX(0deg);
+  }
+
+  .video-container:hover {
+    transform: perspective(1000px) rotateX(0deg) scale(1.02);
+  }
+}
+
+@keyframes crystalShine {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes crystalBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.camera-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+#start-btn,
+#capture-btn {
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(45deg, #4a0080, #800080);
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(128, 0, 128, 0.3);
+  flex: 1;
+  max-width: 200px;
+  min-width: 150px;
+}
+
+#start-btn:hover,
+#capture-btn:hover {
+  background: linear-gradient(45deg, #600080, #9a0080);
+  box-shadow: 0 2px 15px rgba(128, 0, 128, 0.5);
+  transform: translateY(-2px);
 }
 
 #message {
-  margin-top: 1rem;
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   min-height: 2rem;
+  color: #c9a0dc;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
 #loading {
   font-weight: bold;
-  color: #cc0000;
+  color: #ff4081;
+  text-align: center;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
 /* ゲームUIのスタイル */
 #game-ui {
-  max-width: 800px;
-  margin: 2rem auto;
   padding: 1.5rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background: rgba(20, 20, 25, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(128, 0, 128, 0.2);
   text-align: center;
+  border: 1px solid rgba(128, 0, 128, 0.2);
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: auto auto auto 1fr auto;
+  height: calc(100vh - 6rem);
+}
+
+@media (max-width: 1024px) {
+  #game-ui {
+    padding: 1rem;
+    gap: 0.8rem;
+  }
 }
 
 #game-ui h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  color: #007bff;
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  color: #c9a0dc;
+  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3);
+  letter-spacing: 2px;
+}
+
+.game-info {
+  display: grid;
+  grid-template-rows: repeat(3, auto);
+  gap: 1rem;
+  padding: 1.2rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+@media (max-width: 1024px) {
+  .game-info {
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
 }
 
 #score-display,
 #gesture-display,
 #timer-display {
-  margin: 1rem 0;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
   font-weight: bold;
+  text-shadow: 0 0 5px rgba(201, 160, 220, 0.3);
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(128, 0, 128, 0.2);
 }
 
 #timer-display {
-  color: #e74c3c;
+  color: #ff4081;
 }
 
 #gesture-display {
-  color: #2ecc71;
+  color: #9c27b0;
 }
 
 #start-game-btn {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  background: #28a745;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background: linear-gradient(45deg, #4a0080, #800080);
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 2px 10px rgba(128, 0, 128, 0.3);
+  width: 100%;
+  margin-top: auto;
 }
 
 #start-game-btn:hover {
-  background: #218838;
+  background: linear-gradient(45deg, #600080, #9a0080);
+  box-shadow: 0 2px 15px rgba(128, 0, 128, 0.5);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+  #start-game-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
 }
 
 button:disabled {
-  background: #ddd;
+  background: #333 !important;
   cursor: not-allowed;
+  box-shadow: none;
+  color: #666;
+  transform: none !important;
+}
+
+/* ダイアログのスタイル */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog {
+  background: rgba(20, 20, 25, 0.95);
+  border: 2px solid rgba(128, 0, 128, 0.3);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 30px rgba(128, 0, 128, 0.3),
+    0 0 60px rgba(0, 0, 0, 0.5);
+  animation: dialogAppear 0.3s ease-out;
+}
+
+@media (max-width: 1024px) {
+  .dialog {
+    padding: 1.5rem;
+    width: 95%;
+  }
+}
+
+@keyframes dialogAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dialog h3 {
+  font-size: clamp(1.8rem, 5vw, 2.2rem);
+  color: #c9a0dc;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3);
+  letter-spacing: 2px;
+}
+
+.dialog p {
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  margin: 1rem 0;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
+.dialog .score {
+  font-size: clamp(2rem, 6vw, 2.5rem);
+  color: #ff4081;
+  font-weight: bold;
+  margin: 1.5rem 0;
+  text-shadow: 0 0 15px rgba(255, 64, 129, 0.4);
+}
+
+.dialog button {
+  padding: 1rem 2rem;
+  font-size: clamp(1.1rem, 3vw, 1.2rem);
+  background: linear-gradient(45deg, #4a0080, #800080);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Crimson Text', 'Yu Mincho', serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(128, 0, 128, 0.3);
+  margin-top: 1rem;
+  min-width: 200px;
+}
+
+@media (max-width: 1024px) {
+  .dialog button {
+    padding: 0.8rem 1.5rem;
+    min-width: 180px;
+  }
+}
+
+/* カスタムカーソルのスタイル */
+.cursor-wrapper {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  transform-origin: 37px 37px;
+  transition: transform 0.1s ease;
+}
+
+/* 魔法の粒子エフェクト */
+.cursor-wrapper::before,
+.cursor-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 37px;
+  left: 37px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c9a0dc;
+  opacity: 0;
+  pointer-events: none;
+  animation: particleFloat 1.5s ease-out infinite;
+}
+
+.cursor-wrapper::after {
+  animation-delay: 0.3s;
+  width: 3px;
+  height: 3px;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(calc(10px * cos(var(--particle-angle, 45deg))),
+        calc(-20px + 10px * sin(var(--particle-angle, 45deg)))) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 移動時の追加の粒子 */
+.cursor-wrapper.moving::before {
+  --particle-angle: 30deg;
+}
+
+.cursor-wrapper.moving::after {
+  --particle-angle: 60deg;
+}
+
+.cursor-wrapper.moving .particle {
+  opacity: 1;
+}
+
+/* 粒子要素 */
+.particle {
+  position: absolute;
+  top: 37px;
+  left: 37px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #c9a0dc 60%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.particle:nth-child(1) {
+  animation: particleFloat 2s ease-out infinite 0.1s;
+}
+
+.particle:nth-child(2) {
+  animation: particleFloat 1.8s ease-out infinite 0.3s;
+}
+
+.particle:nth-child(3) {
+  animation: particleFloat 1.6s ease-out infinite 0.5s;
+}
+
+/* ボタンのカーソルスタイル */
+button {
+  cursor: none !important;
+}
+
+.magic-wand {
+  width: 48px;
+  height: 48px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  filter: drop-shadow(0 0 10px rgba(201, 160, 220, 0.4)) drop-shadow(0 0 20px rgba(128, 0, 128, 0.2));
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+/* 杖の先端の光るエフェクト */
+.wand-gem {
+  filter: url(#glow);
+  transform-origin: center;
+  animation: gemPulse 2s infinite;
+}
+
+@keyframes gemPulse {
+  0% {
+    filter: url(#glow) brightness(1);
+    transform: scale(1);
+  }
+
+  50% {
+    filter: url(#glow) brightness(1.3);
+    transform: scale(1.1);
+  }
+
+  100% {
+    filter: url(#glow) brightness(1);
+    transform: scale(1);
+  }
+}
+
+/* クリック時のエフェクト */
+.cursor-clicking .magic-wand {
+  filter: drop-shadow(0 0 20px rgba(201, 160, 220, 0.8)) drop-shadow(0 0 40px rgba(128, 0, 128, 0.4));
+}
+
+.cursor-clicking .wand-gem {
+  animation: gemClick 0.5s ease-out;
+}
+
+@keyframes gemClick {
+  0% {
+    filter: url(#glow) brightness(1);
+    transform: scale(1);
+  }
+
+  50% {
+    filter: url(#glow) brightness(2);
+    transform: scale(1.3);
+  }
+
+  100% {
+    filter: url(#glow) brightness(1);
+    transform: scale(1);
+  }
+}
+
+/* ホバー時のエフェクト */
+button:hover~.cursor-wrapper .magic-wand {
+  filter: drop-shadow(0 0 15px rgba(201, 160, 220, 0.6)) drop-shadow(0 0 30px rgba(128, 0, 128, 0.3));
+}
+
+button:hover~.cursor-wrapper .wand-gem {
+  animation: gemHover 1s infinite;
+}
+
+@keyframes gemHover {
+  0% {
+    filter: url(#glow) brightness(1.2);
+    transform: scale(1.1);
+  }
+
+  50% {
+    filter: url(#glow) brightness(1.5);
+    transform: scale(1.2);
+  }
+
+  100% {
+    filter: url(#glow) brightness(1.2);
+    transform: scale(1.1);
+  }
+}
+
+/* カーソルがビデオ領域にある時 */
+.video-container:hover~.cursor-wrapper .wand-gem {
+  filter: url(#glow) brightness(1.5) hue-rotate(45deg);
+}
+
+/* モバイルデバイスではカーソルを非表示 */
+@media (max-width: 1024px) {
+  .cursor-wrapper {
+    display: none;
+  }
 }

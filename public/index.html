@@ -4,33 +4,154 @@
 <head>
   <meta charset="UTF-8" />
   <title>Silent Arcana - Hands MVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
+  <!-- カスタムカーソル -->
+  <div class="cursor-wrapper">
+    <object type="image/svg+xml" data="./magic-wand.svg" class="magic-wand"></object>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
   <h1>Silent Arcana - Hand Tracking MVP</h1>
 
-  <div class="container">
-    <!-- ゲームの読み込みやメッセージ表示 -->
-    <div id="loading"></div>
+  <div class="main-content">
+    <div class="container">
+      <!-- ゲームの読み込みやメッセージ表示 -->
+      <div id="loading"></div>
 
-    <!-- カメラ映像 -->
-    <video id="video" width="960" height="600" autoplay playsinline muted></video>
+      <!-- 水晶玉とカメラ映像 -->
+      <div class="video-container-wrapper">
+        <div class="crystal-container">
+          <div class="video-container">
+            <video id="video" width="960" height="600" autoplay playsinline muted></video>
+          </div>
+          <div class="crystal-base"></div>
+        </div>
+      </div>
 
-    <!-- カメラとキャプチャ -->
-    <button id="start-btn">カメラ開始</button>
-    <button id="capture-btn" disabled>キャプチャ</button>
-    <div id="message"></div>
+      <div id="message"></div>
+    </div>
+
+    <!-- ゲーム用のUI -->
+    <div id="game-ui">
+      <h2>手話学習ゲーム</h2>
+
+      <!-- カメラ操作 -->
+      <div class="camera-controls">
+        <button id="start-btn">カメラ開始</button>
+        <button id="capture-btn" disabled>キャプチャ</button>
+      </div>
+
+      <div class="game-info">
+        <div id="score-display">スコア: 0</div>
+        <div id="gesture-display">手話を実行してください: </div>
+        <div id="timer-display">残り時間: 60 秒</div>
+      </div>
+
+      <button id="start-game-btn">ゲーム開始</button>
+    </div>
   </div>
 
-  <!-- ゲーム用のUI -->
-  <div id="game-ui" class="game-container">
-    <h2>手話学習ゲーム</h2>
-    <div id="score-display">スコア: 0</div>
-    <div id="gesture-display">手話を実行してください: </div>
-    <div id="timer-display">残り時間: 60 秒</div>
-    <button id="start-game-btn">ゲーム開始</button>
+  <!-- ゲーム終了ダイアログ -->
+  <div class="dialog-overlay" style="display: none;">
+    <div class="dialog">
+      <h3>ゲーム終了！</h3>
+      <p>素晴らしいプレイでした！</p>
+      <div class="score">スコア: <span id="final-score">0</span></div>
+      <button id="restart-btn">もう一度プレイ</button>
+    </div>
   </div>
+
+  <!-- カーソルエフェクトのスクリプト -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cursor = document.querySelector('.cursor-wrapper');
+      let lastX = 0;
+      let lastY = 0;
+      let isMoving = false;
+      let moveTimeout;
+
+      // マウスの移動に合わせてカーソルを移動
+      window.addEventListener('mousemove', (e) => {
+        const posX = e.clientX;
+        const posY = e.clientY;
+
+        // 移動距離を計算
+        const distance = Math.hypot(posX - lastX, posY - lastY);
+
+        // 移動中フラグを設定
+        if (distance > 5) {
+          cursor.classList.add('moving');
+          clearTimeout(moveTimeout);
+          isMoving = true;
+
+          // 粒子の角度をランダムに設定
+          cursor.style.setProperty('--particle-angle', `${Math.random() * 90}deg`);
+        }
+
+        // 移動が止まったら少し待ってからmovingクラスを削除
+        moveTimeout = setTimeout(() => {
+          cursor.classList.remove('moving');
+          isMoving = false;
+        }, 100);
+
+        // 杖の先端（37,37）がマウス位置に来るように調整
+        cursor.style.transform = `translate(${posX - 37}px, ${posY - 37}px)`;
+
+        lastX = posX;
+        lastY = posY;
+      });
+
+      // クリック時のエフェクト
+      window.addEventListener('mousedown', () => {
+        document.body.classList.add('cursor-clicking');
+      });
+
+      window.addEventListener('mouseup', () => {
+        document.body.classList.remove('cursor-clicking');
+      });
+
+      // カーソルが画面外に出た時は非表示
+      document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+      });
+
+      document.addEventListener('mouseenter', () => {
+        cursor.style.opacity = '1';
+      });
+    });
+  </script>
+
+  <!-- ▼球面レンズ風フィルターを定義 -->
+  <!-- フィルター定義: filterUnits="objectBoundingBox" で2倍領域に広げる -->
+  <svg style="position:absolute; width:0; height:0;" aria-hidden="true">
+    <filter id="crystalSphereEffect" filterUnits="objectBoundingBox" x="-0.5" y="-0.5" width="2" height="2"
+      color-interpolation-filters="sRGB">
+      <!-- 要素全体(0～1)を覆うfeImage -->
+      <feImage x="0" y="0" width="1" height="1" preserveAspectRatio="none" xlink:href="data:image/svg+xml;charset=utf-8,
+        <svg xmlns='http://www.w3.org/2000/svg' width='100%%' height='100%%'>
+          <defs>
+            <radialGradient id='radGrad' cx='50%%' cy='50%%' r='50%%'>
+              <stop offset='0%%'   stop-color='rgb(128,128,128)'/>
+              <stop offset='80%%'  stop-color='rgb(64,64,64)'/>
+              <stop offset='100%%' stop-color='rgb(48,48,48)'/>
+            </radialGradient>
+          </defs>
+          <rect width='100%%' height='100%%' fill='url(#radGrad)'/>
+        </svg>" result="radMap" />
+
+      <!-- DisplacementMap: scaleを大きめにすると外縁が激しく歪む -->
+      <feDisplacementMap in="SourceGraphic" in2="radMap" scale="10" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
 
   <!-- バンドル後のJS -->
   <script src="./bundle.js"></script>
