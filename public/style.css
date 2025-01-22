@@ -441,6 +441,11 @@ button:disabled {
   animation: particleFloat 1.6s ease-out infinite 0.5s;
 }
 
+/* ボタンのカーソルスタイル */
+button {
+  cursor: none !important;
+}
+
 .magic-wand {
   width: 48px;
   height: 48px;
@@ -449,6 +454,7 @@ button:disabled {
   left: 0;
   filter: drop-shadow(0 0 10px rgba(201, 160, 220, 0.4)) drop-shadow(0 0 20px rgba(128, 0, 128, 0.2));
   transition: all 0.3s ease;
+  pointer-events: none;
 }
 
 /* 杖の先端の光るエフェクト */
