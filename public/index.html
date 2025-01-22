@@ -185,7 +185,8 @@
     function updateRank(score) {
       // 現在のスコアに基づいて称号を決定
       const currentRank = RANKS.reduce((prev, curr) =>
-        score >= curr.minScore ? curr : prev
+        score >= curr.minScore ? curr : prev,
+        RANKS[0] // 初期値として最初のランク（見習い魔術師）を設定
       );
 
       // 称号表示の更新
