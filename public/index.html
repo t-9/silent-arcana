@@ -14,6 +14,9 @@
   <!-- カスタムカーソル -->
   <div class="cursor-wrapper">
     <object type="image/svg+xml" data="./magic-wand.svg" class="magic-wand"></object>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
   </div>
 
   <h1>Silent Arcana - Hand Tracking MVP</h1>
@@ -65,13 +68,40 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const cursor = document.querySelector('.cursor-wrapper');
+      let lastX = 0;
+      let lastY = 0;
+      let isMoving = false;
+      let moveTimeout;
 
       // マウスの移動に合わせてカーソルを移動
       window.addEventListener('mousemove', (e) => {
         const posX = e.clientX;
         const posY = e.clientY;
 
-        cursor.style.transform = `translate(${posX}px, ${posY}px)`;
+        // 移動距離を計算
+        const distance = Math.hypot(posX - lastX, posY - lastY);
+
+        // 移動中フラグを設定
+        if (distance > 5) {
+          cursor.classList.add('moving');
+          clearTimeout(moveTimeout);
+          isMoving = true;
+
+          // 粒子の角度をランダムに設定
+          cursor.style.setProperty('--particle-angle', `${Math.random() * 90}deg`);
+        }
+
+        // 移動が止まったら少し待ってからmovingクラスを削除
+        moveTimeout = setTimeout(() => {
+          cursor.classList.remove('moving');
+          isMoving = false;
+        }, 100);
+
+        // 杖の先端（25,25）がマウス位置に来るように調整
+        cursor.style.transform = `translate(${posX - 25}px, ${posY - 25}px)`;
+
+        lastX = posX;
+        lastY = posY;
       });
 
       // クリック時のエフェクト

@@ -368,10 +368,85 @@ button:disabled {
   transition: transform 0.1s ease;
 }
 
+/* 魔法の粒子エフェクト */
+.cursor-wrapper::before,
+.cursor-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #c9a0dc;
+  opacity: 0;
+  pointer-events: none;
+  animation: particleFloat 1.5s ease-out infinite;
+}
+
+.cursor-wrapper::after {
+  animation-delay: 0.3s;
+  width: 3px;
+  height: 3px;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(calc(10px * cos(var(--particle-angle, 45deg))),
+        calc(-20px + 10px * sin(var(--particle-angle, 45deg)))) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 移動時の追加の粒子 */
+.cursor-wrapper.moving::before {
+  --particle-angle: 30deg;
+}
+
+.cursor-wrapper.moving::after {
+  --particle-angle: 60deg;
+}
+
+.cursor-wrapper.moving .particle {
+  opacity: 1;
+}
+
+/* 粒子要素 */
+.particle {
+  position: absolute;
+  top: 25px;
+  left: 25px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #c9a0dc 60%, transparent 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.particle:nth-child(1) {
+  animation: particleFloat 2s ease-out infinite 0.1s;
+}
+
+.particle:nth-child(2) {
+  animation: particleFloat 1.8s ease-out infinite 0.3s;
+}
+
+.particle:nth-child(3) {
+  animation: particleFloat 1.6s ease-out infinite 0.5s;
+}
+
 .magic-wand {
   width: 32px;
   height: 32px;
-  transform: translate(-25px, -25px);
+  position: absolute;
+  top: 0;
+  left: 0;
   filter: drop-shadow(0 0 10px rgba(201, 160, 220, 0.4)) drop-shadow(0 0 20px rgba(128, 0, 128, 0.2));
   transition: all 0.3s ease;
 }
