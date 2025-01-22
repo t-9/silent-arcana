@@ -64,6 +64,8 @@ export async function detectLoop(
       const keypoints = hands[0].keypoints.map(point => [point.x, point.y]);
       await handleGestureDetection(keypoints);
     }
+    // ゲーム中はメッセージ表示を行わない
+    messageEl.textContent = '';
   } else {
     // ゲーム外の場合は、従来どおり手話名を表示するだけ
     const hands = await detector.estimateHands(videoEl);
