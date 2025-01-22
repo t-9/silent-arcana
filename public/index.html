@@ -11,6 +11,11 @@
 </head>
 
 <body>
+  <!-- カスタムカーソル -->
+  <div class="cursor-wrapper">
+    <object type="image/svg+xml" data="./magic-wand.svg" class="magic-wand"></object>
+  </div>
+
   <h1>Silent Arcana - Hand Tracking MVP</h1>
 
   <div class="main-content">
@@ -55,6 +60,39 @@
       <button id="restart-btn">もう一度プレイ</button>
     </div>
   </div>
+
+  <!-- カーソルエフェクトのスクリプト -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cursor = document.querySelector('.cursor-wrapper');
+
+      // マウスの移動に合わせてカーソルを移動
+      window.addEventListener('mousemove', (e) => {
+        const posX = e.clientX;
+        const posY = e.clientY;
+
+        cursor.style.transform = `translate(${posX}px, ${posY}px)`;
+      });
+
+      // クリック時のエフェクト
+      window.addEventListener('mousedown', () => {
+        document.body.classList.add('cursor-clicking');
+      });
+
+      window.addEventListener('mouseup', () => {
+        document.body.classList.remove('cursor-clicking');
+      });
+
+      // カーソルが画面外に出た時は非表示
+      document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+      });
+
+      document.addEventListener('mouseenter', () => {
+        cursor.style.opacity = '1';
+      });
+    });
+  </script>
 
   <!-- バンドル後のJS -->
   <script src="./bundle.js"></script>
