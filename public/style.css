@@ -76,17 +76,128 @@ h1 {
 
 .video-container {
   position: relative;
-  width: 100%;
+  width: 90%;
   height: 0;
-  padding-bottom: 62.5%;
-  /* 16:10のアスペクト比 */
+  padding-bottom: 90%;
+  /* 正円にする */
+  margin: 2rem auto 0;
+  /* 下マージンを削除 */
   background: rgba(0, 0, 0, 0.8);
-  border-radius: 8px;
+  border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(128, 0, 128, 0.3);
-  box-shadow: 0 0 20px rgba(128, 0, 128, 0.2);
+  border: 3px solid rgba(201, 160, 220, 0.3);
+  box-shadow:
+    inset 0 0 50px rgba(201, 160, 220, 0.2),
+    inset 0 0 100px rgba(128, 0, 128, 0.2),
+    0 0 30px rgba(201, 160, 220, 0.4),
+    0 0 60px rgba(128, 0, 128, 0.2);
+  transform: perspective(1000px) rotateX(5deg);
+  transition: all 0.3s ease;
 }
 
+/* 水晶の光沢効果 */
+.video-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(circle at 30% 30%,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.1) 15%,
+      transparent 60%),
+    radial-gradient(circle at 70% 70%,
+      rgba(201, 160, 220, 0.1) 0%,
+      transparent 60%);
+  z-index: 2;
+  pointer-events: none;
+  animation: crystalShine 15s infinite linear;
+}
+
+/* 水晶の縁の輝き */
+.video-container::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(201, 160, 220, 0.3) 45%,
+      rgba(201, 160, 220, 0.5) 50%,
+      rgba(201, 160, 220, 0.3) 55%,
+      transparent 70%);
+  z-index: 1;
+  animation: crystalBorder 8s infinite linear;
+}
+
+/* 台座 */
+.video-container-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: calc(90% + 4rem);
+  /* 水晶玉の高さ + 台座の高さ */
+}
+
+.video-container-wrapper .video-container {
+  position: absolute;
+  top: 0;
+  left: 5%;
+  width: 90%;
+  height: auto;
+}
+
+.crystal-base {
+  position: absolute;
+  bottom: 2rem;
+  /* 下部の余白 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 54%;
+  /* 水晶玉の90%の60% */
+  height: 4rem;
+  background: linear-gradient(to bottom,
+      #4a0080,
+      #2a0048);
+  clip-path: polygon(20% 0%,
+      80% 0%,
+      100% 100%,
+      0% 100%);
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(128, 0, 128, 0.2);
+}
+
+.crystal-base::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1rem;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(201, 160, 220, 0.3) 30%,
+      rgba(201, 160, 220, 0.5) 50%,
+      rgba(201, 160, 220, 0.3) 70%,
+      transparent 100%);
+  animation: baseShine 4s infinite linear;
+}
+
+@keyframes baseShine {
+  0% {
+    opacity: 0.3;
+    transform: translateX(-100%);
+  }
+
+  100% {
+    opacity: 0.7;
+    transform: translateX(100%);
+  }
+}
+
+/* 球体の3D効果を強調 */
 #video {
   position: absolute;
   top: 0;
@@ -94,12 +205,48 @@ h1 {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 50%;
+  transform: scale(1.1);
+  filter:
+    brightness(1.1) contrast(1.1) url('data:image/svg+xml,\
+      <svg xmlns="http://www.w3.org/2000/svg">\
+        <filter id="sphere">\
+          <feGaussianBlur stdDeviation="2" />\
+          <feColorMatrix type="matrix" values="\
+            1.1 0 0 0 0\
+            0 1.1 0 0 0\
+            0 0 1.1 0 0\
+            0 0 0 1 0"/>\
+        </filter>\
+      </svg>#sphere');
+  z-index: 1;
+}
+
+/* 水晶玉のホバーエフェクト */
+.video-container:hover {
+  transform: perspective(1000px) rotateX(5deg) scale(1.02);
+  box-shadow:
+    inset 0 0 70px rgba(201, 160, 220, 0.3),
+    inset 0 0 120px rgba(128, 0, 128, 0.3),
+    0 0 40px rgba(201, 160, 220, 0.5),
+    0 0 80px rgba(128, 0, 128, 0.3);
 }
 
 @media (max-width: 1024px) {
-  .video-container {
-    padding-bottom: 75%;
-    /* 4:3のアスペクト比に変更 */
+  .video-container-wrapper {
+    padding-bottom: calc(100% + 3rem);
+    /* モバイルでの水晶玉の高さ + 台座の高さ */
+  }
+
+  .video-container-wrapper .video-container {
+    width: 100%;
+    left: 0;
+  }
+
+  .crystal-base {
+    width: 80%;
+    height: 3rem;
+    bottom: 1.5rem;
   }
 }
 
