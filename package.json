@@ -1,6 +1,6 @@
 {
   "name": "silent-arcana",
-  "version": "1.4.16",
+  "version": "1.4.17",
   "description": "A web-based sign language learning platform that uses gamification to foster inclusive workplace communication.",
   "main": "src/app.ts",
   "type": "module",

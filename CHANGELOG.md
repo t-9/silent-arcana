@@ -1,3 +1,10 @@
+## [1.4.17](https://github.com/t-9/silent-arcana/compare/v1.4.16...v1.4.17) (2025-01-22)
+
+
+### Bug Fixes
+
+* format ([d3dd447](https://github.com/t-9/silent-arcana/commit/d3dd447cc34c949c32a8624879499e9c1059d2d3))
+
 ## [1.4.16](https://github.com/t-9/silent-arcana/compare/v1.4.15...v1.4.16) (2025-01-11)
 
 
