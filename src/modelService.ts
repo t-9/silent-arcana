@@ -58,7 +58,14 @@ export async function detectLoop(
   const gameState = getGameState();
   if (gameState.isRunning) {
     // ゲーム中ならゲームハンドラの検出処理を呼ぶ
-    await handleGestureDetection(videoEl, messageEl, loadedGestures);
+    const hands = await detector.estimateHands(videoEl);
+    if (hands && hands.length > 0) {
+      // キーポイントを[x, y]の配列に変換
+      const keypoints = hands[0].keypoints.map(point => [point.x, point.y]);
+      await handleGestureDetection(keypoints);
+    }
+    // ゲーム中はメッセージ表示を行わない
+    messageEl.textContent = '';
   } else {
     // ゲーム外の場合は、従来どおり手話名を表示するだけ
     const hands = await detector.estimateHands(videoEl);

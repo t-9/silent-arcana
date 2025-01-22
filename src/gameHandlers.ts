@@ -6,27 +6,7 @@ import {
   selectNextGesture,
   getGameState,
 } from './gameService';
-import { detectGesture, Gesture } from './gestureService';
-import { getDetector } from './modelService';
-
-/**
- * カメラ映像から手のキーポイントを取得する関数
- */
-async function getHandKeypoints(videoEl: HTMLVideoElement) {
-  const detector = getDetector();
-  if (!detector) {
-    console.error('HandDetectorが利用できません');
-    return [];
-  }
-
-  const hands = await detector.estimateHands(videoEl);
-  if (hands.length === 0) {
-    console.warn('手が検出されていません');
-    return [];
-  }
-
-  return hands[0].keypoints;
-}
+import { detectGesture, Gesture, getGestures } from './gestureService';
 
 /**
  * ゲーム終了時のダイアログを表示
@@ -111,54 +91,59 @@ export function updateGameUI(
 /**
  * 手話の検出を処理 (ゲーム中はこちらを呼ぶ)
  */
-export async function handleGestureDetection(
-  videoEl: HTMLVideoElement,
-  messageEl: HTMLElement,
-  gestures: Gesture[],
-) {
-  // 手のキーポイントを取得
-  const keypoints = await getHandKeypoints(videoEl);
-  if (!keypoints || keypoints.length === 0) {
-    messageEl.textContent = '手が検出されていません';
-    return;
-  }
-
-  // データからジェスチャー名を推定
-  const detectedGesture = detectGesture(keypoints, gestures);
-  if (!detectedGesture) {
-    messageEl.textContent = '該当する手話が見つかりません';
-    return;
-  }
-
-  // 現在のゲーム状態・現在のジェスチャーを取得
+export async function handleGestureDetection(landmarks: number[][]): Promise<void> {
   const state = getGameState();
-  if (!state.currentGesture) {
-    // もう手話が残っていない場合
-    messageEl.textContent = 'ゲームは終了しています';
-    return;
-  }
+  if (!state.isRunning || !state.currentGesture) return;
 
-  // 「現在のジェスチャーと一致した」場合のみスコア加算 & 次の手話へ
+  // ランドマークデータを{x, y}形式に変換
+  const formattedLandmarks = landmarks.map(point => ({
+    x: point[0],
+    y: point[1]
+  }));
+
+  const gestures = getGestures();
+  const detectedGesture = detectGesture(formattedLandmarks, gestures);
   if (detectedGesture === state.currentGesture.name) {
-    console.log(`正解ジェスチャー検出: ${detectedGesture}`);
+    // スコアを更新
     updateScore(10);
-    messageEl.textContent = `正解！ジェスチャー: ${detectedGesture}`;
 
-    // 次のジェスチャーへ (ランダムに選択する想定)
-    const nextGesture = selectNextGesture(gestures);
-    if (nextGesture) {
-      messageEl.textContent += ` / 次の手話: ${nextGesture.name}`;
-    } else {
-      messageEl.textContent += ' / 手話リストが終了しました';
+    // 称号システムの更新
+    const updateScoreUI = (window as any).updateScore;
+    if (typeof updateScoreUI === 'function') {
+      updateScoreUI(state.score);
     }
-  } else {
-    // 手話は検出されたが、現在のジェスチャーと違う場合
-    messageEl.textContent = `違う手話です: ${detectedGesture}`;
+
+    // 次のジェスチャーを選択
+    const nextGesture = selectNextGesture(gestures);
+
+    // UI更新
+    const gestureDisplay = document.getElementById('gesture-display');
+    if (gestureDisplay && nextGesture) {
+      gestureDisplay.textContent = `手話を実行してください: ${nextGesture.name}`;
+    }
+  }
+}
+
+export function handleGestureSuccess(): void {
+  const state = getGameState();
+  if (!state.isRunning) return;
+
+  // スコアを更新
+  updateScore(10);
+
+  // 称号システムの更新
+  const updateScoreUI = (window as any).updateScore;
+  if (typeof updateScoreUI === 'function') {
+    updateScoreUI(state.score);
   }
 
-  // ゲームUIを更新
-  updateGameUI(
-    document.getElementById('score-display')!,
-    document.getElementById('gesture-display')!,
-  );
+  // 次のジェスチャーを選択
+  const gestures = getGestures();
+  const nextGesture = selectNextGesture(gestures);
+
+  // UI更新
+  const gestureDisplay = document.getElementById('gesture-display');
+  if (gestureDisplay && nextGesture) {
+    gestureDisplay.textContent = `手話を実行してください: ${nextGesture.name}`;
+  }
 }
