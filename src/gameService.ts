@@ -3,6 +3,7 @@ import { Gesture } from './gestureService';
 
 export type GameState = {
   score: number;
+  highScore: number;
   currentGesture: Gesture | null;
   remainingTime: number; // 秒単位
   isRunning: boolean;
@@ -11,6 +12,7 @@ export type GameState = {
 const GAME_TIME = 60; // ゲーム全体の制限時間(秒)
 let state: GameState = {
   score: 0,
+  highScore: Number(localStorage.getItem('highScore')) || 0,
   currentGesture: null,
   remainingTime: GAME_TIME,
   isRunning: false,
@@ -23,6 +25,7 @@ export function getGameState(): GameState {
 export function startGame(gestures: Gesture[]): void {
   state = {
     score: 0,
+    highScore: Number(localStorage.getItem('highScore')) || 0,
     currentGesture: gestures[0] || null,
     remainingTime: GAME_TIME,
     isRunning: true,
@@ -32,6 +35,11 @@ export function startGame(gestures: Gesture[]): void {
 
 export function stopGame(): void {
   state.isRunning = false;
+  // ハイスコアの更新
+  if (state.score > state.highScore) {
+    state.highScore = state.score;
+    localStorage.setItem('highScore', state.score.toString());
+  }
   console.log('ゲームを終了しました:', state);
 }
 
