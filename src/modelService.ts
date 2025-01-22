@@ -61,7 +61,7 @@ export async function detectLoop(
     const hands = await detector.estimateHands(videoEl);
     if (hands && hands.length > 0) {
       // キーポイントを[x, y]の配列に変換
-      const keypoints = hands[0].keypoints.map(point => [point.x, point.y]);
+      const keypoints = hands[0].keypoints.map((point) => [point.x, point.y]);
       await handleGestureDetection(keypoints);
     }
     // ゲーム中はメッセージ表示を行わない

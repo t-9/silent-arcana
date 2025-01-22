@@ -17,11 +17,14 @@ export async function startCamera(
         if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) {
           reject(new Error('カメラのビデオ解像度が不正です'));
         } else {
-          console.log(`ビデオ解像度: ${videoEl.videoWidth}x${videoEl.videoHeight}`);
+          console.log(
+            `ビデオ解像度: ${videoEl.videoWidth}x${videoEl.videoHeight}`,
+          );
           resolve();
         }
       };
-      videoEl.onerror = () => reject(new Error('ビデオの読み込みに失敗しました'));
+      videoEl.onerror = () =>
+        reject(new Error('ビデオの読み込みに失敗しました'));
     });
 
     // ビデオ再生

@@ -39,7 +39,13 @@ export async function init(): Promise<void> {
   await loadModel((text: string) => setLoadingText(loadingEl, text));
 
   const gestures = await loadGestureData('./templates/normalizedGestures.json');
-  setupGameUI(startGameBtn, scoreDisplay, gestureDisplay, timerDisplay, gestures);
+  setupGameUI(
+    startGameBtn,
+    scoreDisplay,
+    gestureDisplay,
+    timerDisplay,
+    gestures,
+  );
 
   // カメラ開始後に`detectLoop`を呼び出す
   setupStartButton({
