@@ -6,13 +6,17 @@ export interface Gesture {
   landmarks: [number, number][]; // 21点ぶんの (x, y) 座標
 }
 
+// ジェスチャーデータを保持する変数
+let gestures: Gesture[] = [];
+
 /**
  * JSONの "gestures" 配列だけ抜き出して返す関数
  */
 export async function loadGestureData(url: string): Promise<Gesture[]> {
   const res = await fetch(url);
   const data = await res.json();
-  return data.gestures;
+  gestures = data.gestures; // ロードしたデータを保存
+  return gestures;
 }
 
 /**
@@ -86,4 +90,8 @@ export function detectGesture(
 
   // 最小距離がしきい値より小さければジェスチャー名、それ以外は null
   return minDistance < distanceThreshold ? bestGesture : null;
+}
+
+export function getGestures(): Gesture[] {
+  return gestures;
 }

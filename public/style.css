@@ -347,7 +347,7 @@ h1 {
 
 .game-info {
   display: grid;
-  grid-template-rows: repeat(3, auto);
+  grid-template-rows: repeat(4, auto);
   gap: 1rem;
   padding: 1.2rem;
   background: rgba(0, 0, 0, 0.3);
@@ -700,4 +700,55 @@ button:hover~.cursor-wrapper .wand-gem {
   .cursor-wrapper {
     display: none;
   }
+}
+
+#rank-display {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(128, 0, 128, 0.2);
+}
+
+.rank-title {
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-weight: bold;
+  color: #c9a0dc;
+  text-shadow: 0 0 5px rgba(201, 160, 220, 0.3);
+  margin-bottom: 0.8rem;
+}
+
+.rank-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rank-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#rank-progress-bar {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #4a0080, #800080);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(128, 0, 128, 0.3);
+}
+
+.rank-text {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+  text-align: right;
+}
+
+.final-rank {
+  font-size: clamp(1.3rem, 4vw, 1.6rem);
+  color: #c9a0dc;
+  margin: 1rem 0;
+  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3);
 }

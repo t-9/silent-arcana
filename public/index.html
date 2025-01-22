@@ -51,6 +51,15 @@
 
       <div class="game-info">
         <div id="score-display">スコア: 0</div>
+        <div id="rank-display">
+          <div class="rank-title">称号: <span id="current-rank">見習い魔術師</span></div>
+          <div class="rank-progress">
+            <div class="rank-bar">
+              <div id="rank-progress-bar"></div>
+            </div>
+            <div class="rank-text">次の称号まで: <span id="next-rank-score">50</span>ポイント</div>
+          </div>
+        </div>
         <div id="gesture-display">手話を実行してください: </div>
         <div id="timer-display">残り時間: 60 秒</div>
       </div>
@@ -64,6 +73,7 @@
     <div class="dialog">
       <h3>ゲーム終了！</h3>
       <p>素晴らしいプレイでした！</p>
+      <div class="final-rank">称号: <span id="final-rank">見習い魔術師</span></div>
       <div class="score">スコア: <span id="final-score">0</span></div>
       <button id="restart-btn">もう一度プレイ</button>
     </div>
@@ -152,6 +162,71 @@
     </filter>
   </svg>
 
+  <!-- 称号システムの定義 -->
+  <script>
+    const RANKS = [
+      { title: "見習い魔術師", minScore: 0, nextScore: 50 },
+      { title: "初級魔導士", minScore: 50, nextScore: 100 },
+      { title: "中級魔導士", minScore: 100, nextScore: 200 },
+      { title: "上級魔導士", minScore: 200, nextScore: 350 },
+      { title: "魔道師", minScore: 350, nextScore: 500 },
+      { title: "大魔導士", minScore: 500, nextScore: 700 },
+      { title: "賢者", minScore: 700, nextScore: 1000 },
+      { title: "大賢者", minScore: 1000, nextScore: 1500 },
+      { title: "魔法王", minScore: 1500, nextScore: null }
+    ];
+
+    let currentScore = 0;
+
+    function updateRank(score) {
+      // 現在のスコアに基づいて称号を決定
+      const currentRank = RANKS.reduce((prev, curr) =>
+        score >= curr.minScore ? curr : prev
+      );
+
+      // 称号表示の更新
+      const currentRankElem = document.getElementById('current-rank');
+      const progressBar = document.getElementById('rank-progress-bar');
+      const nextRankScore = document.getElementById('next-rank-score');
+
+      if (currentRankElem) {
+        currentRankElem.textContent = currentRank.title;
+      }
+
+      // プログレスバーと次の称号までの残りポイントを更新
+      if (currentRank.nextScore) {
+        const progress = ((score - currentRank.minScore) /
+          (currentRank.nextScore - currentRank.minScore)) * 100;
+        progressBar.style.width = `${progress}%`;
+        nextRankScore.textContent = currentRank.nextScore - score;
+      } else {
+        // 最高称号に達した場合
+        progressBar.style.width = '100%';
+        nextRankScore.parentElement.textContent = '最高称号達成！';
+      }
+
+      // ゲーム終了時の称号も更新
+      const finalRankElem = document.getElementById('final-rank');
+      if (finalRankElem) {
+        finalRankElem.textContent = currentRank.title;
+      }
+    }
+
+    // スコア更新関数を定義
+    function updateScore(score) {
+      currentScore = score;
+      const scoreDisplay = document.getElementById('score-display');
+      if (scoreDisplay) {
+        scoreDisplay.textContent = `スコア: ${score}`;
+      }
+      updateRank(score);
+    }
+
+    // ゲーム開始時に初期化
+    document.addEventListener('DOMContentLoaded', () => {
+      updateScore(0);
+    });
+  </script>
 
   <!-- バンドル後のJS -->
   <script src="./bundle.js"></script>
