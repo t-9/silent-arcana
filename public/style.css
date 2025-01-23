@@ -303,8 +303,7 @@ body {
   flex-wrap: wrap;
 }
 
-#start-btn,
-#capture-btn {
+#start-btn {
   padding: 0.8rem 1.5rem;
   background: linear-gradient(45deg, #4a0080, #800080);
   color: #fff;
@@ -321,8 +320,7 @@ body {
   min-width: 150px;
 }
 
-#start-btn:hover,
-#capture-btn:hover {
+#start-btn:hover {
   background: linear-gradient(45deg, #600080, #9a0080);
   box-shadow: 0 2px 15px rgba(128, 0, 128, 0.5);
   transform: translateY(-2px);

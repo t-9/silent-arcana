@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import { loadModel, startDetection, detectLoop } from './modelService';
 import { getElement } from './domUtils';
-import { setupStartButton, setupCaptureButton } from './eventHandlers';
+import { setupStartButton, setupKeyboardEvents } from './eventHandlers';
 import { setLoadingText } from './uiUtils';
 import { startCamera } from './cameraService';
 import { setupGameUI } from './gameHandlers';
@@ -18,7 +18,6 @@ export async function init(): Promise<void> {
   const loadingEl = getElement<HTMLElement>('loading');
   const messageEl = getElement<HTMLElement>('message');
   const startBtn = getElement<HTMLElement>('start-btn');
-  const captureBtn = getElement<HTMLButtonElement>('capture-btn');
   // ゲームUI要素を取得
   const startGameBtn = getElement<HTMLButtonElement>('start-game-btn');
   const scoreDisplay = getElement<HTMLElement>('score-display');
@@ -26,7 +25,7 @@ export async function init(): Promise<void> {
   const timerDisplay = getElement<HTMLElement>('timer-display');
 
   // 必須要素が見つからない場合はエラー
-  if (!videoEl || !loadingEl || !messageEl || !startBtn || !captureBtn) {
+  if (!videoEl || !loadingEl || !messageEl || !startBtn) {
     console.error('DOM要素が見つからない');
     return;
   }
@@ -50,7 +49,6 @@ export async function init(): Promise<void> {
   // カメラ開始後に`detectLoop`を呼び出す
   setupStartButton({
     startBtn,
-    captureBtn,
     videoEl,
     messageEl,
     setLoadingText: (text: string) => setLoadingText(loadingEl, text),
@@ -63,8 +61,8 @@ export async function init(): Promise<void> {
     detectLoopFn: detectLoop, // そのまま`detectLoop`を渡す
   });
 
-  // キャプチャボタンを設定
-  setupCaptureButton(captureBtn, videoEl);
+  // キーボードイベントの設定
+  setupKeyboardEvents(videoEl);
 }
 
 // ブラウザ実行時のみ初期化
