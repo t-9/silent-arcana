@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Silent Arcana - Hands MVP</title>
+  <title>Silent Arcana</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
@@ -21,8 +21,6 @@
     <div class="particle"></div>
   </div>
 
-  <h1>Silent Arcana - Hand Tracking MVP</h1>
-
   <div class="main-content">
     <div class="container">
       <!-- ゲームの読み込みやメッセージ表示 -->
@@ -38,19 +36,11 @@
         </div>
       </div>
 
-      <div id="message"></div>
+      <div id="message" data-text=""></div>
     </div>
 
     <!-- ゲーム用のUI -->
     <div id="game-ui">
-      <h2>手話学習ゲーム</h2>
-
-      <!-- カメラ操作 -->
-      <div class="camera-controls">
-        <button id="start-btn">カメラ開始</button>
-        <button id="capture-btn" disabled>キャプチャ</button>
-      </div>
-
       <div class="game-info">
         <div id="score-display">スコア: 0</div>
         <div id="high-score-display">ハイスコア: 0</div>

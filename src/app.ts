@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import { loadModel, startDetection, detectLoop } from './modelService';
 import { getElement } from './domUtils';
-import { setupStartButton, setupCaptureButton } from './eventHandlers';
+import { setupKeyboardEvents } from './eventHandlers';
 import { setLoadingText } from './uiUtils';
 import { startCamera } from './cameraService';
 import { setupGameUI } from './gameHandlers';
@@ -17,8 +17,6 @@ export async function init(): Promise<void> {
   const videoEl = getElement<HTMLVideoElement>('video');
   const loadingEl = getElement<HTMLElement>('loading');
   const messageEl = getElement<HTMLElement>('message');
-  const startBtn = getElement<HTMLElement>('start-btn');
-  const captureBtn = getElement<HTMLButtonElement>('capture-btn');
   // ゲームUI要素を取得
   const startGameBtn = getElement<HTMLButtonElement>('start-game-btn');
   const scoreDisplay = getElement<HTMLElement>('score-display');
@@ -26,7 +24,7 @@ export async function init(): Promise<void> {
   const timerDisplay = getElement<HTMLElement>('timer-display');
 
   // 必須要素が見つからない場合はエラー
-  if (!videoEl || !loadingEl || !messageEl || !startBtn || !captureBtn) {
+  if (!videoEl || !loadingEl || !messageEl) {
     console.error('DOM要素が見つからない');
     return;
   }
@@ -47,24 +45,13 @@ export async function init(): Promise<void> {
     gestures,
   );
 
-  // カメラ開始後に`detectLoop`を呼び出す
-  setupStartButton({
-    startBtn,
-    captureBtn,
-    videoEl,
-    messageEl,
-    setLoadingText: (text: string) => setLoadingText(loadingEl, text),
-    startCameraFn: async (video, setLoading) => {
-      await startCamera(video, setLoading); // カメラの初期化
-      startDetection(); // 推定を開始
-      detectLoop(video, messageEl); // 検出ループを開始
-    },
-    startDetectionFn: startDetection,
-    detectLoopFn: detectLoop, // そのまま`detectLoop`を渡す
-  });
+  // カメラを自動的に開始
+  startDetection();
+  await startCamera(videoEl, (text: string) => setLoadingText(loadingEl, text));
+  detectLoop(videoEl, messageEl);
 
-  // キャプチャボタンを設定
-  setupCaptureButton(captureBtn, videoEl);
+  // キーボードイベントの設定
+  setupKeyboardEvents(videoEl);
 }
 
 // ブラウザ実行時のみ初期化

@@ -4,6 +4,7 @@ import { createHandDetector } from './detectionModule';
 import { Gesture, loadGestureData, detectGesture } from './gestureService';
 import { getGameState } from './gameService'; // ★追加: ゲーム状態を参照
 import { handleGestureDetection } from './gameHandlers'; // ★追加: ゲーム用ハンドラを呼ぶ
+import { setLoadingText } from './uiUtils';
 
 let detector: HandDetector | null = null;
 let running = false;
@@ -20,22 +21,42 @@ export function getDetector(): HandDetector | null {
 export async function loadModel(
   setLoading: (text: string) => void,
 ): Promise<HandDetector> {
-  setLoading('モデル読み込み中...');
-  detector = await createHandDetector();
-  console.log('MediaPipe Handsモデル読み込み完了');
-  setLoading('');
-
-  // ジェスチャーデータの読み込み
-  try {
-    loadedGestures = await loadGestureData(
-      './templates/normalizedGestures.json',
-    );
-    console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
-  } catch (e) {
-    console.error('ジェスチャーデータの読み込みに失敗:', e);
+  const messageEl = document.getElementById('message');
+  if (!messageEl) {
+    throw new Error('メッセージ要素が見つかりません');
   }
 
-  return detector;
+  // setLoadingをオーバーライドして、messageElを使用するように変更
+  const originalSetLoading = setLoading;
+  setLoading = (text: string) => {
+    originalSetLoading(text);
+    setLoadingText(messageEl, text);
+  };
+
+  setLoading('モデルを読み込んでいます...');
+
+  try {
+    detector = await createHandDetector();
+    console.log('MediaPipe Handsモデル読み込み完了');
+    setLoading('');
+
+    // ジェスチャーデータの読み込み
+    try {
+      loadedGestures = await loadGestureData(
+        './templates/normalizedGestures.json',
+      );
+      console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
+    } catch (e) {
+      console.error('ジェスチャーデータの読み込みに失敗:', e);
+    }
+
+    return detector;
+  } catch (err) {
+    const errorText = 'モデルの読み込みに失敗しました';
+    console.error(errorText, err);
+    setLoading(errorText);
+    throw err;
+  }
 }
 
 /**
@@ -50,7 +71,7 @@ export async function detectLoop(
   // ビデオ要素が正しく設定されているか確認
   if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) {
     console.error('ビデオが適切に初期化されていません');
-    messageEl.textContent = 'ビデオの初期化に失敗しました';
+    setLoadingText(messageEl, 'ビデオの初期化に失敗しました');
     return;
   }
 
@@ -65,19 +86,19 @@ export async function detectLoop(
       await handleGestureDetection(keypoints);
     }
     // ゲーム中はメッセージ表示を行わない
-    messageEl.textContent = '';
+    setLoadingText(messageEl, '');
   } else {
     // ゲーム外の場合は、従来どおり手話名を表示するだけ
     const hands = await detector.estimateHands(videoEl);
     if (hands && hands.length > 0) {
       const gestureName = detectGesture(hands[0].keypoints, loadedGestures);
       if (gestureName) {
-        messageEl.textContent = `検出された手話: ${gestureName}`;
+        setLoadingText(messageEl, `検出された手話: ${gestureName}`);
       } else {
-        messageEl.textContent = '該当する手話が見つかりません';
+        setLoadingText(messageEl, '該当する手話が見つかりません');
       }
     } else {
-      messageEl.textContent = '手が検出されていません';
+      setLoadingText(messageEl, '手が検出されていません');
     }
   }
 
