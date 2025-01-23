@@ -33,6 +33,9 @@ export async function init(): Promise<void> {
     return;
   }
 
+  // ゲーム開始ボタンを一時的に無効化
+  startGameBtn.disabled = true;
+
   // モデルを読み込み
   await loadModel((text: string) => setLoadingText(loadingEl, text));
 
@@ -47,8 +50,15 @@ export async function init(): Promise<void> {
 
   // カメラを自動的に開始
   startDetection();
-  await startCamera(videoEl, (text: string) => setLoadingText(loadingEl, text));
-  detectLoop(videoEl, messageEl);
+  try {
+    await startCamera(videoEl, (text: string) => setLoadingText(loadingEl, text));
+    detectLoop(videoEl, messageEl);
+    // カメラの開始が成功したらボタンを有効化
+    startGameBtn.disabled = false;
+  } catch (error) {
+    console.error('カメラの開始に失敗しました:', error);
+    setLoadingText(messageEl, 'カメラの開始に失敗しました。ページを再読み込みしてください。');
+  }
 
   // キーボードイベントの設定
   setupKeyboardEvents(videoEl);
