@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- ノイズテクスチャ（より粗い） -->
+    <filter id="roughNoise" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="7" seed="5" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="
+        0.3 0 0 0 0
+        0 0.3 0 0 0
+        0 0 0.3 0 0
+        0 0 0 0.5 0"/>
+    </filter>
+
+    <!-- 細かいノイズ -->
+    <filter id="fineNoise" x="-50%" y="-50%" width="200%" height="200%">
+      <feTurbulence type="turbulence" baseFrequency="1.5" numOctaves="4" seed="2" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="
+        0.1 0 0 0 0
+        0 0.1 0 0 0
+        0 0 0.1 0 0
+        0 0 0 0.3 0"/>
+    </filter>
+    
+    <!-- より暗い羊皮紙のグラデーション -->
+    <linearGradient id="parchmentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4b684"/>
+      <stop offset="25%" stop-color="#c4a574"/>
+      <stop offset="50%" stop-color="#b89664"/>
+      <stop offset="75%" stop-color="#aa8754"/>
+      <stop offset="100%" stop-color="#9e7b44"/>
+    </linearGradient>
+
+    <!-- エッジの装飾用パターン -->
+    <pattern id="edgePattern" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M0,15 Q7,15 15,0 Q22,15 30,15" fill="none" stroke="#614b2a" stroke-width="0.8" opacity="0.15"/>
+      <path d="M15,0 Q22,15 30,15" fill="none" stroke="#614b2a" stroke-width="0.8" opacity="0.15" transform="rotate(90, 15, 15)"/>
+    </pattern>
+
+    <!-- ざらつき用のテクスチャ -->
+    <filter id="paperTexture">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="5" seed="3" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="
+        0.2 0 0 0 0
+        0 0.2 0 0 0
+        0 0 0.2 0 0
+        0 0 0 0.4 0"/>
+      <feComposite operator="in" in2="SourceGraphic"/>
+    </filter>
+
+    <!-- 羊皮紙の複雑なグラデーション -->
+    <radialGradient id="centerLight" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#e8d5a9"/>
+      <stop offset="70%" stop-color="#d4b684"/>
+      <stop offset="100%" stop-color="#c4a574"/>
+    </radialGradient>
+
+    <linearGradient id="darkEdges" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#aa8754"/>
+      <stop offset="30%" stop-color="#b89664" stop-opacity="0.6"/>
+      <stop offset="70%" stop-color="#b89664" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#9e7b44"/>
+    </linearGradient>
+
+    <!-- 繊維質感のフィルター -->
+    <filter id="paperFibers">
+      <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="5" seed="5" stitchTiles="stitch"/>
+      <feColorMatrix type="matrix" values="
+        0.3 0 0 0 0
+        0 0.3 0 0 0
+        0 0 0.3 0 0
+        0 0 0 0.5 0"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+    </filter>
+
+    <!-- シミのような染みフィルター -->
+    <filter id="stains">
+      <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="3" seed="10"/>
+      <feColorMatrix type="matrix" values="
+        0.1 0 0 0 0
+        0 0.1 0 0 0
+        0 0 0.1 0 0
+        0 0 0 0.1 0"/>
+    </filter>
+
+    <!-- 破れ目用のマスク -->
+    <mask id="tornMask">
+      <rect width="800" height="300" fill="white"/>
+      
+      <!-- 大きな破れと剥がれ: 左上 -->
+      <path d="M0,0 
+               L200,0
+               L190,25
+               Q188,27 190,29
+               Q192,31 190,33
+               Q188,35 190,37
+               L180,40
+               Q178,42 176,40
+               Q174,38 172,40
+               Q170,42 168,40
+               L160,35
+               Q158,33 156,35
+               Q154,37 152,35
+               L140,30
+               Q138,28 136,30
+               Q134,32 132,30
+               L120,25
+               Q118,23 116,25
+               Q114,27 112,25
+               L100,20
+               Q98,18 96,20
+               Q94,22 92,20
+               L80,15
+               Q78,13 76,15
+               Q74,17 72,15
+               L0,10
+               Z" 
+            fill="black"/>
+
+      <!-- 大きな破れと剥がれ: 右上 -->
+      <path d="M600,0
+               L800,0
+               L800,30
+               L780,28
+               Q778,30 776,28
+               Q774,26 772,28
+               L760,25
+               Q758,23 756,25
+               Q754,27 752,25
+               L740,20
+               Q738,18 736,20
+               Q734,22 732,20
+               L720,15
+               Q718,13 716,15
+               Q714,17 712,15
+               L700,10
+               Q698,8 696,10
+               Q694,12 692,10
+               L680,5
+               Q678,3 676,5
+               Q674,7 672,5
+               L660,0
+               Z" 
+            fill="black"/>
+
+      <!-- 大きな破れと剥がれ: 右側 -->
+      <path d="M800,100
+               L780,98
+               Q778,100 780,102
+               Q782,104 780,106
+               Q778,108 780,110
+               L770,115
+               Q768,117 766,115
+               Q764,113 762,115
+               Q760,117 758,115
+               L750,110
+               Q748,108 746,110
+               Q744,112 742,110
+               L800,120
+               Z" 
+            fill="black"/>
+
+      <!-- 大きな破れと剥がれ: 左下 -->
+      <path d="M0,200
+               L40,198
+               Q42,200 40,202
+               Q38,204 40,206
+               Q42,208 40,210
+               L35,215
+               Q33,217 31,215
+               Q29,213 27,215
+               Q25,217 23,215
+               L20,220
+               Q18,222 16,220
+               Q14,218 12,220
+               L10,225
+               Q8,227 6,225
+               Q4,223 2,225
+               L0,230
+               Z" 
+            fill="black"/>
+
+      <!-- 大きな破れと剥がれ: 右下 -->
+      <path d="M800,250
+               L760,248
+               Q758,250 756,248
+               Q754,246 752,248
+               Q750,250 748,248
+               L745,252
+               Q743,254 741,252
+               Q739,250 737,252
+               L735,256
+               Q733,258 731,256
+               Q729,254 727,256
+               L725,260
+               Q723,262 721,260
+               Q719,258 717,260
+               L715,264
+               Q713,266 711,264
+               Q709,262 707,264
+               L705,268
+               Q703,270 701,268
+               L800,270
+               Z" 
+            fill="black"/>
+    </mask>
+
+    <!-- 破れ目の裏側の影用のマスク -->
+    <mask id="tornShadowMask">
+      <rect width="800" height="300" fill="black"/>
+      <!-- 各破れ目の影の領域（白で描画） -->
+      <!-- ... 破れ目のパスと同じものを少しずらして配置 ... -->
+    </mask>
+
+    <!-- 影用のフィルター -->
+    <filter id="shadowFilter">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="3" dy="3"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 基本の羊皮紙レイヤー -->
+  <g filter="url(#shadowFilter)" mask="url(#tornMask)">
+    <!-- 中心の明るい部分 -->
+    <rect width="800" height="300" fill="url(#centerLight)"/>
+    <!-- 端の暗い部分 -->
+    <rect width="800" height="300" fill="url(#darkEdges)" opacity="0.6"/>
+    <!-- 繊維質感 -->
+    <rect width="800" height="300" filter="url(#paperFibers)" opacity="0.3"/>
+    <!-- シミ -->
+    <rect width="800" height="300" filter="url(#stains)" opacity="0.1"/>
+  </g>
+
+  <!-- 破れ目の裏側の影 -->
+  <g mask="url(#tornShadowMask)">
+    <rect width="800" height="300" fill="rgba(0,0,0,0.3)"/>
+  </g>
+
+  <!-- 破れ目のエッジ効果 -->
+  <g stroke="#614b2a" stroke-width="0.8" fill="none" opacity="0.5" mask="url(#tornMask)">
+    <!-- 左上の破れ目のエッジ -->
+    <path d="M190,25
+             Q188,27 190,29
+             Q192,31 190,33
+             Q188,35 190,37"/>
+    
+    <!-- 右上の破れ目のエッジ -->
+    <path d="M780,28
+             Q778,30 776,28
+             Q774,26 772,28"/>
+
+    <!-- 右側の破れ目のエッジ -->
+    <path d="M780,98
+             Q778,100 780,102
+             Q782,104 780,106
+             Q778,108 780,110"/>
+
+    <!-- 左下の破れ目のエッジ -->
+    <path d="M40,198
+             Q42,200 40,202
+             Q38,204 40,206
+             Q42,208 40,210"/>
+
+    <!-- 右下の破れ目のエッジ -->
+    <path d="M760,248
+             Q758,250 756,248
+             Q754,246 752,248
+             Q750,250 748,248"/>
+  </g>
+
+  <!-- 繊維が剥がれているような効果 -->
+  <g stroke="#614b2a" stroke-width="0.3" opacity="0.2">
+    <path d="M190,25 L192,27 M194,26 L196,28 M198,27 L200,29" />
+    <path d="M780,28 L782,30 M784,29 L786,31 M788,30 L790,32" />
+    <path d="M40,198 L42,200 M44,199 L46,201 M48,200 L50,202" />
+  </g>
+</svg> 

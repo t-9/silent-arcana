@@ -72,12 +72,18 @@ export async function detectLoop(
     if (hands && hands.length > 0) {
       const gestureName = detectGesture(hands[0].keypoints, loadedGestures);
       if (gestureName) {
-        messageEl.textContent = `検出された手話: ${gestureName}`;
+        const text = `検出された手話: ${gestureName}`;
+        messageEl.textContent = text;
+        messageEl.setAttribute('data-text', text);
       } else {
-        messageEl.textContent = '該当する手話が見つかりません';
+        const text = '該当する手話が見つかりません';
+        messageEl.textContent = text;
+        messageEl.setAttribute('data-text', text);
       }
     } else {
-      messageEl.textContent = '手が検出されていません';
+      const text = '手が検出されていません';
+      messageEl.textContent = text;
+      messageEl.setAttribute('data-text', text);
     }
   }
 
