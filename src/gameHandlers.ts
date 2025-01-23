@@ -63,7 +63,7 @@ export function setupGameUI(
     startGame(gestures); // ゲームロジックの初期化
     updateGameUI(scoreDisplay, gestureDisplay); // UIの初期更新
 
-    let timeRemaining = 60; // タイマーの設定（秒単位）
+    let timeRemaining = 30; // 30秒に変更
     timerDisplay.textContent = `残り時間: ${timeRemaining} 秒`;
 
     // タイマー処理
@@ -72,8 +72,8 @@ export function setupGameUI(
       timerDisplay.textContent = `残り時間: ${timeRemaining} 秒`;
 
       if (timeRemaining <= 0) {
-        clearInterval(timerInterval); // タイマー停止
-        stopGame(); // ゲーム終了ロジック
+        clearInterval(timerInterval);
+        stopGame();
         showGameOverDialog(getGameState().score);
       }
     }, 1000);

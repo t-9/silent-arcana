@@ -9,7 +9,7 @@ export type GameState = {
   isRunning: boolean;
 };
 
-const GAME_TIME = 60; // ゲーム全体の制限時間(秒)
+const GAME_TIME = 30; // ゲーム全体の制限時間(秒)
 let state: GameState = {
   score: 0,
   highScore: Number(localStorage.getItem('highScore')) || 0,
