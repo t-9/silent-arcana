@@ -1,6 +1,5 @@
 // src/eventHandlers.ts
-import { startCamera } from './cameraService';
-import { startDetection, detectLoop, getDetector } from './modelService';
+import { getDetector } from './modelService';
 import { detectHandsOnce, toRelativeLandmarks } from './logic';
 
 /**
@@ -41,31 +40,5 @@ export function setupKeyboardEvents(videoEl: HTMLVideoElement): void {
     if (event.key.toLowerCase() === 'c') {
       await executeCapture(videoEl);
     }
-  });
-}
-
-type SetupStartButtonOptions = {
-  startBtn: HTMLElement;
-  videoEl: HTMLVideoElement;
-  messageEl: HTMLElement;
-  setLoadingText: (text: string) => void;
-  startCameraFn?: typeof startCamera;
-  startDetectionFn?: typeof startDetection;
-  detectLoopFn?: typeof detectLoop;
-};
-
-export function setupStartButton({
-  startBtn,
-  videoEl,
-  messageEl,
-  setLoadingText,
-  startCameraFn = startCamera,
-  startDetectionFn = startDetection,
-  detectLoopFn = detectLoop,
-}: SetupStartButtonOptions): void {
-  startBtn.addEventListener('click', async () => {
-    startDetectionFn();
-    await startCameraFn(videoEl, setLoadingText);
-    detectLoopFn(videoEl, messageEl);
   });
 }
