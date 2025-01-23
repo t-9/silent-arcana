@@ -7,6 +7,7 @@ import {
   getGameState,
 } from './gameService';
 import { detectGesture, Gesture, getGestures } from './gestureService';
+import { GameConfig } from './config';
 
 // windowオブジェクトの型を拡張
 declare global {
@@ -63,7 +64,7 @@ export function setupGameUI(
     startGame(gestures); // ゲームロジックの初期化
     updateGameUI(scoreDisplay, gestureDisplay); // UIの初期更新
 
-    let timeRemaining = 30; // 30秒に変更
+    let timeRemaining = GameConfig.GAME_TIME;
     timerDisplay.textContent = `残り時間: ${timeRemaining} 秒`;
 
     // タイマー処理
