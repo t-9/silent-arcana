@@ -1,5 +1,6 @@
 // src/gameService.ts
 import { Gesture } from './gestureService';
+import { GameConfig } from './config';
 
 export type GameState = {
   score: number;
@@ -9,12 +10,11 @@ export type GameState = {
   isRunning: boolean;
 };
 
-const GAME_TIME = 60; // ゲーム全体の制限時間(秒)
 let state: GameState = {
   score: 0,
   highScore: Number(localStorage.getItem('highScore')) || 0,
   currentGesture: null,
-  remainingTime: GAME_TIME,
+  remainingTime: GameConfig.GAME_TIME,
   isRunning: false,
 };
 
@@ -27,7 +27,7 @@ export function startGame(gestures: Gesture[]): void {
     score: 0,
     highScore: Number(localStorage.getItem('highScore')) || 0,
     currentGesture: gestures[0] || null,
-    remainingTime: GAME_TIME,
+    remainingTime: GameConfig.GAME_TIME,
     isRunning: true,
   };
   console.log('ゲームを開始しました:', state);
