@@ -19,17 +19,6 @@ body {
   flex-direction: column;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 1rem;
-  color: #c9a0dc;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  text-shadow: 0 0 10px rgba(201, 160, 220, 0.3),
-    0 0 20px rgba(128, 0, 128, 0.2);
-  letter-spacing: 3px;
-  font-weight: 700;
-}
-
 .main-content {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -54,10 +43,6 @@ h1 {
 
   body {
     padding: 0.5rem;
-  }
-
-  h1 {
-    margin-bottom: 0.5rem;
   }
 }
 
@@ -435,11 +420,14 @@ h1 {
 }
 
 @keyframes messageGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     text-shadow:
       1px 1px 2px rgba(26, 15, 10, 0.3),
       0 0 4px rgba(26, 15, 10, 0.2);
   }
+
   50% {
     text-shadow:
       1px 1px 4px rgba(26, 15, 10, 0.4),
