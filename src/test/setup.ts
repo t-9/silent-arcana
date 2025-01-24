@@ -24,9 +24,15 @@ Object.defineProperty(window, 'MediaStream', {
 
 // getUserMediaのモック
 if (!global.navigator) {
-  global.navigator = {};
+  (global as any).navigator = {
+    mediaDevices: {
+      getUserMedia: vi.fn()
+    }
+  };
+} else if (!global.navigator.mediaDevices) {
+  (global.navigator as any).mediaDevices = {
+    getUserMedia: vi.fn()
+  };
+} else {
+  global.navigator.mediaDevices.getUserMedia = vi.fn();
 }
-if (!global.navigator.mediaDevices) {
-  global.navigator.mediaDevices = {};
-}
-global.navigator.mediaDevices.getUserMedia = vi.fn(); 

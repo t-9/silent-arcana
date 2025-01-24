@@ -1,9 +1,24 @@
 // src/gestureService.ts
-import { toRelativeLandmarks } from './logic';
-
 export interface Gesture {
   name: string;
   keypoints: number[][];
+}
+
+let gestures: Gesture[] = [];
+
+export async function loadGestureData(): Promise<Gesture[]> {
+  try {
+    const response = await fetch('/templates/normalizedGestures.json');
+    gestures = await response.json();
+    return gestures;
+  } catch (error) {
+    console.error('ジェスチャーデータの読み込みに失敗しました:', error);
+    throw error;
+  }
+}
+
+export function getGestures(): Gesture[] {
+  return gestures;
 }
 
 /**

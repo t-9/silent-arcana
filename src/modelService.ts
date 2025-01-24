@@ -19,7 +19,7 @@ export function getDetector(): HandDetector | null {
  * モデルの読み込みと、手話用ジェスチャーデータの読み込み
  */
 export async function loadModel(
-  setLoading: (text: string) => void,
+  setLoading: (text: string | boolean) => void,
 ): Promise<HandDetector> {
   const messageEl = document.getElementById('message');
   if (!messageEl) {
@@ -28,9 +28,9 @@ export async function loadModel(
 
   // setLoadingをオーバーライドして、messageElを使用するように変更
   const originalSetLoading = setLoading;
-  setLoading = (text: string) => {
+  setLoading = (text: string | boolean) => {
     originalSetLoading(text);
-    setLoadingText(messageEl, text);
+    setLoadingText(messageEl, String(text));
   };
 
   setLoading('モデルを読み込んでいます...');
@@ -42,9 +42,7 @@ export async function loadModel(
 
     // ジェスチャーデータの読み込み
     try {
-      loadedGestures = await loadGestureData(
-        './templates/normalizedGestures.json',
-      );
+      await loadGestureData();
       console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
     } catch (e) {
       console.error('ジェスチャーデータの読み込みに失敗:', e);
@@ -91,7 +89,8 @@ export async function detectLoop(
     // ゲーム外の場合は、従来どおり手話名を表示するだけ
     const hands = await detector.estimateHands(videoEl);
     if (hands && hands.length > 0) {
-      const gestureName = detectGesture(hands[0].keypoints, loadedGestures);
+      const keypoints = hands[0].keypoints.map((point) => [point.x, point.y]);
+      const gestureName = detectGesture(keypoints, loadedGestures);
       if (gestureName) {
         setLoadingText(messageEl, `検出された手話: ${gestureName}`);
       } else {
