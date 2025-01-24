@@ -1,36 +1,26 @@
 // src/test/normalizeGestures.test.ts
 
-import { jest } from '@jest/globals';
-import { normalizeGestures } from '../normalizeGestures';
+import { describe, it, expect } from 'vitest';
+import { normalizeKeypoints } from '../normalizeGestures';
 
-jest.mock('fs', () => {
-  // requireActual で本物の fs を呼び出して、必要なものだけスプレッドして使う
-  const originalFs = jest.requireActual('fs');
-  return {
-    ...(originalFs as typeof import('fs')),
-    readFileSync: jest.fn(),
-    writeFileSync: jest.fn(),
-  };
-});
+describe('normalizeKeypoints', () => {
+  it('should normalize gesture keypoints', () => {
+    const input = [
+      { x: 0, y: 0, z: 0 },
+      { x: 1, y: 1, z: 1 },
+      { x: 2, y: 2, z: 2 }
+    ];
 
-describe('normalizeGestures script', () => {
-  let consoleLogSpy: jest.SpiedFunction<typeof console.log>;
+    const expected = [
+      [0, 0, 0],
+      [1, 1, 1],
+      [2, 2, 2]
+    ];
 
-  beforeEach(() => {
-    // console.log などをモック
-    consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    expect(normalizeKeypoints(input)).toEqual(expected);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-    jest.clearAllMocks();
-  });
-
-  it('should read dummyGestures, normalize them, and write to normalizedGestures', () => {
-    // テスト対象: 関数を明示的に呼び出し
-    normalizeGestures();
-
-    // ログなどの確認
-    expect(consoleLogSpy).toHaveBeenCalled();
+  it('should handle empty input', () => {
+    expect(normalizeKeypoints([])).toEqual([]);
   });
 });

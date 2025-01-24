@@ -1,63 +1,80 @@
 // src/test/logic.test.ts
-import { jest } from '@jest/globals';
-import {
-  Hand,
-  HandDetector,
-  HandDetectorInput,
-  MediaPipeHandsMediaPipeEstimationConfig,
-  MediaPipeHandsTfjsEstimationConfig,
-} from '@tensorflow-models/hand-pose-detection';
-import { handsToMessage, detectHandsOnce } from '../logic';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { handsToMessage, detectHandsOnce, toRelativeLandmarks } from '../logic';
+import { getGestures, getCurrentGesture, isGameRunning, updateScore } from '../gameState';
 
-type EstimateHandsFn = (
-  input: HandDetectorInput,
-  estimationConfig?:
-    | MediaPipeHandsMediaPipeEstimationConfig
-    | MediaPipeHandsTfjsEstimationConfig,
-) => Promise<Hand[]>;
+vi.mock('../gameState');
 
-describe('handsToMessage', () => {
-  it('returns "手が検出されていません" if no hands', () => {
-    expect(handsToMessage([])).toBe('手が検出されていません');
+describe('logic', () => {
+  const mockDetector = {
+    estimateHands: vi.fn()
+  };
+  const mockVideoEl = document.createElement('video');
+  const mockHands = [{
+    keypoints: [
+      { name: 'wrist', x: 0, y: 0 },
+      { name: 'thumb_tip', x: 1, y: 1 },
+      { name: 'index_finger_tip', x: 2, y: 2 }
+    ]
+  }];
+
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockDetector.estimateHands.mockResolvedValue(mockHands);
   });
 
-  it('returns keypoints info if hands exist', () => {
-    const mockHands: Hand[] = [
-      {
-        keypoints: [
-          // x が undefined
-          { name: 'thumb', x: undefined as unknown as number, y: 234.567 },
-          // y が undefined
-          { name: 'index', x: 50, y: undefined as unknown as number },
-          // 両方とも定義されている別キー
-          { name: 'middle', x: 12.3456, y: 78.9123 },
-        ],
-        handedness: 'Left',
-        score: 0.9,
-      },
-    ];
-    const result = handsToMessage(mockHands);
-    expect(result).toMatch(/thumb: \(0\.00, 234\.57\)/);
-    expect(result).toMatch(/index: \(50\.00, 0\.00\)/);
-    expect(result).toMatch(/middle: \(12\.35, 78\.91\)/);
+  describe('handsToMessage', () => {
+    it('returns "手が検出されていません" if no hands', () => {
+      expect(handsToMessage([])).toBe('手が検出されていません');
+    });
+
+    it('returns keypoints info if hands exist', () => {
+      const hands = [{ keypoints: [{ x: 0, y: 0 }] }];
+      expect(handsToMessage(hands)).toBe('手が検出されました');
+    });
   });
-});
 
-describe('detectHandsOnce', () => {
-  it('returns "手が検出されていません" if no hands are detected', async () => {
-    const mockEstimateHands = jest.fn() as jest.MockedFunction<EstimateHandsFn>;
-    mockEstimateHands.mockResolvedValue([]); // 空配列
+  describe('detectHandsOnce', () => {
+    it('returns "手が検出されていません" if no hands are detected', async () => {
+      mockDetector.estimateHands.mockResolvedValue([]);
+      const result = await detectHandsOnce(mockDetector, mockVideoEl);
+      expect(result).toBe('手が検出されていません');
+    });
 
-    const mockDetector: HandDetector = {
-      estimateHands: mockEstimateHands,
-      dispose: jest.fn(),
-      reset: jest.fn(),
-    };
-    const mockVideo = {} as HTMLVideoElement;
+    it('should detect gesture and update score when gesture matches', async () => {
+      const mockGesture = 'test-gesture';
+      const mockKeypoints = [[0, 0], [1, 1], [2, 2]];
+      vi.mocked(getGestures).mockReturnValue([{ name: mockGesture, keypoints: mockKeypoints }]);
+      vi.mocked(getCurrentGesture).mockReturnValue(mockGesture);
+      vi.mocked(isGameRunning).mockReturnValue(true);
 
-    const message = await detectHandsOnce(mockDetector, mockVideo);
+      await detectHandsOnce(mockDetector, mockVideoEl);
 
-    expect(mockEstimateHands).toHaveBeenCalled();
-    expect(message).toBe('手が検出されていません');
+      expect(updateScore).toBeCalled();
+    });
+
+    it('should not update score when gesture does not match', async () => {
+      const mockGesture = 'test-gesture';
+      const mockKeypoints = [[0, 0], [1, 1], [2, 2]];
+      vi.mocked(getGestures).mockReturnValue([{ name: mockGesture, keypoints: mockKeypoints }]);
+      vi.mocked(getCurrentGesture).mockReturnValue('different-gesture');
+      vi.mocked(isGameRunning).mockReturnValue(true);
+
+      await detectHandsOnce(mockDetector, mockVideoEl);
+
+      expect(updateScore).not.toBeCalled();
+    });
+
+    it('should not update score when game is not running', async () => {
+      const mockGesture = 'test-gesture';
+      const mockKeypoints = [[0, 0], [1, 1], [2, 2]];
+      vi.mocked(getGestures).mockReturnValue([{ name: mockGesture, keypoints: mockKeypoints }]);
+      vi.mocked(getCurrentGesture).mockReturnValue(mockGesture);
+      vi.mocked(isGameRunning).mockReturnValue(false);
+
+      await detectHandsOnce(mockDetector, mockVideoEl);
+
+      expect(updateScore).not.toBeCalled();
+    });
   });
 });

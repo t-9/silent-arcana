@@ -1,5 +1,7 @@
 // src/logic.ts
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
+import { getGestures, getCurrentGesture, isGameRunning, updateScore } from './gameState';
+import { detectGesture } from './gestureService';
 
 /**
  * 推定結果から表示用の文字列を作る純粋関数
@@ -8,15 +10,7 @@ export function handsToMessage(hands: Hand[]): string {
   if (!hands || hands.length === 0) {
     return '手が検出されていません';
   }
-
-  const keypoints = hands[0].keypoints;
-  const info = keypoints.map((k) => {
-    const nm = k.name ?? 'point';
-    const xCoord = k.x?.toFixed(2) ?? '0.00';
-    const yCoord = k.y?.toFixed(2) ?? '0.00';
-    return `${nm}: (${xCoord}, ${yCoord})`;
-  });
-  return `検出された手: ${info.join(', ')}`;
+  return '手が検出されました';
 }
 
 /**
@@ -33,13 +27,22 @@ export async function detectHandsOnce(
     return '手が検出されていません';
   }
 
-  // ここで「最初の手」だけを判定対象にする例
+  // ここで「最初の手」だけを判定対象にする
   const keypoints = hands[0].keypoints;
+  const rel = toRelativeLandmarks(keypoints);
 
-  // [ [x,y], [x,y], ... ] に変換
-  const arr = convertHandKeypointsToArray(keypoints);
+  // ジェスチャー検出と得点更新
+  const gestures = getGestures();
+  if (gestures && gestures.length > 0) {
+    const detectedGesture = detectGesture(rel, gestures);
+    const currentGesture = getCurrentGesture();
 
-  return `検出された手: ${JSON.stringify(arr)}`;
+    if (detectedGesture && currentGesture === detectedGesture && isGameRunning()) {
+      updateScore();
+    }
+  }
+
+  return '手が検出されました';
 }
 
 // 2) dummyGestures.json の 21 keypoints 順序に対応したキー名一覧を定義

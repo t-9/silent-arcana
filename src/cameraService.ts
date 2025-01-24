@@ -3,22 +3,27 @@ import { getGetUserMedia } from './cameraModule';
 
 export async function startCamera(
   videoEl: HTMLVideoElement,
-  setLoading: (text: string) => void,
-) {
+  setLoading: (text: string | boolean) => void,
+): Promise<void> {
   const messageEl = document.getElementById('message');
-  setLoading('カメラを起動しています...');
+  setLoading(true);
   if (messageEl) {
     messageEl.textContent = 'カメラを起動しています...';
     messageEl.setAttribute('data-text', 'カメラを起動しています...');
   }
+
   try {
     const stream = await getGetUserMedia()({ video: true });
     videoEl.srcObject = stream;
 
     // メタデータが読み込まれるのを待つ
     await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('カメラの起動がタイムアウトしました'));
+      }, 5000);
+
       videoEl.onloadedmetadata = () => {
-        console.log('onloadedmetadata event fired');
+        clearTimeout(timeout);
         if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) {
           reject(new Error('カメラのビデオ解像度が不正です'));
         } else {
@@ -28,23 +33,30 @@ export async function startCamera(
           resolve();
         }
       };
-      videoEl.onerror = () =>
+
+      videoEl.onerror = () => {
+        clearTimeout(timeout);
         reject(new Error('ビデオの読み込みに失敗しました'));
+      };
     });
 
     // ビデオ再生
     await videoEl.play();
-    setLoading('');
+    setLoading(false);
     if (messageEl) {
       messageEl.textContent = '';
       messageEl.setAttribute('data-text', '');
     }
   } catch (err) {
-    console.error('カメラ使用許可が必要です:', err);
-    setLoading('カメラの起動に失敗しました');
+    console.error('カメラの起動に失敗しました:', err);
+    setLoading(false);
     if (messageEl) {
       messageEl.textContent = 'カメラの起動に失敗しました';
       messageEl.setAttribute('data-text', 'カメラの起動に失敗しました');
     }
+    if (err instanceof Error && err.message === 'カメラの起動がタイムアウトしました') {
+      throw err;
+    }
+    throw new Error('カメラ使用許可が必要です');
   }
 }

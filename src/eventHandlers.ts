@@ -21,21 +21,25 @@ async function executeCapture(videoEl: HTMLVideoElement) {
     return;
   }
 
-  const hands = await detector.estimateHands(videoEl);
-  if (hands.length === 0) {
-    console.warn('No hand detected (2nd check)');
-    return;
+  try {
+    const hands = await detector.estimateHands(videoEl);
+    if (!hands || hands.length === 0) {
+      console.warn('No hand detected (2nd check)');
+      return;
+    }
+
+    const rel = toRelativeLandmarks(hands[0].keypoints);
+    console.log(JSON.stringify(rel));
+  } catch (error) {
+    console.error('Error during hand detection:', error);
   }
-
-  const rel = toRelativeLandmarks(hands[0].keypoints);
-
-  console.log(JSON.stringify(rel));
 }
 
 /**
  * キーボードイベントの設定
  */
 export function setupKeyboardEvents(videoEl: HTMLVideoElement): void {
+  const detector = getDetector();
   document.addEventListener('keydown', async (event) => {
     if (event.key.toLowerCase() === 'c') {
       await executeCapture(videoEl);
