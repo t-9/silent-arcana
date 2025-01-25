@@ -37,7 +37,9 @@ export async function init(): Promise<void> {
   startGameBtn.disabled = true;
 
   // モデルを読み込み
-  await loadModel((text: string | boolean) => setLoadingText(loadingEl, String(text)));
+  await loadModel((text: string | boolean) =>
+    setLoadingText(loadingEl, String(text)),
+  );
 
   const gestures = await loadGestureData();
   setupGameUI(
@@ -51,13 +53,18 @@ export async function init(): Promise<void> {
   // カメラを自動的に開始
   startDetection();
   try {
-    await startCamera(videoEl, (text: string | boolean) => setLoadingText(loadingEl, String(text)));
+    await startCamera(videoEl, (text: string | boolean) =>
+      setLoadingText(loadingEl, String(text)),
+    );
     detectLoop(videoEl, messageEl);
     // カメラの開始が成功したらボタンを有効化
     startGameBtn.disabled = false;
   } catch (error) {
     console.error('カメラの開始に失敗しました:', error);
-    setLoadingText(messageEl, 'カメラの開始に失敗しました。ページを再読み込みしてください。');
+    setLoadingText(
+      messageEl,
+      'カメラの開始に失敗しました。ページを再読み込みしてください。',
+    );
   }
 
   // キーボードイベントの設定

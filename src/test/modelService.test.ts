@@ -1,5 +1,13 @@
 // src/test/modelService.test.ts
-import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from 'vitest';
 import {
   getDetector,
   loadModel,
@@ -46,12 +54,14 @@ describe('modelService', () => {
     (createHandDetector as Mock).mockResolvedValue(mockDetector);
     (loadGestureData as Mock).mockResolvedValue([]);
     (getGameState as unknown as Mock).mockReturnValue({ isRunning: false });
-    mockDetector.estimateHands.mockResolvedValue([{
-      keypoints: [
-        { x: 0, y: 0, name: 'point1' },
-        { x: 1, y: 1, name: 'point2' },
-      ]
-    }]);
+    mockDetector.estimateHands.mockResolvedValue([
+      {
+        keypoints: [
+          { x: 0, y: 0, name: 'point1' },
+          { x: 1, y: 1, name: 'point2' },
+        ],
+      },
+    ]);
 
     // requestAnimationFrameのモック
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
@@ -83,7 +93,9 @@ describe('modelService', () => {
       expect(createHandDetector).toHaveBeenCalled();
       expect(loadGestureData).toHaveBeenCalled();
       expect(detector).toBe(mockDetector);
-      expect(mockSetLoading).toHaveBeenCalledWith('モデルを読み込んでいます...');
+      expect(mockSetLoading).toHaveBeenCalledWith(
+        'モデルを読み込んでいます...',
+      );
       expect(mockSetLoading).toHaveBeenCalledWith('');
     });
 
@@ -92,7 +104,9 @@ describe('modelService', () => {
       (createHandDetector as Mock).mockRejectedValue(error);
 
       await expect(loadModel(mockSetLoading)).rejects.toThrow();
-      expect(mockSetLoading).toHaveBeenCalledWith('モデルを読み込んでいます...');
+      expect(mockSetLoading).toHaveBeenCalledWith(
+        'モデルを読み込んでいます...',
+      );
     });
 
     it('should handle gesture data loading error', async () => {
@@ -107,7 +121,9 @@ describe('modelService', () => {
 
     it('should handle missing message element', async () => {
       document.body.innerHTML = ''; // メッセージ要素を削除
-      await expect(loadModel(mockSetLoading)).rejects.toThrow('メッセージ要素が見つかりません');
+      await expect(loadModel(mockSetLoading)).rejects.toThrow(
+        'メッセージ要素が見つかりません',
+      );
     });
   });
 
@@ -150,7 +166,10 @@ describe('modelService', () => {
     });
 
     it('should handle invalid video element', async () => {
-      const invalidVideoEl = { videoWidth: 0, videoHeight: 0 } as HTMLVideoElement;
+      const invalidVideoEl = {
+        videoWidth: 0,
+        videoHeight: 0,
+      } as HTMLVideoElement;
 
       await detectLoop(invalidVideoEl, mockMessageEl);
 

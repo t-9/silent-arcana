@@ -6,19 +6,19 @@ import { loadModel } from '../modelService';
 
 // モックの設定
 vi.mock('../gestureService', () => ({
-  loadGestureData: vi.fn().mockResolvedValue([
-    { name: 'test-gesture', landmarks: [[0, 0, 0]] }
-  ])
+  loadGestureData: vi
+    .fn()
+    .mockResolvedValue([{ name: 'test-gesture', landmarks: [[0, 0, 0]] }]),
 }));
 
 vi.mock('../modelService', () => ({
   loadModel: vi.fn().mockResolvedValue(undefined),
   startDetection: vi.fn(),
-  detectLoop: vi.fn()
+  detectLoop: vi.fn(),
 }));
 
 vi.mock('../cameraService', () => ({
-  startCamera: vi.fn().mockResolvedValue(undefined)
+  startCamera: vi.fn().mockResolvedValue(undefined),
 }));
 
 describe('app', () => {
@@ -43,7 +43,9 @@ describe('app', () => {
     expect(loadGestureData).toHaveBeenCalled();
 
     // ボタンが有効化されていることを確認
-    const startGameBtn = document.getElementById('start-game-btn') as HTMLButtonElement;
+    const startGameBtn = document.getElementById(
+      'start-game-btn',
+    ) as HTMLButtonElement;
     expect(startGameBtn.disabled).toBe(false);
   });
 });

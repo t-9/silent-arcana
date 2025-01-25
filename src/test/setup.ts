@@ -4,22 +4,24 @@ import { vi } from 'vitest';
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
-  clear: vi.fn()
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
+  value: localStorageMock,
 });
 
 // MediaStreamのモック
 class MediaStreamMock {
   getTracks() {
-    return [{
-      stop: () => { }
-    }];
+    return [
+      {
+        stop: () => {},
+      },
+    ];
   }
 }
 Object.defineProperty(window, 'MediaStream', {
-  value: MediaStreamMock
+  value: MediaStreamMock,
 });
 
 // MediaDevicesのモック
@@ -32,7 +34,7 @@ const createMediaDevicesMock = () => {
     ondevicechange: null,
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn()
+    dispatchEvent: vi.fn(),
   };
   return mediaDevices;
 };
@@ -41,25 +43,37 @@ const createMediaDevicesMock = () => {
 class PluginArrayMock {
   length = 0;
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  item(_index: number) { return null; }
-  namedItem(_name: string) { return null; }
+  item(_index: number) {
+    return null;
+  }
+  namedItem(_name: string) {
+    return null;
+  }
   /* eslint-enable @typescript-eslint/no-unused-vars */
   /* istanbul ignore next */
   refresh(): void {
     // テスト環境ではプラグインの更新は不要
     // このメソッドはPluginArrayインターフェースを満たすために存在
   }
-  [Symbol.iterator]() { return [][Symbol.iterator](); }
+  [Symbol.iterator]() {
+    return [][Symbol.iterator]();
+  }
 }
 
 // MimeTypeArrayのモック
 class MimeTypeArrayMock {
   length = 0;
   /* eslint-disable @typescript-eslint/no-unused-vars */
-  item(_index: number) { return null; }
-  namedItem(_name: string) { return null; }
+  item(_index: number) {
+    return null;
+  }
+  namedItem(_name: string) {
+    return null;
+  }
   /* eslint-enable @typescript-eslint/no-unused-vars */
-  [Symbol.iterator]() { return [][Symbol.iterator](); }
+  [Symbol.iterator]() {
+    return [][Symbol.iterator]();
+  }
 }
 
 // getUserMediaのモック
@@ -96,13 +110,14 @@ if (!global.navigator) {
     canShare: () => false,
     getGamepads: () => [],
     requestMIDIAccess: () => Promise.reject(new Error('Not implemented')),
-    requestMediaKeySystemAccess: () => Promise.reject(new Error('Not implemented')),
+    requestMediaKeySystemAccess: () =>
+      Promise.reject(new Error('Not implemented')),
     share: () => Promise.reject(new Error('Not implemented')),
-    vibrate: () => false
+    vibrate: () => false,
   } as unknown as Navigator;
 } else if (!global.navigator.mediaDevices) {
   Object.defineProperty(global.navigator, 'mediaDevices', {
     value: createMediaDevicesMock(),
-    configurable: true
+    configurable: true,
   });
 }

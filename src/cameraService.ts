@@ -54,7 +54,10 @@ export async function startCamera(
       messageEl.textContent = 'カメラの起動に失敗しました';
       messageEl.setAttribute('data-text', 'カメラの起動に失敗しました');
     }
-    if (err instanceof Error && err.message === 'カメラの起動がタイムアウトしました') {
+    if (
+      err instanceof Error &&
+      err.message === 'カメラの起動がタイムアウトしました'
+    ) {
       throw err;
     }
     throw new Error('カメラ使用許可が必要です');

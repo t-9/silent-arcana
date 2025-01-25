@@ -69,10 +69,10 @@ export function normalizeKeypoints(keypoints: Keypoint[]): number[][] {
   const baseZ = wrist.z;
 
   // 各キーポイントを相対座標に変換
-  return keypoints.map(point => [
+  return keypoints.map((point) => [
     point.x - baseX,
     point.y - baseY,
-    point.z - baseZ
+    point.z - baseZ,
   ]);
 }
 
