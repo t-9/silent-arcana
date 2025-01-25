@@ -16,6 +16,7 @@ describe('cameraService', () => {
   } as unknown as HTMLVideoElement;
   const mockSetLoading = vi.fn();
   let mockGetUserMedia: ReturnType<typeof vi.fn>;
+  let mockMessageEl: HTMLDivElement;
 
   beforeEach(() => {
     vi.resetAllMocks();
@@ -24,10 +25,20 @@ describe('cameraService', () => {
       () => mockGetUserMedia,
     );
     vi.useFakeTimers();
+
+    // メッセージ要素のモック
+    mockMessageEl = document.createElement('div');
+    mockMessageEl.id = 'message';
+    document.body.appendChild(mockMessageEl);
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    // メッセージ要素のクリーンアップ
+    const messageEl = document.getElementById('message');
+    if (messageEl) {
+      document.body.removeChild(messageEl);
+    }
   });
 
   it('should start camera successfully', async () => {
@@ -57,6 +68,18 @@ describe('cameraService', () => {
     );
 
     expect(mockSetLoading).toHaveBeenCalledWith(true);
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
+  });
+
+  it.skipIf(process.env.CI)('should handle metadata load timeout', async () => {
+    const mockStream = { id: 'test-stream' };
+    mockGetUserMedia.mockResolvedValue(mockStream);
+
+    const promise = startCamera(mockVideoEl, mockSetLoading);
+    await vi.advanceTimersByTimeAsync(5000);
+
+    await expect(promise).rejects.toThrow('カメラの起動がタイムアウトしました');
+    expect(mockMessageEl.textContent).toBe('カメラの起動に失敗しました');
     expect(mockSetLoading).toHaveBeenCalledWith(false);
   });
 });

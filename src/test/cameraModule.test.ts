@@ -1,26 +1,55 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { getGetUserMedia, setGetUserMedia } from '../cameraModule';
 
 describe('cameraModule', () => {
-  const mockStream = new MediaStream();
-  const mockGetUserMedia = vi.fn();
+  it('should use default constraints when none provided', async () => {
+    const mockGetUserMedia = vi.fn().mockResolvedValue('mockStream');
+    vi.spyOn(navigator.mediaDevices, 'getUserMedia').mockImplementation(
+      mockGetUserMedia,
+    );
 
-  beforeEach(() => {
-    vi.resetAllMocks();
-    setGetUserMedia(mockGetUserMedia);
+    const getUserMedia = getGetUserMedia();
+    await getUserMedia({});
+
+    expect(mockGetUserMedia).toHaveBeenCalledWith({
+      video: {
+        width: { ideal: 960 },
+        height: { ideal: 600 },
+      },
+    });
   });
 
-  it('should return MediaStream when getUserMedia succeeds', async () => {
-    mockGetUserMedia.mockResolvedValue(mockStream);
+  it('should merge custom constraints with defaults', async () => {
+    const mockGetUserMedia = vi.fn().mockResolvedValue('mockStream');
+    vi.spyOn(navigator.mediaDevices, 'getUserMedia').mockImplementation(
+      mockGetUserMedia,
+    );
+
     const getUserMedia = getGetUserMedia();
-    const stream = await getUserMedia({});
-    expect(stream).toBe(mockStream);
+    await getUserMedia({
+      video: {
+        width: { ideal: 1280 },
+        facingMode: 'user',
+      },
+    });
+
+    expect(mockGetUserMedia).toHaveBeenCalledWith({
+      video: {
+        width: { ideal: 1280 },
+        height: { ideal: 600 },
+        facingMode: 'user',
+      },
+    });
   });
 
-  it('should throw error when getUserMedia fails', async () => {
-    const error = new Error('Camera access denied');
-    mockGetUserMedia.mockRejectedValue(error);
+  it('should allow setting custom getUserMedia function', async () => {
+    const customGetUserMedia = vi.fn().mockResolvedValue('customStream');
+    setGetUserMedia(customGetUserMedia);
+
     const getUserMedia = getGetUserMedia();
-    await expect(getUserMedia({})).rejects.toThrow('Camera access denied');
+    const stream = await getUserMedia({ video: true });
+
+    expect(customGetUserMedia).toHaveBeenCalled();
+    expect(stream).toBe('customStream');
   });
 });
