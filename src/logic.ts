@@ -122,8 +122,8 @@ export function toRelativeLandmarks(keypoints: { x: number; y: number; name?: st
   const absValues = relativePoints.flatMap(p => [Math.abs(p[0]), Math.abs(p[1])]);
   const maxAbs = Math.max(...absValues);
 
-  // スケール係数を計算（最大絶対値が2になるように）
-  const SCALE = maxAbs / 2;
+  // スケール係数を計算（最大絶対値が1になるように）
+  const SCALE = maxAbs;
 
   // デバッグ用のログ
   console.log('Before normalization:', {
@@ -132,7 +132,7 @@ export function toRelativeLandmarks(keypoints: { x: number; y: number; name?: st
     points: relativePoints
   });
 
-  // 正規化（-2から2の範囲に収める）
+  // 正規化（-1から1の範囲に収める）
   const normalizedPoints = relativePoints.map(point => [
     point[0] / SCALE,
     point[1] / SCALE
