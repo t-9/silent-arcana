@@ -76,12 +76,15 @@ export function normalizeKeypoints(keypoints: Keypoint[]): number[][] {
   ]);
 }
 
-export function normalizeGestures(): void {
-  console.log('Dummy Gestures Path:', dummyGesturesPath);
-  console.log('Normalized Gestures Path:', normalizedGesturesPath);
+export function normalizeGestures(
+  srcPath: string = dummyGesturesPath,
+  dstPath: string = normalizedGesturesPath,
+): void {
+  console.log('Dummy Gestures Path:', srcPath);
+  console.log('Normalized Gestures Path:', dstPath);
 
   // ジェスチャーデータの読み込み
-  const rawData = readFileSync(dummyGesturesPath, 'utf-8');
+  const rawData = readFileSync(srcPath, 'utf-8');
   const data = JSON.parse(rawData);
   const gestures: Gesture[] = data.gestures;
 
@@ -113,10 +116,8 @@ export function normalizeGestures(): void {
 
   // 正規化されたデータを保存
   writeFileSync(
-    normalizedGesturesPath,
+    dstPath,
     JSON.stringify({ gestures: normalizedGestures }, null, 2),
   );
   console.log('ジェスチャーデータを正規化して保存しました。');
 }
-
-normalizeGestures();
