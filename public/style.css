@@ -1011,6 +1011,20 @@ button:hover~.cursor-wrapper .wand-gem {
   z-index: 2;
 }
 
+/* ガラスの形状 */
+.hourglass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px solid rgba(201, 160, 220, 0.5);
+  clip-path: polygon(0% 0%, 100% 0%, 80% 50%, 100% 100%, 0% 100%, 20% 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .hourglass-top,
 .hourglass-bottom {
   position: relative;
