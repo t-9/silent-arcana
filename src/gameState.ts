@@ -1,8 +1,10 @@
+import { Gesture } from './gestureService';
+
 // ゲームの状態を管理する変数
 let isRunning = false;
 let currentScore = 0;
 let currentGesture: string | null = null;
-let gestures: Array<{ name: string, keypoints: number[][] }> = [];
+let gestures: Gesture[] = [];
 
 // ゲームの状態を取得・設定する関数
 export const isGameRunning = () => isRunning;
@@ -21,6 +23,6 @@ export const setCurrentGesture = (value: string | null) => {
 };
 
 export const getGestures = () => gestures;
-export const setGestures = (value: Array<{ name: string, keypoints: number[][] }>) => {
+export const setGestures = (value: Gesture[]) => {
   gestures = value;
 };

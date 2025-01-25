@@ -9,7 +9,7 @@ describe('detectGesture', () => {
 
   const gestures = [{
     name: 'test-gesture',
-    keypoints: [
+    landmarks: [
       [0, 0, 0], [1, 1, 1], [2, 2, 2]
     ]
   }];

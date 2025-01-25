@@ -23,10 +23,15 @@ export function getGameState(): GameState {
 }
 
 export function startGame(gestures: Gesture[]): void {
+  if (!gestures || gestures.length === 0) {
+    console.error('ジェスチャーデータが読み込まれていません');
+    return;
+  }
+
   state = {
     score: 0,
     highScore: Number(localStorage.getItem('highScore')) || 0,
-    currentGesture: gestures[0] || null,
+    currentGesture: selectNextGesture(gestures),
     remainingTime: GameConfig.GAME_TIME,
     isRunning: true,
   };

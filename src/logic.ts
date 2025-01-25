@@ -29,15 +29,23 @@ export async function detectHandsOnce(
 
   // ここで「最初の手」だけを判定対象にする
   const keypoints = hands[0].keypoints;
+  console.log('Raw keypoints:', keypoints);
+
   const rel = toRelativeLandmarks(keypoints);
+  console.log('Relative landmarks:', rel);
 
   // ジェスチャー検出と得点更新
   const gestures = getGestures();
+  console.log('Available gestures:', gestures);
+
   if (gestures && gestures.length > 0) {
     const detectedGesture = detectGesture(rel, gestures);
     const currentGesture = getCurrentGesture();
+    console.log('Current gesture:', currentGesture);
+    console.log('Detected gesture:', detectedGesture);
 
     if (detectedGesture && currentGesture === detectedGesture && isGameRunning()) {
+      console.log('Score updated!');
       updateScore();
     }
   }
@@ -95,42 +103,18 @@ export function convertHandKeypointsToArray(
 }
 
 /**
- * wrist を原点(0,0)に合わせ、他の指の座標はそこからの相対位置に変換する。
- * 例: wristが (640, 350) なら、(650, 345) は (10, -5) になる。
- * さらに値を "ある程度" 正規化して小さくしたいなら、SCALE などで割る。
+ * キーポイントを相対座標に変換する
  */
-export function toRelativeLandmarks(
-  keypoints: Array<{ x: number; y: number; name?: string }>,
-): number[][] {
-  // 'wrist' を大文字小文字無視で探す
-  const wrist = keypoints.find(
-    (pt) => pt.name && pt.name.toLowerCase() === 'wrist',
-  );
-  if (!wrist) {
-    console.warn('Wrist keypoint not found. Returning absolute coordinates.');
-    return keypoints.map((pt) => [pt.x, pt.y]);
-  }
+export function toRelativeLandmarks(keypoints: { x: number; y: number; name?: string }[]): number[][] {
+  // まずキーポイントを配列形式に変換
+  const points = convertHandKeypointsToArray(keypoints);
 
-  const baseX = wrist.x;
-  const baseY = wrist.y;
+  // 手首の位置を基準点として取得
+  const wrist = points[0];  // KEYPOINT_ORDERの最初が'wrist'
 
-  // 手のバウンディングボックスを計算
-  const xs = keypoints.map((pt) => pt.x);
-  const ys = keypoints.map((pt) => pt.y);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-  const width = maxX - minX;
-  const height = maxY - minY;
-
-  // スケールを動的に設定（手の幅を基準に）
-  const SCALE = Math.max(width, height) / 2;
-
-  // 手の中心点を基準に正規化
-  return keypoints.map((pt) => {
-    const dx = (pt.x - baseX) / SCALE;
-    const dy = (pt.y - baseY) / SCALE;
-    return [dx, dy];
-  });
+  // すべての点を手首からの相対位置に変換（x, y座標のみ使用）
+  return points.map(point => [
+    point[0] - wrist[0],  // x座標の相対化
+    point[1] - wrist[1]   // y座標の相対化
+  ]);
 }
