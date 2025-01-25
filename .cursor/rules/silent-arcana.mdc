@@ -1,0 +1,17 @@
+---
+description: silent-arcara rule
+globs: 
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+コードのテストにはvitestを使用しているからjestは使用しないで
+テストファイルはsrc/testの中に作って
+
+コード変更後はコードの変更が問題ないか次のコマンドでテストして
+- wsl npm run test:coverage
+- wsl npm run lint
+- wsl npm run format
