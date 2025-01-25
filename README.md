@@ -23,7 +23,7 @@ npm start
 ```
 
 ブラウザで http://localhost:8080 にアクセスするとローカル実行版を確認できます。
-テストは npm test で実行可能です。
+テストは npm test で実行可能です。テストカバレッジを確認する場合は npm run test:coverage を実行してください。
 
 ## Dockerでの実行方法
 
@@ -57,6 +57,9 @@ http://localhost:8080
 ```bash
 # Dockerイメージ内でテスト実行
 docker run -it --rm silent-arcana npm test
+
+# カバレッジレポートの生成
+docker run -it --rm silent-arcana npm run test:coverage
 ```
 
 ## 主要技術スタック
@@ -66,7 +69,7 @@ docker run -it --rm silent-arcana npm test
 - [Docker](https://www.docker.com/)
 - [GitHub Actions](https://github.co.jp/features/actions)
 - [GitHub Pages](https://docs.github.com/ja/pages/getting-started-with-github-pages/about-github-pages)
-- [Jest](https://jestjs.io/)
+- [Vitest](https://vitest.dev/)
 - [serve](https://github.com/vercel/serve)
 - TypeScript
 - ESLint + @typescript-eslint
@@ -75,6 +78,7 @@ docker run -it --rm silent-arcana npm test
 ## CI/CD
 - **GitHub Actions**: プルリク・push時に自動テスト (npm test)、ビルド (npm run build) を実施
 - **Pagesデプロイ**: メインブランチへのpush後、public/配下をgh-pagesブランチへ自動反映し、GitHub Pagesで公開
+- **カバレッジ**: テストカバレッジをCodecovとSonarCloudで計測・監視
 
 ## ツール
 
