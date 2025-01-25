@@ -5,6 +5,7 @@ import { Gesture, loadGestureData, detectGesture } from './gestureService';
 import { getGameState } from './gameService'; // ★追加: ゲーム状態を参照
 import { handleGestureDetection } from './gameHandlers'; // ★追加: ゲーム用ハンドラを呼ぶ
 import { setLoadingText } from './uiUtils';
+import { toRelativeLandmarks } from './logic';
 
 let detector: HandDetector | null = null;
 let running = false;
@@ -80,8 +81,10 @@ export async function detectLoop(
     const hands = await detector.estimateHands(videoEl);
     if (hands && hands.length > 0) {
       // キーポイントを[x, y]の配列に変換
-      const keypoints = hands[0].keypoints.map((point) => [point.x, point.y]);
-      await handleGestureDetection(keypoints);
+      const normalizedKeypoints = toRelativeLandmarks(
+        hands[0].keypoints // { x, y, name }を含んでいる想定
+      );
+      await handleGestureDetection(normalizedKeypoints);
     }
     // ゲーム中はメッセージ表示を行わない
     setLoadingText(messageEl, '');
@@ -89,8 +92,8 @@ export async function detectLoop(
     // ゲーム外の場合は、従来どおり手話名を表示するだけ
     const hands = await detector.estimateHands(videoEl);
     if (hands && hands.length > 0) {
-      const keypoints = hands[0].keypoints.map((point) => [point.x, point.y]);
-      const gestureName = detectGesture(keypoints, loadedGestures);
+      const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
+      const gestureName = detectGesture(normalizedKeypoints, loadedGestures);
       if (gestureName) {
         setLoadingText(messageEl, `検出された手話: ${gestureName}`);
       } else {

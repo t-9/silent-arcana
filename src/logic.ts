@@ -112,9 +112,39 @@ export function toRelativeLandmarks(keypoints: { x: number; y: number; name?: st
   // 手首の位置を基準点として取得
   const wrist = points[0];  // KEYPOINT_ORDERの最初が'wrist'
 
-  // すべての点を手首からの相対位置に変換（x, y座標のみ使用）
-  return points.map(point => [
-    point[0] - wrist[0],  // x座標の相対化
-    point[1] - wrist[1]   // y座標の相対化
+  // 手首を原点とした相対座標に変換
+  const relativePoints = points.map(point => [
+    point[0] - wrist[0],
+    point[1] - wrist[1]
   ]);
+
+  // 相対座標の最大絶対値を計算
+  const absValues = relativePoints.flatMap(p => [Math.abs(p[0]), Math.abs(p[1])]);
+  const maxAbs = Math.max(...absValues);
+
+  // スケール係数を計算（最大絶対値が2になるように）
+  const SCALE = maxAbs / 2;
+
+  // デバッグ用のログ
+  console.log('Before normalization:', {
+    maxAbs,
+    SCALE,
+    points: relativePoints
+  });
+
+  // 正規化（-2から2の範囲に収める）
+  const normalizedPoints = relativePoints.map(point => [
+    point[0] / SCALE,
+    point[1] / SCALE
+  ]);
+
+  // デバッグ用のログ
+  const xValues = normalizedPoints.map(p => p[0]);
+  const yValues = normalizedPoints.map(p => p[1]);
+  console.log('After normalization:', {
+    x: { min: Math.min(...xValues), max: Math.max(...xValues) },
+    y: { min: Math.min(...yValues), max: Math.max(...yValues) }
+  });
+
+  return normalizedPoints;
 }
