@@ -22,6 +22,76 @@ let timeRemaining: number;
 let sandParticles: HTMLElement[] = [];
 
 /**
+ * 砂時計の初期化と開始を行う共通関数
+ */
+function initializeHourglass(timerDisplay: HTMLElement) {
+  const hourglass = timerDisplay.querySelector('.hourglass') as HTMLElement;
+  const hourglassTopSand = timerDisplay.querySelector(
+    '.hourglass-top .sand',
+  ) as HTMLElement;
+  const hourglassBottomSand = timerDisplay.querySelector(
+    '.hourglass-bottom .sand',
+  ) as HTMLElement;
+
+  // 初期状態でトランジションを無効化
+  hourglassTopSand.style.transition = 'none';
+  hourglassBottomSand.style.transition = 'none';
+  hourglassTopSand.style.height = '0%';
+  hourglassBottomSand.style.height = '100%';
+
+  // 砂時計を回転させる
+  hourglass.classList.add('flipping');
+
+  // アニメーション終了時の処理
+  hourglass.addEventListener(
+    'animationend',
+    () => {
+      hourglass.classList.remove('flipping');
+      hourglass.classList.add('animation-completed');
+
+      // 回転後は元の上部が下部になっているので、砂は元の下部（今の上部）に100%の状態から開始
+      hourglassTopSand.style.height = '0%';
+      hourglassBottomSand.style.height = '100%';
+
+      // 少し遅延を入れてからトランジションを有効化し、タイマーを開始
+      setTimeout(() => {
+        hourglassTopSand.style.transition = 'height 0.5s ease-in-out';
+        hourglassBottomSand.style.transition = 'height 0.5s ease-in-out';
+        // タイマーの開始
+        startTimer(timerDisplay);
+      }, 50);
+    },
+    { once: true },
+  );
+}
+
+/**
+ * スコアの更新を行う共通関数
+ */
+function updateGameScore(score: number) {
+  updateScore(score);
+  if (typeof window.updateScore === 'function') {
+    window.updateScore(getGameState().score);
+  }
+}
+
+/**
+ * 次のジェスチャーを設定する共通関数
+ */
+function setNextGesture() {
+  const gestures = getGestures();
+  const nextGesture = selectNextGesture(gestures);
+  const gestureDisplay = document.getElementById('gesture-display');
+  if (gestureDisplay && nextGesture) {
+    const gestureName = gestureDisplay.querySelector('.gesture-name');
+    if (gestureName) {
+      gestureName.textContent = nextGesture.name;
+    }
+  }
+  return nextGesture;
+}
+
+/**
  * ゲーム終了時のダイアログを表示
  */
 export function showGameOverDialog(score: number) {
@@ -64,51 +134,8 @@ export function showGameOverDialog(score: number) {
     if (scoreDisplay && gestureDisplay && timerDisplay) {
       // UIを更新
       updateGameUI(scoreDisplay, gestureDisplay);
-
-      // 称号システムのリセット
-      if (typeof window.updateScore === 'function') {
-        window.updateScore(0);
-      }
-
-      // 砂時計のリセットと開始
-      const hourglass = timerDisplay.querySelector('.hourglass') as HTMLElement;
-      const hourglassTopSand = timerDisplay.querySelector(
-        '.hourglass-top .sand',
-      ) as HTMLElement;
-      const hourglassBottomSand = timerDisplay.querySelector(
-        '.hourglass-bottom .sand',
-      ) as HTMLElement;
-
-      // 初期状態でトランジションを無効化
-      hourglassTopSand.style.transition = 'none';
-      hourglassBottomSand.style.transition = 'none';
-      hourglassTopSand.style.height = '0%';
-      hourglassBottomSand.style.height = '100%';
-
-      // 砂時計を回転させる
-      hourglass.classList.add('flipping');
-
-      // アニメーション終了時の処理
-      hourglass.addEventListener(
-        'animationend',
-        () => {
-          hourglass.classList.remove('flipping');
-          hourglass.classList.add('animation-completed');
-
-          // 回転後は元の上部が下部になっているので、砂は元の下部（今の上部）に100%の状態から開始
-          hourglassTopSand.style.height = '0%';
-          hourglassBottomSand.style.height = '100%';
-
-          // 少し遅延を入れてからトランジションを有効化し、タイマーを開始
-          setTimeout(() => {
-            hourglassTopSand.style.transition = 'height 0.5s ease-in-out';
-            hourglassBottomSand.style.transition = 'height 0.5s ease-in-out';
-            // タイマーの開始
-            startTimer(timerDisplay);
-          }, 50);
-        },
-        { once: true },
-      );
+      updateGameScore(0);
+      initializeHourglass(timerDisplay);
     }
   };
 }
@@ -135,50 +162,8 @@ export function setupGameUI(
     // ゲーム開始ボタンを無効化
     startGameBtn.setAttribute('disabled', 'true');
 
-    // 称号システムのリセット
-    if (typeof window.updateScore === 'function') {
-      window.updateScore(0);
-    }
-
-    // 砂時計の要素を取得
-    const hourglass = timerDisplay.querySelector('.hourglass') as HTMLElement;
-    const hourglassTopSand = timerDisplay.querySelector(
-      '.hourglass-top .sand',
-    ) as HTMLElement;
-    const hourglassBottomSand = timerDisplay.querySelector(
-      '.hourglass-bottom .sand',
-    ) as HTMLElement;
-
-    // 初期状態でトランジションを無効化
-    hourglassTopSand.style.transition = 'none';
-    hourglassBottomSand.style.transition = 'none';
-    hourglassTopSand.style.height = '0%';
-    hourglassBottomSand.style.height = '100%';
-
-    // 砂時計を回転させる
-    hourglass.classList.add('flipping');
-
-    // アニメーション終了時の処理
-    hourglass.addEventListener(
-      'animationend',
-      () => {
-        hourglass.classList.remove('flipping');
-        hourglass.classList.add('animation-completed');
-
-        // 回転後は元の上部が下部になっているので、砂は元の下部（今の上部）に100%の状態から開始
-        hourglassTopSand.style.height = '0%';
-        hourglassBottomSand.style.height = '100%';
-
-        // 少し遅延を入れてからトランジションを有効化し、タイマーを開始
-        setTimeout(() => {
-          hourglassTopSand.style.transition = 'height 0.5s ease-in-out';
-          hourglassBottomSand.style.transition = 'height 0.5s ease-in-out';
-          // タイマーの開始
-          startTimer(timerDisplay);
-        }, 50);
-      },
-      { once: true },
-    );
+    updateGameScore(0);
+    initializeHourglass(timerDisplay);
   });
 }
 
@@ -226,25 +211,8 @@ export async function handleGestureDetection(
   const gestures = getGestures();
   const detectedGesture = detectGesture(landmarks, gestures);
   if (detectedGesture === state.currentGesture.name) {
-    // スコアを更新
-    updateScore(10);
-
-    // 称号システムの更新
-    if (typeof window.updateScore === 'function') {
-      window.updateScore(state.score);
-    }
-
-    // 次のジェスチャーを選択
-    const nextGesture = selectNextGesture(gestures);
-
-    // UI更新
-    const gestureDisplay = document.getElementById('gesture-display');
-    if (gestureDisplay && nextGesture) {
-      const gestureName = gestureDisplay.querySelector('.gesture-name');
-      if (gestureName) {
-        gestureName.textContent = nextGesture.name;
-      }
-    }
+    updateGameScore(10);
+    setNextGesture();
   }
 }
 
@@ -252,26 +220,8 @@ export function handleGestureSuccess(): void {
   const state = getGameState();
   if (!state.isRunning) return;
 
-  // スコアを更新
-  updateScore(10);
-
-  // 称号システムの更新
-  if (typeof window.updateScore === 'function') {
-    window.updateScore(state.score);
-  }
-
-  // 次のジェスチャーを選択
-  const gestures = getGestures();
-  const nextGesture = selectNextGesture(gestures);
-
-  // UI更新
-  const gestureDisplay = document.getElementById('gesture-display');
-  if (gestureDisplay && nextGesture) {
-    const gestureName = gestureDisplay.querySelector('.gesture-name');
-    if (gestureName) {
-      gestureName.textContent = nextGesture.name;
-    }
-  }
+  updateGameScore(10);
+  setNextGesture();
 }
 
 /**
