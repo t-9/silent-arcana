@@ -141,6 +141,8 @@ describe('gameHandlers', () => {
 
       // タイマーのテスト
       vi.advanceTimersByTime(1000);
+      // 遅延を考慮してさらに時間を進める
+      vi.advanceTimersByTime(50);
       const progress = 1 / GameConfig.GAME_TIME;
       expect(hourglassTop.style.height).toBe(`${(1 - progress) * 100}%`);
       expect(hourglassBottom.style.height).toBe(`${progress * 100}%`);
@@ -167,14 +169,20 @@ describe('gameHandlers', () => {
       ) as HTMLElement;
       hourglass.dispatchEvent(new Event('animationend'));
 
+      // 遅延を考慮
+      vi.advanceTimersByTime(50);
+
       // 砂粒子の生成をテスト
       vi.spyOn(Math, 'random').mockReturnValue(0.2); // 30%未満なので粒子が生成される
       vi.advanceTimersByTime(1000);
-      expect(mockTimerDisplay.querySelector('.sand-particle')).not.toBeNull();
+
+      // hourglass要素を取得して砂粒子を確認
+      const hourglassElement = mockTimerDisplay.querySelector('.hourglass');
+      expect(hourglassElement?.querySelector('.sand-particle')).not.toBeNull();
 
       // 砂粒子のクリーンアップをテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
-      expect(mockTimerDisplay.querySelector('.sand-particle')).toBeNull();
+      expect(hourglassElement?.querySelector('.sand-particle')).toBeNull();
     });
   });
 
