@@ -290,6 +290,63 @@ describe('gameHandlers', () => {
       sandParticle.remove(); // 明示的に要素を削除
       expect(mockTimerDisplay.querySelector('.sand-particle')).toBeNull();
     });
+
+    it('should call window.updateScore when available', () => {
+      const mockUpdateScore = vi.fn();
+      const originalUpdateScore = window.updateScore;
+      window.updateScore = mockUpdateScore;
+
+      const mockStartGameBtn = document.createElement('button');
+      const mockScoreDisplay = document.createElement('div');
+      const mockGestureDisplay = document.createElement('div');
+      const mockTimerDisplay = document.createElement('div');
+
+      // ダイアログオーバーレイを作成
+      const overlay = document.createElement('div');
+      overlay.classList.add('dialog-overlay');
+      document.body.appendChild(overlay);
+
+      // 砂時計の構造を作成
+      const hourglass = document.createElement('div');
+      hourglass.classList.add('hourglass');
+      const hourglassTop = document.createElement('div');
+      hourglassTop.classList.add('hourglass-top');
+      const hourglassBottom = document.createElement('div');
+      hourglassBottom.classList.add('hourglass-bottom');
+      const hourglassTopSand = document.createElement('div');
+      hourglassTopSand.classList.add('sand');
+      const hourglassBottomSand = document.createElement('div');
+      hourglassBottomSand.classList.add('sand');
+
+      hourglassTop.appendChild(hourglassTopSand);
+      hourglassBottom.appendChild(hourglassBottomSand);
+      hourglass.appendChild(hourglassTop);
+      hourglass.appendChild(hourglassBottom);
+      mockTimerDisplay.appendChild(hourglass);
+
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        mockGestures,
+      );
+
+      // タイマーをモック化
+      vi.useFakeTimers();
+
+      // ボタンをクリック
+      mockStartGameBtn.click();
+
+      // イベントループを進める
+      vi.advanceTimersByTime(0);
+
+      // window.updateScoreが0で呼び出されたことを確認
+      expect(mockUpdateScore).toHaveBeenCalledWith(0);
+
+      window.updateScore = originalUpdateScore;
+      vi.useRealTimers();
+    });
   });
 
   describe('updateGameUI', () => {
@@ -427,6 +484,32 @@ describe('gameHandlers', () => {
       expect(updateScore).toHaveBeenCalledWith(10);
       expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
     });
+
+    it('should handle gesture detection with missing UI elements', async () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+      (detectGesture as Mock).mockReturnValue(mockGestures[0].name);
+
+      // Remove gesture-display element
+      const gestureDisplay = document.getElementById('gesture-display');
+      gestureDisplay?.remove();
+
+      const mockUpdateScore = vi.fn();
+      const originalUpdateScore = window.updateScore;
+      window.updateScore = mockUpdateScore;
+
+      const landmarks = [[0, 0]];
+      await handleGestureDetection(landmarks);
+
+      expect(mockUpdateScore).toHaveBeenCalledWith(0);
+
+      window.updateScore = originalUpdateScore;
+    });
   });
 
   describe('handleGestureSuccess', () => {
@@ -513,6 +596,30 @@ describe('gameHandlers', () => {
 
       expect(updateScore).toHaveBeenCalledWith(10);
       expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
+    });
+
+    it('should handle gesture success with missing UI elements', () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+
+      // Remove gesture-display element
+      const gestureDisplay = document.getElementById('gesture-display');
+      gestureDisplay?.remove();
+
+      const mockUpdateScore = vi.fn();
+      const originalUpdateScore = window.updateScore;
+      window.updateScore = mockUpdateScore;
+
+      handleGestureSuccess();
+
+      expect(mockUpdateScore).toHaveBeenCalledWith(0);
+
+      window.updateScore = originalUpdateScore;
     });
   });
 
