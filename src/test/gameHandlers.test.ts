@@ -136,16 +136,16 @@ describe('gameHandlers', () => {
       const hourglassBottom = mockTimerDisplay.querySelector(
         '.hourglass-bottom .sand',
       ) as HTMLElement;
-      expect(hourglassTop.style.height).toBe('100%');
-      expect(hourglassBottom.style.height).toBe('0%');
+      expect(hourglassTop.style.height).toBe('0%');
+      expect(hourglassBottom.style.height).toBe('100%');
 
       // タイマーのテスト
       vi.advanceTimersByTime(1000);
       // 遅延を考慮してさらに時間を進める
       vi.advanceTimersByTime(50);
       const progress = 1 / GameConfig.GAME_TIME;
-      expect(hourglassTop.style.height).toBe(`${(1 - progress) * 100}%`);
-      expect(hourglassBottom.style.height).toBe(`${progress * 100}%`);
+      expect(hourglassTop.style.height).toBe(`${progress * 100}%`);
+      expect(hourglassBottom.style.height).toBe(`${(1 - progress) * 100}%`);
 
       // ゲーム終了のテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
