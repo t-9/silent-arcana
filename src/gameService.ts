@@ -62,7 +62,7 @@ export const resetState = (initialHighScore?: number): void => {
   state = {
     score: 0,
     highScore:
-      initialHighScore ?? Number(localStorage.getItem('highScore') || '100'),
+      initialHighScore ?? Number(localStorage.getItem('highScore') ?? '100'),
     currentGesture: null,
     remainingTime: GameConfig.GAME_TIME,
     isRunning: false,
