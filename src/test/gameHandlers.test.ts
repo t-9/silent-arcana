@@ -383,6 +383,50 @@ describe('gameHandlers', () => {
 
       expect(detectGesture).not.toHaveBeenCalled();
     });
+
+    it('should handle correct gesture detection with missing gesture display', async () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+      (detectGesture as Mock).mockReturnValue(mockGestures[0].name);
+
+      // Remove gesture-display element
+      const gestureDisplay = document.getElementById('gesture-display');
+      gestureDisplay?.remove();
+
+      const landmarks = [[0, 0]];
+      await handleGestureDetection(landmarks);
+
+      expect(detectGesture).toHaveBeenCalledWith(landmarks, mockGestures);
+      expect(updateScore).toHaveBeenCalledWith(10);
+      expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
+    });
+
+    it('should handle correct gesture detection with missing gesture name element', async () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+      (detectGesture as Mock).mockReturnValue(mockGestures[0].name);
+
+      // Remove gesture-name element
+      const gestureName = document.querySelector('.gesture-name');
+      gestureName?.remove();
+
+      const landmarks = [[0, 0]];
+      await handleGestureDetection(landmarks);
+
+      expect(detectGesture).toHaveBeenCalledWith(landmarks, mockGestures);
+      expect(updateScore).toHaveBeenCalledWith(10);
+      expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
+    });
   });
 
   describe('handleGestureSuccess', () => {
@@ -431,6 +475,44 @@ describe('gameHandlers', () => {
       expect(mockUpdateScore).toHaveBeenCalledWith(0);
 
       window.updateScore = originalUpdateScore;
+    });
+
+    it('should handle missing gesture display element', () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+
+      // Remove gesture-display element
+      const gestureDisplay = document.getElementById('gesture-display');
+      gestureDisplay?.remove();
+
+      handleGestureSuccess();
+
+      expect(updateScore).toHaveBeenCalledWith(10);
+      expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
+    });
+
+    it('should handle missing gesture name element', () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+
+      // Remove gesture-name element
+      const gestureName = document.querySelector('.gesture-name');
+      gestureName?.remove();
+
+      handleGestureSuccess();
+
+      expect(updateScore).toHaveBeenCalledWith(10);
+      expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
     });
   });
 
@@ -552,6 +634,62 @@ describe('gameHandlers', () => {
       // 完了メッセージが表示されることを確認
       const gestureName = mockGestureDisplay.querySelector('.gesture-name');
       expect(gestureName?.textContent).toBe('完了');
+    });
+  });
+
+  describe('sand particle animation', () => {
+    it('should handle sand particle animation end', () => {
+      // タイマー表示要素を作成
+      const mockTimerDisplay = document.createElement('div');
+      mockTimerDisplay.className = 'timer-display';
+
+      // 砂時計を作成
+      const hourglass = document.createElement('div');
+      hourglass.className = 'hourglass';
+
+      // 上部と下部を作成
+      const hourglassTop = document.createElement('div');
+      hourglassTop.className = 'hourglass-top';
+      const hourglassBottom = document.createElement('div');
+      hourglassBottom.className = 'hourglass-bottom';
+
+      // 砂を追加
+      const hourglassTopSand = document.createElement('div');
+      hourglassTopSand.className = 'sand';
+      const hourglassBottomSand = document.createElement('div');
+      hourglassBottomSand.className = 'sand';
+
+      // 構造を組み立て
+      hourglassTop.appendChild(hourglassTopSand);
+      hourglassBottom.appendChild(hourglassBottomSand);
+      hourglass.appendChild(hourglassTop);
+      hourglass.appendChild(hourglassBottom);
+      mockTimerDisplay.appendChild(hourglass);
+
+      // タイマーを開始
+      startTimer(mockTimerDisplay);
+
+      // Math.randomをモック化して、必ず砂粒子が生成されるようにする
+      const originalRandom = Math.random;
+      Math.random = vi.fn().mockReturnValue(0.1); // 0.3未満の値を返す
+
+      // 砂粒子のアニメーションをシミュレート
+      vi.advanceTimersByTime(1000);
+
+      // Math.randomを元に戻す
+      Math.random = originalRandom;
+
+      // 砂粒子を取得
+      const sandParticle = mockTimerDisplay.querySelector('.sand-particle');
+      expect(sandParticle).not.toBeNull();
+
+      if (sandParticle) {
+        // アニメーション終了イベントを発火
+        sandParticle.dispatchEvent(new Event('animationend'));
+
+        // 砂粒子が削除されたことを確認
+        expect(mockTimerDisplay.querySelector('.sand-particle')).toBeNull();
+      }
     });
   });
 });
