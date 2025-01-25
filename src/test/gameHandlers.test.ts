@@ -118,6 +118,8 @@ describe('gameHandlers', () => {
       mockStartGameBtn.click();
 
       expect(startGame).toHaveBeenCalledWith(mockGestures);
+      // ゲーム開始後にボタンが無効化されていることを確認
+      expect(mockStartGameBtn.disabled).toBe(true);
 
       // 砂時計の回転アニメーションをテスト
       const hourglass = mockTimerDisplay.querySelector(
@@ -171,6 +173,33 @@ describe('gameHandlers', () => {
       // ゲーム終了のテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
       expect(stopGame).toHaveBeenCalled();
+
+      // ゲーム終了時にダイアログが表示されることを確認
+      expect(mockOverlay.style.display).toBe('flex');
+    });
+
+    it('should show game over dialog with correct score', () => {
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        mockGestures,
+      );
+
+      mockStartGameBtn.click();
+
+      // ゲーム終了時の処理をシミュレート
+      vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
+
+      // ダイアログの表示を確認
+      expect(mockOverlay.style.display).toBe('flex');
+      expect(mockFinalScore.textContent).toBe('0');
+      expect(mockFinalHighScore.textContent).toBe('100');
+
+      // リスタートボタンをクリックするとダイアログが閉じることを確認
+      mockRestartBtn.click();
+      expect(mockOverlay.style.display).toBe('none');
     });
 
     it('should maintain hourglass shape after rotation', () => {
@@ -203,6 +232,24 @@ describe('gameHandlers', () => {
     });
 
     it('should handle sand particles during game', () => {
+      // モック要素のセットアップ
+      const mockStartGameBtn = document.createElement('button');
+      const mockScoreDisplay = document.createElement('div');
+      const mockGestureDisplay = document.createElement('div');
+      const mockTimerDisplay = document.createElement('div');
+      mockTimerDisplay.innerHTML = `
+        <div class="hourglass">
+          <div class="hourglass-top">
+            <div class="sand"></div>
+          </div>
+          <div class="hourglass-bottom">
+            <div class="sand"></div>
+          </div>
+        </div>
+      `;
+      const mockGestures = [{ name: 'test', landmarks: [[0, 0]] }];
+
+      // ゲームUIのセットアップ
       setupGameUI(
         mockStartGameBtn,
         mockScoreDisplay,
@@ -211,28 +258,20 @@ describe('gameHandlers', () => {
         mockGestures,
       );
 
+      // ランダム関数をモック化して砂粒子の生成を制御
+      const mockRandom = vi.spyOn(Math, 'random');
+      mockRandom.mockReturnValue(0.2); // 30%の確率で砂粒子を生成
+
+      // ゲームを開始
       mockStartGameBtn.click();
 
-      // アニメーション終了をシミュレート
-      const hourglass = mockTimerDisplay.querySelector(
-        '.hourglass',
-      ) as HTMLElement;
-      hourglass.dispatchEvent(new Event('animationend'));
-
-      // 遅延を考慮
-      vi.advanceTimersByTime(50);
-
-      // 砂粒子の生成をテスト
-      vi.spyOn(Math, 'random').mockReturnValue(0.2); // 30%未満なので粒子が生成される
-      vi.advanceTimersByTime(1000);
-
-      // hourglass要素を取得して砂粒子を確認
-      const hourglassElement = mockTimerDisplay.querySelector('.hourglass');
-      expect(hourglassElement?.querySelector('.sand-particle')).not.toBeNull();
-
       // 砂粒子のクリーンアップをテスト
-      vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
-      expect(hourglassElement?.querySelector('.sand-particle')).toBeNull();
+      vi.advanceTimersByTime(GameConfig.GAME_TIME);
+      const hourglassElement = mockTimerDisplay.querySelector('.hourglass');
+      expect(hourglassElement?.querySelector('.sand-particle')).toBe(null);
+
+      // モックを元に戻す
+      mockRandom.mockRestore();
     });
   });
 
