@@ -16,7 +16,10 @@ export default defineConfig({
         '**/node_modules/**',
         '**/*.test.ts',
         'webpack.config.js',
-        'vitest.config.ts'
+        'vitest.config.ts',
+        'eslint.config.js',
+        'release.config.js',
+        '*.config.{js,ts}'  // 全ての設定ファイルを除外
       ]
     }
   },
