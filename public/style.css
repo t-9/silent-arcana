@@ -1044,8 +1044,8 @@ button:hover~.cursor-wrapper .wand-gem {
   width: 100%;
   bottom: 0;
   background: linear-gradient(180deg,
-      rgba(201, 160, 220, 0.8),
-      rgba(128, 0, 128, 0.8));
+      rgba(128, 0, 128, 0.8),
+      rgba(201, 160, 220, 0.8));
   height: 0%;
   transform-origin: bottom center;
   transition: height 0.5s ease-in-out;
@@ -1056,7 +1056,7 @@ button:hover~.cursor-wrapper .wand-gem {
   position: absolute;
   width: 100%;
   top: 0;
-  background: linear-gradient(180deg,
+  background: linear-gradient(0deg,
       rgba(128, 0, 128, 0.8),
       rgba(201, 160, 220, 0.8));
   height: 100%;
@@ -1122,29 +1122,18 @@ button:hover~.cursor-wrapper .wand-gem {
     transform: rotate(0deg);
   }
 
-  49.99% {
-    transform: rotate(90deg);
-  }
-
-  50% {
-    transform: rotate(90deg);
-  }
-
   100% {
     transform: rotate(180deg);
   }
 }
 
 @keyframes sandColorTop {
-
-  0%,
-  49.99% {
+  0% {
     background: linear-gradient(180deg,
-        rgba(201, 160, 220, 0.8),
-        rgba(128, 0, 128, 0.8));
+        rgba(128, 0, 128, 0.8),
+        rgba(201, 160, 220, 0.8));
   }
 
-  50%,
   100% {
     background: linear-gradient(180deg,
         rgba(128, 0, 128, 0.8),
@@ -1153,19 +1142,16 @@ button:hover~.cursor-wrapper .wand-gem {
 }
 
 @keyframes sandColorBottom {
-
-  0%,
-  49.99% {
-    background: linear-gradient(180deg,
+  0% {
+    background: linear-gradient(0deg,
         rgba(128, 0, 128, 0.8),
         rgba(201, 160, 220, 0.8));
   }
 
-  50%,
   100% {
-    background: linear-gradient(180deg,
-        rgba(201, 160, 220, 0.8),
-        rgba(128, 0, 128, 0.8));
+    background: linear-gradient(0deg,
+        rgba(128, 0, 128, 0.8),
+        rgba(201, 160, 220, 0.8));
   }
 }
 
@@ -1175,8 +1161,22 @@ button:hover~.cursor-wrapper .wand-gem {
 
 .hourglass.flipping .hourglass-top .sand {
   animation: sandColorTop 1s ease-in-out forwards;
+  animation-fill-mode: forwards;
 }
 
 .hourglass.flipping .hourglass-bottom .sand {
   animation: sandColorBottom 1s ease-in-out forwards;
+  animation-fill-mode: forwards;
+}
+
+.hourglass.flipping.animation-completed .hourglass-top .sand {
+  background: linear-gradient(180deg,
+      rgba(128, 0, 128, 0.8),
+      rgba(201, 160, 220, 0.8));
+}
+
+.hourglass.flipping.animation-completed .hourglass-bottom .sand {
+  background: linear-gradient(0deg,
+      rgba(128, 0, 128, 0.8),
+      rgba(201, 160, 220, 0.8));
 }
