@@ -64,6 +64,11 @@ export function setupGameUI(
     startGame(gestures); // ゲームロジックの初期化
     updateGameUI(scoreDisplay, gestureDisplay); // UIの初期更新
 
+    // 称号システムのリセット
+    if (typeof window.updateScore === 'function') {
+      window.updateScore(0);
+    }
+
     let timeRemaining = GameConfig.GAME_TIME;
     timerDisplay.textContent = `残り時間: ${timeRemaining} 秒`;
 
