@@ -1,11 +1,18 @@
 // src/test/logic.test.ts
-import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  type MockedFunction,
+} from 'vitest';
 import { detectHandsOnce, handsToMessage } from '../logic';
 import { getDetector } from '../modelService';
 import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 
 vi.mock('../modelService', () => ({
-  getDetector: vi.fn()
+  getDetector: vi.fn(),
 }));
 
 describe('logic', () => {
@@ -13,12 +20,14 @@ describe('logic', () => {
   const mockDetector = {
     estimateHands: mockEstimateHands,
     dispose: vi.fn(),
-    reset: vi.fn()
+    reset: vi.fn(),
   } as unknown as HandDetector;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (getDetector as MockedFunction<typeof getDetector>).mockReturnValue(mockDetector);
+    (getDetector as MockedFunction<typeof getDetector>).mockReturnValue(
+      mockDetector,
+    );
   });
 
   describe('handsToMessage', () => {

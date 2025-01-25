@@ -1,6 +1,11 @@
 // src/logic.ts
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
-import { getGestures, getCurrentGesture, isGameRunning, updateScore } from './gameState';
+import {
+  getGestures,
+  getCurrentGesture,
+  isGameRunning,
+  updateScore,
+} from './gameState';
 import { detectGesture } from './gestureService';
 
 /**
@@ -44,7 +49,11 @@ export async function detectHandsOnce(
     console.log('Current gesture:', currentGesture);
     console.log('Detected gesture:', detectedGesture);
 
-    if (detectedGesture && currentGesture === detectedGesture && isGameRunning()) {
+    if (
+      detectedGesture &&
+      currentGesture === detectedGesture &&
+      isGameRunning()
+    ) {
       console.log('Score updated!');
       updateScore();
     }
@@ -105,21 +114,26 @@ export function convertHandKeypointsToArray(
 /**
  * キーポイントを相対座標に変換する
  */
-export function toRelativeLandmarks(keypoints: { x: number; y: number; name?: string }[]): number[][] {
+export function toRelativeLandmarks(
+  keypoints: { x: number; y: number; name?: string }[],
+): number[][] {
   // まずキーポイントを配列形式に変換
   const points = convertHandKeypointsToArray(keypoints);
 
   // 手首の位置を基準点として取得
-  const wrist = points[0];  // KEYPOINT_ORDERの最初が'wrist'
+  const wrist = points[0]; // KEYPOINT_ORDERの最初が'wrist'
 
   // 手首を原点とした相対座標に変換
-  const relativePoints = points.map(point => [
+  const relativePoints = points.map((point) => [
     point[0] - wrist[0],
-    point[1] - wrist[1]
+    point[1] - wrist[1],
   ]);
 
   // 相対座標の最大絶対値を計算
-  const absValues = relativePoints.flatMap(p => [Math.abs(p[0]), Math.abs(p[1])]);
+  const absValues = relativePoints.flatMap((p) => [
+    Math.abs(p[0]),
+    Math.abs(p[1]),
+  ]);
   const maxAbs = Math.max(...absValues);
 
   // スケール係数を計算（最大絶対値が1になるように）
@@ -129,21 +143,21 @@ export function toRelativeLandmarks(keypoints: { x: number; y: number; name?: st
   console.log('Before normalization:', {
     maxAbs,
     SCALE,
-    points: relativePoints
+    points: relativePoints,
   });
 
   // 正規化（-1から1の範囲に収める）
-  const normalizedPoints = relativePoints.map(point => [
+  const normalizedPoints = relativePoints.map((point) => [
     point[0] / SCALE,
-    point[1] / SCALE
+    point[1] / SCALE,
   ]);
 
   // デバッグ用のログ
-  const xValues = normalizedPoints.map(p => p[0]);
-  const yValues = normalizedPoints.map(p => p[1]);
+  const xValues = normalizedPoints.map((p) => p[0]);
+  const yValues = normalizedPoints.map((p) => p[1]);
   console.log('After normalization:', {
     x: { min: Math.min(...xValues), max: Math.max(...xValues) },
-    y: { min: Math.min(...yValues), max: Math.max(...yValues) }
+    y: { min: Math.min(...yValues), max: Math.max(...yValues) },
   });
 
   return normalizedPoints;

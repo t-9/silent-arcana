@@ -1,16 +1,23 @@
-import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  type MockedFunction,
+} from 'vitest';
 import { setupKeyboardEvents } from '../eventHandlers';
 import { getDetector } from '../modelService';
 import { detectHandsOnce, toRelativeLandmarks } from '../logic';
 import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 
 vi.mock('../modelService', () => ({
-  getDetector: vi.fn()
+  getDetector: vi.fn(),
 }));
 
 vi.mock('../logic', () => ({
   detectHandsOnce: vi.fn(),
-  toRelativeLandmarks: vi.fn()
+  toRelativeLandmarks: vi.fn(),
 }));
 
 describe('eventHandlers', () => {
@@ -20,16 +27,22 @@ describe('eventHandlers', () => {
     const mockDetector = {
       estimateHands: mockEstimateHands,
       dispose: vi.fn(),
-      reset: vi.fn()
+      reset: vi.fn(),
     } as unknown as HandDetector;
     const mockLandmarks = [{ x: 0, y: 0, z: 0 }];
 
     beforeEach(() => {
       vi.resetAllMocks();
       vi.useFakeTimers();
-      (getDetector as MockedFunction<typeof getDetector>).mockReturnValue(mockDetector);
-      (detectHandsOnce as MockedFunction<typeof detectHandsOnce>).mockResolvedValue('手が検出されました');
-      (toRelativeLandmarks as MockedFunction<typeof toRelativeLandmarks>).mockReturnValue([[0, 0, 0]]);
+      (getDetector as MockedFunction<typeof getDetector>).mockReturnValue(
+        mockDetector,
+      );
+      (
+        detectHandsOnce as MockedFunction<typeof detectHandsOnce>
+      ).mockResolvedValue('手が検出されました');
+      (
+        toRelativeLandmarks as MockedFunction<typeof toRelativeLandmarks>
+      ).mockReturnValue([[0, 0, 0]]);
       mockEstimateHands.mockResolvedValue([{ keypoints: mockLandmarks }]);
     });
 
@@ -43,7 +56,9 @@ describe('eventHandlers', () => {
 
     it('should not capture when no hand is detected', async () => {
       setupKeyboardEvents(mockVideoEl);
-      (detectHandsOnce as MockedFunction<typeof detectHandsOnce>).mockResolvedValue('手が検出されていません');
+      (
+        detectHandsOnce as MockedFunction<typeof detectHandsOnce>
+      ).mockResolvedValue('手が検出されていません');
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
       await vi.runAllTimersAsync();
       expect(toRelativeLandmarks).not.toBeCalled();
@@ -64,4 +79,4 @@ describe('eventHandlers', () => {
       expect(detectHandsOnce).not.toBeCalled();
     });
   });
-}); 
+});

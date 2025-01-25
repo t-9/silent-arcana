@@ -12,7 +12,7 @@ describe('cameraService', () => {
     onerror: null,
     play: vi.fn().mockResolvedValue(undefined),
     videoWidth: 1280,
-    videoHeight: 720
+    videoHeight: 720,
   } as unknown as HTMLVideoElement;
   const mockSetLoading = vi.fn();
   let mockGetUserMedia: ReturnType<typeof vi.fn>;
@@ -20,7 +20,9 @@ describe('cameraService', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     mockGetUserMedia = vi.fn();
-    vi.spyOn(cameraModule, 'getGetUserMedia').mockImplementation(() => mockGetUserMedia);
+    vi.spyOn(cameraModule, 'getGetUserMedia').mockImplementation(
+      () => mockGetUserMedia,
+    );
     vi.useFakeTimers();
   });
 
@@ -33,7 +35,7 @@ describe('cameraService', () => {
     mockGetUserMedia.mockResolvedValue(mockStream);
 
     const startCameraPromise = startCamera(mockVideoEl, mockSetLoading);
-    
+
     // メタデータロードイベントをシミュレート
     await vi.advanceTimersByTimeAsync(100);
     if (mockVideoEl.onloadedmetadata) {
@@ -50,9 +52,10 @@ describe('cameraService', () => {
   it('shows error if getUserMedia throws', async () => {
     mockGetUserMedia.mockRejectedValue(new Error('Camera access denied'));
 
-    await expect(startCamera(mockVideoEl, mockSetLoading))
-      .rejects.toThrow('カメラ使用許可が必要です');
-    
+    await expect(startCamera(mockVideoEl, mockSetLoading)).rejects.toThrow(
+      'カメラ使用許可が必要です',
+    );
+
     expect(mockSetLoading).toHaveBeenCalledWith(true);
     expect(mockSetLoading).toHaveBeenCalledWith(false);
   });

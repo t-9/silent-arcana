@@ -10,10 +10,10 @@ export const GameConfig = {
 
   /** 称号の閾値 */
   RANK_THRESHOLDS: {
-    BEGINNER: 0,      // 見習い魔術師
-    INTERMEDIATE: 50,  // 初級魔導士
-    ADVANCED: 100,    // 中級魔導士
-    EXPERT: 200,      // 上級魔導士
-    MASTER: 300,      // 大魔導士
-  }
-} as const; 
+    BEGINNER: 0, // 見習い魔術師
+    INTERMEDIATE: 50, // 初級魔導士
+    ADVANCED: 100, // 中級魔導士
+    EXPERT: 200, // 上級魔導士
+    MASTER: 300, // 大魔導士
+  },
+} as const;

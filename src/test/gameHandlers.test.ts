@@ -1,4 +1,12 @@
-import { vi, describe, it, expect, beforeEach, afterEach, type Mock } from 'vitest';
+import {
+  vi,
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+  type Mock,
+} from 'vitest';
 import {
   setupGameUI,
   updateGameUI,
@@ -90,11 +98,15 @@ describe('gameHandlers', () => {
       mockStartGameBtn.click();
 
       expect(startGame).toHaveBeenCalledWith(mockGestures);
-      expect(mockTimerDisplay.textContent).toBe(`残り時間: ${GameConfig.GAME_TIME} 秒`);
+      expect(mockTimerDisplay.textContent).toBe(
+        `残り時間: ${GameConfig.GAME_TIME} 秒`,
+      );
 
       // タイマーのテスト
       vi.advanceTimersByTime(1000);
-      expect(mockTimerDisplay.textContent).toBe(`残り時間: ${GameConfig.GAME_TIME - 1} 秒`);
+      expect(mockTimerDisplay.textContent).toBe(
+        `残り時間: ${GameConfig.GAME_TIME - 1} 秒`,
+      );
 
       // ゲーム終了のテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
@@ -195,4 +207,4 @@ describe('gameHandlers', () => {
       window.updateScore = originalUpdateScore;
     });
   });
-}); 
+});

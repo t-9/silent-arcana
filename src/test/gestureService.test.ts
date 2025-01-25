@@ -4,15 +4,21 @@ import { detectGesture } from '../gestureService';
 
 describe('detectGesture', () => {
   const keypointsMatch = [
-    [0, 0, 0], [1, 1, 1], [2, 2, 2]
+    [0, 0, 0],
+    [1, 1, 1],
+    [2, 2, 2],
   ];
 
-  const gestures = [{
-    name: 'test-gesture',
-    landmarks: [
-      [0, 0, 0], [1, 1, 1], [2, 2, 2]
-    ]
-  }];
+  const gestures = [
+    {
+      name: 'test-gesture',
+      landmarks: [
+        [0, 0, 0],
+        [1, 1, 1],
+        [2, 2, 2],
+      ],
+    },
+  ];
 
   it('should detect matching gesture', () => {
     const result = detectGesture(keypointsMatch, gestures);

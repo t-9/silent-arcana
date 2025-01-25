@@ -42,9 +42,14 @@ function calcDistance(ptsA: number[][], ptsB: number[][]): number {
 export function detectGesture(
   keypoints: number[][],
   gestures: Gesture[],
-  distanceThreshold = 20000.0
+  distanceThreshold = 20000.0,
 ): string | null {
-  if (!keypoints || keypoints.length === 0 || !gestures || gestures.length === 0) {
+  if (
+    !keypoints ||
+    keypoints.length === 0 ||
+    !gestures ||
+    gestures.length === 0
+  ) {
     console.log('Invalid input:', { keypoints, gestures });
     return null;
   }
@@ -53,7 +58,10 @@ export function detectGesture(
   let minDistance = Number.MAX_VALUE;
 
   console.log('Input keypoints:', keypoints);
-  console.log('Available gestures:', gestures.map(g => ({ name: g.name, landmarks: g.landmarks })));
+  console.log(
+    'Available gestures:',
+    gestures.map((g) => ({ name: g.name, landmarks: g.landmarks })),
+  );
 
   for (const gesture of gestures) {
     const dist = calcDistance(keypoints, gesture.landmarks);
