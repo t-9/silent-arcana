@@ -131,6 +131,9 @@ describe('cameraService', () => {
       'カメラの起動がタイムアウトしました',
     );
     expect(mockMessageEl.textContent).toBe('カメラの起動に失敗しました');
+
+    // タイムアウト後のクリーンアップを確認
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
   });
 
   it('should handle missing message element', async () => {
