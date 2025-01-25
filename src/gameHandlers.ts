@@ -101,9 +101,15 @@ export function updateGameUI(
 
   // 次のジェスチャー表示を更新
   if (state.currentGesture) {
-    gestureDisplay.textContent = `手話を実行してください: ${state.currentGesture.name}`;
+    const gestureName = gestureDisplay.querySelector('.gesture-name');
+    if (gestureName) {
+      gestureName.textContent = state.currentGesture.name;
+    }
   } else {
-    gestureDisplay.textContent = 'すべてのジェスチャーが終了しました';
+    const gestureName = gestureDisplay.querySelector('.gesture-name');
+    if (gestureName) {
+      gestureName.textContent = '完了';
+    }
   }
 }
 
@@ -133,7 +139,10 @@ export async function handleGestureDetection(
     // UI更新
     const gestureDisplay = document.getElementById('gesture-display');
     if (gestureDisplay && nextGesture) {
-      gestureDisplay.textContent = `手話を実行してください: ${nextGesture.name}`;
+      const gestureName = gestureDisplay.querySelector('.gesture-name');
+      if (gestureName) {
+        gestureName.textContent = nextGesture.name;
+      }
     }
   }
 }
@@ -157,6 +166,9 @@ export function handleGestureSuccess(): void {
   // UI更新
   const gestureDisplay = document.getElementById('gesture-display');
   if (gestureDisplay && nextGesture) {
-    gestureDisplay.textContent = `手話を実行してください: ${nextGesture.name}`;
+    const gestureName = gestureDisplay.querySelector('.gesture-name');
+    if (gestureName) {
+      gestureName.textContent = nextGesture.name;
+    }
   }
 }

@@ -878,3 +878,99 @@ button:hover~.cursor-wrapper .wand-gem {
   margin: 1rem 0;
   text-shadow: 0 0 10px rgba(201, 160, 220, 0.3);
 }
+
+/* タロットカードスタイル */
+.tarot-card {
+  width: 300px;
+  height: 500px;
+  margin: 20px auto;
+  perspective: 1000px;
+  font-family: 'Crimson Text', serif;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.card-frame {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background: linear-gradient(45deg, #1a1a2e, #16213e);
+  border: 8px solid #4a4a6a;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  color: #e2e2e2;
+}
+
+.card-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #c9a0dc;
+  text-shadow: 0 0 5px rgba(201, 160, 220, 0.7);
+}
+
+.card-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.gesture-name {
+  font-size: 36px;
+  font-weight: 600;
+  margin: 20px 0;
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.gesture-symbol {
+  font-size: 48px;
+  color: #9370db;
+  margin: 20px 0;
+  animation: pulse 2s infinite;
+}
+
+.card-footer {
+  font-size: 18px;
+  font-style: italic;
+  margin-bottom: 20px;
+  color: #8a2be2;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+/* カードのホバーエフェクト */
+.tarot-card:hover .card-inner {
+  transform: rotateY(10deg);
+}

@@ -115,14 +115,24 @@ describe('gameHandlers', () => {
   });
 
   describe('updateGameUI', () => {
+    let mockScoreDisplay: HTMLElement;
+    let mockGestureDisplay: HTMLElement;
+    let gestureName: HTMLElement;
+
+    beforeEach(() => {
+      mockScoreDisplay = document.createElement('div');
+      mockGestureDisplay = document.createElement('div');
+      gestureName = document.createElement('div');
+      gestureName.className = 'gesture-name';
+      mockGestureDisplay.appendChild(gestureName);
+    });
+
     it('should update score and gesture displays', () => {
       updateGameUI(mockScoreDisplay, mockGestureDisplay);
 
       expect(mockScoreDisplay.textContent).toBe('スコア: 0');
       expect(mockHighScoreDisplay.textContent).toBe('ハイスコア: 100');
-      expect(mockGestureDisplay.textContent).toBe(
-        '手話を実行してください: テスト手話1',
-      );
+      expect(gestureName.textContent).toBe('テスト手話1');
     });
 
     it('should handle game end state', () => {
@@ -135,9 +145,7 @@ describe('gameHandlers', () => {
 
       updateGameUI(mockScoreDisplay, mockGestureDisplay);
 
-      expect(mockGestureDisplay.textContent).toBe(
-        'すべてのジェスチャーが終了しました',
-      );
+      expect(gestureName.textContent).toBe('完了');
     });
   });
 
