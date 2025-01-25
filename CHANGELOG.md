@@ -1,3 +1,11 @@
+## [1.4.22](https://github.com/t-9/silent-arcana/compare/v1.4.21...v1.4.22) (2025-01-25)
+
+
+### Bug Fixes
+
+* detectLoop関数の認知的複雑性を下げる ([ae04863](https://github.com/t-9/silent-arcana/commit/ae04863c2a1cce19541ad63568abcce668f1fd05))
+* modelServiceのカバレッジを上げる ([e79cccb](https://github.com/t-9/silent-arcana/commit/e79cccbcb67e97b82c93e1e9f0a22758579b8b2e))
+
 ## [1.4.21](https://github.com/t-9/silent-arcana/compare/v1.4.20...v1.4.21) (2025-01-25)
 
 
