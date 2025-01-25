@@ -1,3 +1,10 @@
+## [1.4.21](https://github.com/t-9/silent-arcana/compare/v1.4.20...v1.4.21) (2025-01-25)
+
+
+### Bug Fixes
+
+* カバレッジ設定更新 ([1dc562c](https://github.com/t-9/silent-arcana/commit/1dc562c97951e957e5b5dc813524d6c136da4601))
+
 ## [1.4.20](https://github.com/t-9/silent-arcana/compare/v1.4.19...v1.4.20) (2025-01-25)
 
 
