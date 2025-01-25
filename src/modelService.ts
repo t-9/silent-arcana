@@ -71,36 +71,35 @@ export async function detectLoop(
   if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0) {
     console.error('ビデオが適切に初期化されていません');
     setLoadingText(messageEl, 'ビデオの初期化に失敗しました');
-    return;
-  }
-
-  // ゲームが進行中かどうかを判定
-  const gameState = getGameState();
-  if (gameState.isRunning) {
-    // ゲーム中ならゲームハンドラの検出処理を呼ぶ
-    const hands = await detector.estimateHands(videoEl);
-    if (hands && hands.length > 0) {
-      // キーポイントを[x, y]の配列に変換
-      const normalizedKeypoints = toRelativeLandmarks(
-        hands[0].keypoints // { x, y, name }を含んでいる想定
-      );
-      await handleGestureDetection(normalizedKeypoints);
-    }
-    // ゲーム中はメッセージ表示を行わない
-    setLoadingText(messageEl, '');
   } else {
-    // ゲーム外の場合は、従来どおり手話名を表示するだけ
-    const hands = await detector.estimateHands(videoEl);
-    if (hands && hands.length > 0) {
-      const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
-      const gestureName = detectGesture(normalizedKeypoints, loadedGestures);
-      if (gestureName) {
-        setLoadingText(messageEl, `検出された手話: ${gestureName}`);
-      } else {
-        setLoadingText(messageEl, '該当する手話が見つかりません');
+    // ゲームが進行中かどうかを判定
+    const gameState = getGameState();
+    if (gameState.isRunning) {
+      // ゲーム中ならゲームハンドラの検出処理を呼ぶ
+      const hands = await detector.estimateHands(videoEl);
+      if (hands && hands.length > 0) {
+        // キーポイントを[x, y]の配列に変換
+        const normalizedKeypoints = toRelativeLandmarks(
+          hands[0].keypoints // { x, y, name }を含んでいる想定
+        );
+        await handleGestureDetection(normalizedKeypoints);
       }
+      // ゲーム中はメッセージ表示を行わない
+      setLoadingText(messageEl, '');
     } else {
-      setLoadingText(messageEl, '手が検出されていません');
+      // ゲーム外の場合は、従来どおり手話名を表示するだけ
+      const hands = await detector.estimateHands(videoEl);
+      if (hands && hands.length > 0) {
+        const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
+        const gestureName = detectGesture(normalizedKeypoints, loadedGestures);
+        if (gestureName) {
+          setLoadingText(messageEl, `検出された手話: ${gestureName}`);
+        } else {
+          setLoadingText(messageEl, '該当する手話が見つかりません');
+        }
+      } else {
+        setLoadingText(messageEl, '手が検出されていません');
+      }
     }
   }
 
