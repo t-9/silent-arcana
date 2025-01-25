@@ -68,7 +68,7 @@ export function setupGameUI(
       // アニメーション終了時に粒子を削除
       particle.addEventListener('animationend', () => {
         particle.remove();
-        sandParticles = sandParticles.filter(p => p !== particle);
+        sandParticles = sandParticles.filter((p) => p !== particle);
       });
     }
   }
@@ -91,39 +91,57 @@ export function setupGameUI(
     const totalTime = GameConfig.GAME_TIME;
 
     // 砂時計の要素を取得
-    const hourglassTop = timerDisplay.querySelector('.hourglass-top .sand') as HTMLElement;
-    const hourglassBottom = timerDisplay.querySelector('.hourglass-bottom .sand') as HTMLElement;
+    const hourglass = timerDisplay.querySelector('.hourglass') as HTMLElement;
+    const hourglassTop = timerDisplay.querySelector(
+      '.hourglass-top .sand',
+    ) as HTMLElement;
+    const hourglassBottom = timerDisplay.querySelector(
+      '.hourglass-bottom .sand',
+    ) as HTMLElement;
 
-    // ゲーム開始時: 上部が満タン、下部が空に変更
-    hourglassTop.style.height = '100%';
-    hourglassBottom.style.height = '0%';
+    // 砂時計を回転させる
+    hourglass.classList.add('flipping');
 
-    // タイマー処理
-    timerInterval = setInterval(() => {
-      timeRemaining -= 1;
+    // 回転アニメーション終了時の処理
+    hourglass.addEventListener(
+      'animationend',
+      () => {
+        hourglass.classList.remove('flipping');
 
-      // 砂時計のアニメーション
-      const progress = (totalTime - timeRemaining) / totalTime;
-      const topHeight = (1 - progress) * 100;
-      const bottomHeight = progress * 100;
+        // 砂の高さを設定
+        hourglassTop.style.height = '100%';
+        hourglassBottom.style.height = '0%';
 
-      hourglassTop.style.height = `${topHeight}%`;
-      hourglassBottom.style.height = `${bottomHeight}%`;
+        // タイマー処理を開始
+        timerInterval = setInterval(() => {
+          timeRemaining -= 1;
 
-      // 砂粒子のアニメーション
-      if (timeRemaining > 0 && Math.random() < 0.3) { // 30%の確率で粒子を生成
-        addSandParticle();
-      }
+          // 砂時計のアニメーション
+          const progress = (totalTime - timeRemaining) / totalTime;
+          const topHeight = (1 - progress) * 100;
+          const bottomHeight = progress * 100;
 
-      if (timeRemaining <= 0) {
-        clearInterval(timerInterval);
-        // 残っている砂粒子を削除
-        sandParticles.forEach(particle => particle.remove());
-        sandParticles = [];
-        stopGame();
-        showGameOverDialog(getGameState().score);
-      }
-    }, 1000);
+          hourglassTop.style.height = `${topHeight}%`;
+          hourglassBottom.style.height = `${bottomHeight}%`;
+
+          // 砂粒子のアニメーション
+          if (timeRemaining > 0 && Math.random() < 0.3) {
+            // 30%の確率で粒子を生成
+            addSandParticle();
+          }
+
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            // 残っている砂粒子を削除
+            sandParticles.forEach((particle) => particle.remove());
+            sandParticles = [];
+            stopGame();
+            showGameOverDialog(getGameState().score);
+          }
+        }, 1000);
+      },
+      { once: true },
+    ); // イベントリスナーを一度だけ実行
   });
 }
 

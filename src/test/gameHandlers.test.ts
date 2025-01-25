@@ -119,6 +119,16 @@ describe('gameHandlers', () => {
 
       expect(startGame).toHaveBeenCalledWith(mockGestures);
 
+      // 砂時計の回転アニメーションをテスト
+      const hourglass = mockTimerDisplay.querySelector(
+        '.hourglass',
+      ) as HTMLElement;
+      expect(hourglass.classList.contains('flipping')).toBe(true);
+
+      // アニメーション終了をシミュレート
+      hourglass.dispatchEvent(new Event('animationend'));
+      expect(hourglass.classList.contains('flipping')).toBe(false);
+
       // 砂時計の初期状態をテスト
       const hourglassTop = mockTimerDisplay.querySelector(
         '.hourglass-top .sand',
@@ -138,6 +148,33 @@ describe('gameHandlers', () => {
       // ゲーム終了のテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
       expect(stopGame).toHaveBeenCalled();
+    });
+
+    it('should handle sand particles during game', () => {
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        mockGestures,
+      );
+
+      mockStartGameBtn.click();
+
+      // アニメーション終了をシミュレート
+      const hourglass = mockTimerDisplay.querySelector(
+        '.hourglass',
+      ) as HTMLElement;
+      hourglass.dispatchEvent(new Event('animationend'));
+
+      // 砂粒子の生成をテスト
+      vi.spyOn(Math, 'random').mockReturnValue(0.2); // 30%未満なので粒子が生成される
+      vi.advanceTimersByTime(1000);
+      expect(mockTimerDisplay.querySelector('.sand-particle')).not.toBeNull();
+
+      // 砂粒子のクリーンアップをテスト
+      vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
+      expect(mockTimerDisplay.querySelector('.sand-particle')).toBeNull();
     });
   });
 
