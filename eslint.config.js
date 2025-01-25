@@ -1,14 +1,33 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
-import tseslint from "typescript-eslint";
+import js from "@eslint/js";
+import * as tseslint from "@typescript-eslint/eslint-plugin";
+import * as parser from "@typescript-eslint/parser";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-  { files: ["**/*.{js,mjs,cjs,ts}"] },
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
+  js.configs.recommended,
   {
+    files: ["**/*.{js,mjs,cjs,ts}"],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        process: true,
+        global: true,
+        NodeJS: true,
+        MediaStreamConstraints: true,
+        MediaTrackConstraints: true
+      },
+      parser: parser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        project: "./tsconfig.json"
+      }
+    },
+    plugins: {
+      "@typescript-eslint": tseslint
+    },
     rules: {
       // 標準のno-unused-varsを無効化
       'no-unused-vars': 'off',
@@ -21,6 +40,8 @@ export default [
           caughtErrorsIgnorePattern: '^_',
         },
       ],
-    },
-  },
+      // TypeScriptの推奨ルールを有効化
+      ...tseslint.configs.recommended.rules
+    }
+  }
 ];

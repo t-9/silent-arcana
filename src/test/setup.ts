@@ -40,8 +40,10 @@ const createMediaDevicesMock = () => {
 // PluginArrayのモック
 class PluginArrayMock {
   length = 0;
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   item(_index: number) { return null; }
   namedItem(_name: string) { return null; }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   refresh() { }
   [Symbol.iterator]() { return [][Symbol.iterator](); }
 }
@@ -49,8 +51,10 @@ class PluginArrayMock {
 // MimeTypeArrayのモック
 class MimeTypeArrayMock {
   length = 0;
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   item(_index: number) { return null; }
   namedItem(_name: string) { return null; }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
   [Symbol.iterator]() { return [][Symbol.iterator](); }
 }
 
