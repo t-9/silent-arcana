@@ -1,3 +1,17 @@
+## [1.4.18](https://github.com/t-9/silent-arcana/compare/v1.4.17...v1.4.18) (2025-01-22)
+
+
+### Bug Fixes
+
+* issue [#95](https://github.com/t-9/silent-arcana/issues/95) [#96](https://github.com/t-9/silent-arcana/issues/96) Remove this useless assignment to variable "isMoving". ([3a39b1f](https://github.com/t-9/silent-arcana/commit/3a39b1f2a395c7ceee7b9e86d0f8208adac71fce))
+
+## [1.4.17](https://github.com/t-9/silent-arcana/compare/v1.4.16...v1.4.17) (2025-01-22)
+
+
+### Bug Fixes
+
+* format ([d3dd447](https://github.com/t-9/silent-arcana/commit/d3dd447cc34c949c32a8624879499e9c1059d2d3))
+
 ## [1.4.16](https://github.com/t-9/silent-arcana/compare/v1.4.15...v1.4.16) (2025-01-11)
 
 
