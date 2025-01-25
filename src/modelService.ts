@@ -9,7 +9,7 @@ import { toRelativeLandmarks } from './logic';
 
 let detector: HandDetector | null = null;
 let running = false;
-let loadedGestures: Gesture[] = [];
+const loadedGestures: Gesture[] = [];
 
 // Detectorを外から取得するためのゲッター
 export function getDetector(): HandDetector | null {
