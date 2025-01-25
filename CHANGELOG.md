@@ -1,3 +1,10 @@
+## [1.4.20](https://github.com/t-9/silent-arcana/compare/v1.4.19...v1.4.20) (2025-01-25)
+
+
+### Bug Fixes
+
+* lint error 修正 ([48ccc0d](https://github.com/t-9/silent-arcana/commit/48ccc0dba4a8e99c3f0896d41324b6ccaf044988))
+
 ## [1.4.19](https://github.com/t-9/silent-arcana/compare/v1.4.18...v1.4.19) (2025-01-25)
 
 
