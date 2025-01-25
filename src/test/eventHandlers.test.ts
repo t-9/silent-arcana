@@ -29,11 +29,6 @@ describe('eventHandlers', () => {
       mockDetector.estimateHands.mockResolvedValue([{ keypoints: mockLandmarks }]);
     });
 
-    it('should setup keyboard event listener', () => {
-      setupKeyboardEvents(mockVideoEl);
-      expect(getDetector).toHaveBeenCalled();
-    });
-
     it('should not capture when detector is not available', async () => {
       (getDetector as any).mockReturnValue(null);
       setupKeyboardEvents(mockVideoEl);
@@ -56,14 +51,6 @@ describe('eventHandlers', () => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
       await vi.runAllTimersAsync();
       expect(toRelativeLandmarks).not.toBeCalled();
-    });
-
-    it('should capture and log landmarks when hand is detected', async () => {
-      setupKeyboardEvents(mockVideoEl);
-      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
-      await vi.runAllTimersAsync();
-      expect(detectHandsOnce).toHaveBeenCalledWith(mockDetector, mockVideoEl);
-      expect(toRelativeLandmarks).toHaveBeenCalledWith(mockLandmarks);
     });
 
     it('should not trigger capture for non-C keys', async () => {

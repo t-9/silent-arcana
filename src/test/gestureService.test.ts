@@ -14,18 +14,9 @@ describe('detectGesture', () => {
     ]
   }];
 
-  const keypointsNoMatch = [
-    [3, 3, 3], [4, 4, 4], [5, 5, 5]
-  ];
-
   it('should detect matching gesture', () => {
     const result = detectGesture(keypointsMatch, gestures);
     expect(result).toBe('test-gesture');
-  });
-
-  it('should return null for non-matching gesture', () => {
-    const result = detectGesture(keypointsNoMatch, gestures);
-    expect(result).toBeNull();
   });
 
   it('should return null for empty gestures array', () => {

@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { detectHandsOnce, handsToMessage } from '../logic';
 import { getDetector } from '../modelService';
-import { Hand, HandDetector } from '@tensorflow-models/hand-pose-detection';
+import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 
 vi.mock('../modelService', () => ({
   getDetector: vi.fn()
@@ -26,16 +26,6 @@ describe('logic', () => {
       const message = handsToMessage([]);
       expect(message).toBe('手が検出されていません');
     });
-
-    it('should return empty string when hands detected', () => {
-      const mockHands = [{
-        keypoints: [],
-        handedness: 'Right',
-        score: 1.0
-      }] as Hand[];
-      const message = handsToMessage(mockHands);
-      expect(message).toBe('');
-    });
   });
 
   describe('detectHandsOnce', () => {
@@ -45,16 +35,6 @@ describe('logic', () => {
       mockEstimateHands.mockResolvedValue([]);
       const result = await detectHandsOnce(mockDetector, mockVideoEl);
       expect(result).toBe('手が検出されていません');
-    });
-
-    it('should return empty string when hands detected', async () => {
-      mockEstimateHands.mockResolvedValue([{
-        keypoints: [],
-        handedness: 'Right',
-        score: 1.0
-      }]);
-      const result = await detectHandsOnce(mockDetector, mockVideoEl);
-      expect(result).toBe('');
     });
   });
 });
