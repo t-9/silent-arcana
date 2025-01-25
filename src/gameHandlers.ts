@@ -94,7 +94,7 @@ export function setupGameUI(
     const hourglassTop = timerDisplay.querySelector('.hourglass-top .sand') as HTMLElement;
     const hourglassBottom = timerDisplay.querySelector('.hourglass-bottom .sand') as HTMLElement;
 
-    // 初期状態: 上部が満タン、下部が空
+    // ゲーム開始時: 上部が満タン、下部が空に変更
     hourglassTop.style.height = '100%';
     hourglassBottom.style.height = '0%';
 
