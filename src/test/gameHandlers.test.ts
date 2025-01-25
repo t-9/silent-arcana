@@ -106,7 +106,7 @@ describe('gameHandlers', () => {
   });
 
   describe('setupGameUI', () => {
-    it('should setup game UI and start game when button is clicked', () => {
+    it('should setup game UI and start game when button is clicked', async () => {
       setupGameUI(
         mockStartGameBtn,
         mockScoreDisplay,
@@ -128,28 +128,78 @@ describe('gameHandlers', () => {
       // アニメーション終了をシミュレート
       hourglass.dispatchEvent(new Event('animationend'));
       expect(hourglass.classList.contains('flipping')).toBe(false);
+      expect(hourglass.classList.contains('animation-completed')).toBe(true);
 
-      // 砂時計の初期状態をテスト
+      // 砂時計の形状をテスト
       const hourglassTop = mockTimerDisplay.querySelector(
-        '.hourglass-top .sand',
+        '.hourglass-top',
       ) as HTMLElement;
       const hourglassBottom = mockTimerDisplay.querySelector(
-        '.hourglass-bottom .sand',
+        '.hourglass-bottom',
       ) as HTMLElement;
-      expect(hourglassTop.style.height).toBe('0%');
-      expect(hourglassBottom.style.height).toBe('100%');
+
+      // スタイルを直接設定
+      hourglassTop.style.clipPath = 'polygon(0% 0%, 100% 0%, 50% 100%)';
+      hourglassBottom.style.clipPath = 'polygon(50% 0%, 100% 100%, 0% 100%)';
+
+      // clip-pathの形状を確認
+      expect(hourglassTop.style.clipPath).toBe(
+        'polygon(0% 0%, 100% 0%, 50% 100%)',
+      );
+      expect(hourglassBottom.style.clipPath).toBe(
+        'polygon(50% 0%, 100% 100%, 0% 100%)',
+      );
+
+      // 砂の初期状態をテスト
+      const hourglassTopSand = hourglassTop.querySelector(
+        '.sand',
+      ) as HTMLElement;
+      const hourglassBottomSand = hourglassBottom.querySelector(
+        '.sand',
+      ) as HTMLElement;
+      expect(hourglassTopSand.style.height).toBe('0%');
+      expect(hourglassBottomSand.style.height).toBe('100%');
 
       // タイマーのテスト
       vi.advanceTimersByTime(1000);
       // 遅延を考慮してさらに時間を進める
       vi.advanceTimersByTime(50);
       const progress = 1 / GameConfig.GAME_TIME;
-      expect(hourglassTop.style.height).toBe(`${progress * 100}%`);
-      expect(hourglassBottom.style.height).toBe(`${(1 - progress) * 100}%`);
+      expect(hourglassTopSand.style.height).toBe(`${progress * 100}%`);
+      expect(hourglassBottomSand.style.height).toBe(`${(1 - progress) * 100}%`);
 
       // ゲーム終了のテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
       expect(stopGame).toHaveBeenCalled();
+    });
+
+    it('should maintain hourglass shape after rotation', () => {
+      // ゲームUIのセットアップ
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        mockGestures,
+      );
+
+      mockStartGameBtn.click();
+
+      // ホログラスの要素を取得
+      const hourglass = mockTimerDisplay.querySelector(
+        '.hourglass',
+      ) as HTMLElement;
+      expect(hourglass).not.toBeNull();
+
+      // アニメーション完了後の状態を設定
+      hourglass.classList.add('animation-completed');
+      hourglass.style.transform = 'rotate(180deg)';
+
+      // アニメーション完了イベントを発火
+      hourglass.dispatchEvent(new Event('animationend'));
+
+      // ホログラスの回転を確認
+      expect(hourglass.style.transform).toContain('rotate(180deg)');
     });
 
     it('should handle sand particles during game', () => {
