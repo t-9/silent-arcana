@@ -44,7 +44,11 @@ class PluginArrayMock {
   item(_index: number) { return null; }
   namedItem(_name: string) { return null; }
   /* eslint-enable @typescript-eslint/no-unused-vars */
-  refresh() { }
+  /* istanbul ignore next */
+  refresh(): void {
+    // テスト環境ではプラグインの更新は不要
+    // このメソッドはPluginArrayインターフェースを満たすために存在
+  }
   [Symbol.iterator]() { return [][Symbol.iterator](); }
 }
 
