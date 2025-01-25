@@ -54,7 +54,41 @@ export function setupGameUI(
   gestures: Gesture[],
 ) {
   let timerInterval: NodeJS.Timeout;
+  let timeRemaining: number;
   let sandParticles: HTMLElement[] = [];
+
+  function startTimer(timerDisplay: HTMLElement) {
+    const hourglassTopSand = timerDisplay.querySelector('.hourglass-top .sand') as HTMLElement;
+    const hourglassBottomSand = timerDisplay.querySelector('.hourglass-bottom .sand') as HTMLElement;
+    const totalTime = GameConfig.GAME_TIME;
+    timeRemaining = totalTime;
+
+    timerInterval = setInterval(() => {
+      timeRemaining -= 1;
+
+      // 砂時計のアニメーション
+      const progress = (totalTime - timeRemaining) / totalTime;
+      const topHeight = (1 - progress) * 100;
+      const bottomHeight = progress * 100;
+
+      hourglassTopSand.style.height = `${topHeight}%`;
+      hourglassBottomSand.style.height = `${bottomHeight}%`;
+
+      // 砂粒子のアニメーション
+      if (timeRemaining > 0 && Math.random() < 0.3) { // 30%の確率で粒子を生成
+        addSandParticle();
+      }
+
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        // 残っている砂粒子を削除
+        sandParticles.forEach(particle => particle.remove());
+        sandParticles = [];
+        stopGame();
+        showGameOverDialog(getGameState().score);
+      }
+    }, 1000);
+  }
 
   // 砂粒子を追加する関数
   function addSandParticle() {
@@ -68,7 +102,7 @@ export function setupGameUI(
       // アニメーション終了時に粒子を削除
       particle.addEventListener('animationend', () => {
         particle.remove();
-        sandParticles = sandParticles.filter((p) => p !== particle);
+        sandParticles = sandParticles.filter(p => p !== particle);
       });
     }
   }
@@ -87,61 +121,36 @@ export function setupGameUI(
       window.updateScore(0);
     }
 
-    let timeRemaining = GameConfig.GAME_TIME;
-    const totalTime = GameConfig.GAME_TIME;
-
     // 砂時計の要素を取得
     const hourglass = timerDisplay.querySelector('.hourglass') as HTMLElement;
-    const hourglassTop = timerDisplay.querySelector(
-      '.hourglass-top .sand',
-    ) as HTMLElement;
-    const hourglassBottom = timerDisplay.querySelector(
-      '.hourglass-bottom .sand',
-    ) as HTMLElement;
+    const hourglassTopSand = timerDisplay.querySelector('.hourglass-top .sand') as HTMLElement;
+    const hourglassBottomSand = timerDisplay.querySelector('.hourglass-bottom .sand') as HTMLElement;
+
+    // 初期状態でトランジションを無効化
+    hourglassTopSand.style.transition = 'none';
+    hourglassBottomSand.style.transition = 'none';
+    hourglassTopSand.style.height = '0%';
+    hourglassBottomSand.style.height = '100%';
 
     // 砂時計を回転させる
     hourglass.classList.add('flipping');
 
-    // 回転アニメーション終了時の処理
-    hourglass.addEventListener(
-      'animationend',
-      () => {
-        hourglass.classList.remove('flipping');
+    // アニメーション終了時の処理
+    hourglass.addEventListener('animationend', () => {
+      hourglass.classList.remove('flipping');
 
-        // 砂の高さを設定
-        hourglassTop.style.height = '100%';
-        hourglassBottom.style.height = '0%';
+      // トランジションを無効化したまま砂を上部に配置
+      hourglassTopSand.style.height = '100%';
+      hourglassBottomSand.style.height = '0%';
 
-        // タイマー処理を開始
-        timerInterval = setInterval(() => {
-          timeRemaining -= 1;
-
-          // 砂時計のアニメーション
-          const progress = (totalTime - timeRemaining) / totalTime;
-          const topHeight = (1 - progress) * 100;
-          const bottomHeight = progress * 100;
-
-          hourglassTop.style.height = `${topHeight}%`;
-          hourglassBottom.style.height = `${bottomHeight}%`;
-
-          // 砂粒子のアニメーション
-          if (timeRemaining > 0 && Math.random() < 0.3) {
-            // 30%の確率で粒子を生成
-            addSandParticle();
-          }
-
-          if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            // 残っている砂粒子を削除
-            sandParticles.forEach((particle) => particle.remove());
-            sandParticles = [];
-            stopGame();
-            showGameOverDialog(getGameState().score);
-          }
-        }, 1000);
-      },
-      { once: true },
-    ); // イベントリスナーを一度だけ実行
+      // 少し遅延を入れてからトランジションを有効化
+      setTimeout(() => {
+        hourglassTopSand.style.transition = 'height 0.5s ease-in-out';
+        hourglassBottomSand.style.transition = 'height 0.5s ease-in-out';
+        // タイマーの開始
+        startTimer(timerDisplay);
+      }, 50);
+    }, { once: true });
   });
 }
 
