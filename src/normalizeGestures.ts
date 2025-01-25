@@ -48,6 +48,34 @@ const normalizedGesturesPath = resolve(
   '../public/templates/normalizedGestures.json',
 );
 
+interface Keypoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/**
+ * キーポイントを正規化する関数
+ */
+export function normalizeKeypoints(keypoints: Keypoint[]): number[][] {
+  if (!keypoints || keypoints.length === 0) {
+    return [];
+  }
+
+  // 手首の位置を基準点として使用
+  const wrist = keypoints[0];
+  const baseX = wrist.x;
+  const baseY = wrist.y;
+  const baseZ = wrist.z;
+
+  // 各キーポイントを相対座標に変換
+  return keypoints.map(point => [
+    point.x - baseX,
+    point.y - baseY,
+    point.z - baseZ
+  ]);
+}
+
 export function normalizeGestures(): void {
   console.log('Dummy Gestures Path:', dummyGesturesPath);
   console.log('Normalized Gestures Path:', normalizedGesturesPath);

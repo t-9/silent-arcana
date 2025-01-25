@@ -37,9 +37,9 @@ export async function init(): Promise<void> {
   startGameBtn.disabled = true;
 
   // モデルを読み込み
-  await loadModel((text: string) => setLoadingText(loadingEl, text));
+  await loadModel((text: string | boolean) => setLoadingText(loadingEl, String(text)));
 
-  const gestures = await loadGestureData('./templates/normalizedGestures.json');
+  const gestures = await loadGestureData();
   setupGameUI(
     startGameBtn,
     scoreDisplay,
@@ -51,7 +51,7 @@ export async function init(): Promise<void> {
   // カメラを自動的に開始
   startDetection();
   try {
-    await startCamera(videoEl, (text: string) => setLoadingText(loadingEl, text));
+    await startCamera(videoEl, (text: string | boolean) => setLoadingText(loadingEl, String(text)));
     detectLoop(videoEl, messageEl);
     // カメラの開始が成功したらボタンを有効化
     startGameBtn.disabled = false;

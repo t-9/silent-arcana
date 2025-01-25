@@ -1,81 +1,59 @@
 // src/test/cameraService.test.ts
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { startCamera } from '../cameraService';
-import { jest } from '@jest/globals';
+import * as cameraModule from '../cameraModule';
 
-type GetUserMediaFn = (
-  constraints: MediaStreamConstraints,
-) => Promise<MediaStream>;
-const mockGetUserMedia = jest.fn();
-const typedMock = mockGetUserMedia as jest.MockedFunction<GetUserMediaFn>;
-typedMock.mockResolvedValue({} as MediaStream);
+vi.mock('../cameraModule');
 
 describe('cameraService', () => {
-  /*
-  it('startCamera sets srcObject and clears loading on success', async () => {
-    // ★1) モックのvideoElを用意
-    const mockVideoEl = {
-      srcObject: null,
-      onloadedmetadata: () => { },
-    } as unknown as HTMLVideoElement;
+  const mockVideoEl = {
+    srcObject: null,
+    onloadedmetadata: null,
+    onerror: null,
+    play: vi.fn().mockResolvedValue(undefined),
+    videoWidth: 1280,
+    videoHeight: 720
+  } as unknown as HTMLVideoElement;
+  const mockSetLoading = vi.fn();
+  let mockGetUserMedia: ReturnType<typeof vi.fn>;
 
-    // ★2) モックの setLoading
-    const mockSetLoading = jest.fn();
-
-    // ★3) getUserMediaを成功モックに
-    typedMock.mockResolvedValue({} as MediaStream);
-    (global.navigator as any).mediaDevices = {
-      getUserMedia: typedMock,
-    };
-
-    // ★4) startCamera呼び出し
-    // ただし"即await"せずに一旦変数に受け取る
-    const startCameraPromise = startCamera(mockVideoEl, mockSetLoading);
-
-    // ★5) startCamera内部で "onloadedmetadata = () => {resolve()}" がセットされるはず
-    // それを手動で発火:
-    mockVideoEl.onloadedmetadata && mockVideoEl.onloadedmetadata(new Event('loadedmetadata'));
-    expect(typeof mockVideoEl.onloadedmetadata).toBe('function');
-
-    // ★6) ここでresolve()が呼ばれるので、await で完了
-    await startCameraPromise;
-
-    // ★7) 検証
-    expect(mockSetLoading).toHaveBeenCalledWith('カメラを起動しています...');
-    expect(mockVideoEl.srcObject).not.toBeNull();
-    expect(mockSetLoading).toHaveBeenLastCalledWith('');
+  beforeEach(() => {
+    vi.resetAllMocks();
+    mockGetUserMedia = vi.fn();
+    vi.spyOn(cameraModule, 'getGetUserMedia').mockImplementation(() => mockGetUserMedia);
+    vi.useFakeTimers();
   });
-  */
 
-  it('startCamera shows error if getUserMedia throws', async () => {
-    const mockVideoEl = {
-      srcObject: null,
-      onloadedmetadata: jest.fn(),
-    } as unknown as HTMLVideoElement;
-    const mockSetLoading = jest.fn();
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
-    typedMock.mockRejectedValue(new Error('User denied camera access'));
+  it('should start camera successfully', async () => {
+    const mockStream = { id: 'test-stream' };
+    mockGetUserMedia.mockResolvedValue(mockStream);
 
-    if (!navigator.mediaDevices) {
-      // definePropertyでプロパティを新規作成
-      Object.defineProperty(navigator, 'mediaDevices', {
-        value: {},
-        writable: true,
-        configurable: true,
-      });
+    const startCameraPromise = startCamera(mockVideoEl, mockSetLoading);
+    
+    // メタデータロードイベントをシミュレート
+    await vi.advanceTimersByTimeAsync(100);
+    if (mockVideoEl.onloadedmetadata) {
+      mockVideoEl.onloadedmetadata({} as Event);
     }
 
-    // 5) 既存の mediaDevices を上書き可能にして、getUserMedia を差し替え
-    Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
-      value: mockGetUserMedia,
-      writable: true,
-      configurable: true,
-    });
+    await startCameraPromise;
 
-    await startCamera(mockVideoEl, mockSetLoading);
+    expect(mockSetLoading).toHaveBeenCalledWith(true);
+    expect(mockVideoEl.srcObject).toBe(mockStream);
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
+  });
 
-    expect(mockSetLoading).toHaveBeenCalledWith('カメラを起動しています...');
-    expect(mockSetLoading).toHaveBeenLastCalledWith(
-      'カメラの起動に失敗しました',
-    );
+  it('shows error if getUserMedia throws', async () => {
+    mockGetUserMedia.mockRejectedValue(new Error('Camera access denied'));
+
+    await expect(startCamera(mockVideoEl, mockSetLoading))
+      .rejects.toThrow('カメラ使用許可が必要です');
+    
+    expect(mockSetLoading).toHaveBeenCalledWith(true);
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
   });
 });

@@ -116,14 +116,8 @@ export async function handleGestureDetection(
   const state = getGameState();
   if (!state.isRunning || !state.currentGesture) return;
 
-  // ランドマークデータを{x, y}形式に変換
-  const formattedLandmarks = landmarks.map((point) => ({
-    x: point[0],
-    y: point[1],
-  }));
-
   const gestures = getGestures();
-  const detectedGesture = detectGesture(formattedLandmarks, gestures);
+  const detectedGesture = detectGesture(landmarks, gestures);
   if (detectedGesture === state.currentGesture.name) {
     // スコアを更新
     updateScore(10);

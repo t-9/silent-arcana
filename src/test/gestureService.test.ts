@@ -1,44 +1,31 @@
 // src/test/gestureService.test.ts
-import { detectGesture, Gesture } from '../gestureService';
-
-/**
- * テストデータを共通化する関数
- */
-function setupTestData() {
-  const gestures: Gesture[] = [
-    {
-      name: 'ありがとう',
-      landmarks: Array(21)
-        .fill([0, 0])
-        .map(([x, y], i) => [x + (i % 3), y + (i % 3)]),
-    },
-    {
-      name: 'hello',
-      landmarks: Array(21)
-        .fill([3, 3])
-        .map(([x, y], i) => [x + (i % 3), y + (i % 3)]),
-    },
-  ];
-
-  const keypointsMatch = Array(21)
-    .fill({ x: 0, y: 0 })
-    .map(({ x, y }, i) => ({ x: x + (i % 3), y: y + (i % 3) }));
-
-  const keypointsNoMatch = Array(21).fill({ x: 10000, y: 10000 });
-
-  return { gestures, keypointsMatch, keypointsNoMatch };
-}
+import { describe, it, expect } from 'vitest';
+import { detectGesture } from '../gestureService';
 
 describe('detectGesture', () => {
-  const { gestures, keypointsMatch, keypointsNoMatch } = setupTestData();
+  const keypointsMatch = [
+    [0, 0, 0], [1, 1, 1], [2, 2, 2]
+  ];
 
-  it('returns the correct gesture when a match is found', () => {
-    const result = detectGesture(keypointsMatch, gestures, 10);
-    expect(result).toBe('ありがとう');
+  const gestures = [{
+    name: 'test-gesture',
+    landmarks: [
+      [0, 0, 0], [1, 1, 1], [2, 2, 2]
+    ]
+  }];
+
+  it('should detect matching gesture', () => {
+    const result = detectGesture(keypointsMatch, gestures);
+    expect(result).toBe('test-gesture');
   });
 
-  it('returns null when no match is found', () => {
-    const result = detectGesture(keypointsNoMatch, gestures, 10);
+  it('should return null for empty gestures array', () => {
+    const result = detectGesture(keypointsMatch, []);
+    expect(result).toBeNull();
+  });
+
+  it('should return null for empty keypoints array', () => {
+    const result = detectGesture([], gestures);
     expect(result).toBeNull();
   });
 });

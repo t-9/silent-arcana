@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from 'vitest';
 import { getElement } from '../domUtils';
 
 describe('domUtils', () => {
@@ -9,23 +10,19 @@ describe('domUtils', () => {
   });
 
   it('should return the correct HTMLElement for a valid ID', () => {
-    const div = getElement<HTMLDivElement>('test-div');
-    expect(div).not.toBeNull();
-    expect(div?.tagName).toBe('DIV');
-
-    const btn = getElement<HTMLButtonElement>('test-btn');
-    expect(btn).not.toBeNull();
-    expect(btn?.tagName).toBe('BUTTON');
+    const element = getElement<HTMLDivElement>('test-div');
+    expect(element).not.toBeNull();
+    expect(element?.tagName.toLowerCase()).toBe('div');
   });
 
   it('should return null for an invalid ID', () => {
-    const element = getElement<HTMLDivElement>('non-existent');
+    const element = getElement<HTMLElement>('non-existent');
     expect(element).toBeNull();
   });
 
   it('should cast the element to the specified type', () => {
-    const btn = getElement<HTMLButtonElement>('test-btn');
-    expect(btn).not.toBeNull();
-    expect(btn instanceof HTMLButtonElement).toBe(true);
+    const button = getElement<HTMLButtonElement>('test-btn');
+    expect(button).not.toBeNull();
+    expect(button?.tagName.toLowerCase()).toBe('button');
   });
 });
