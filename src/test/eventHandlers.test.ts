@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 import { setupKeyboardEvents } from '../eventHandlers';
 import { getDetector } from '../modelService';
 import { detectHandsOnce, toRelativeLandmarks } from '../logic';
+import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 
 vi.mock('../modelService', () => ({
   getDetector: vi.fn()
@@ -15,22 +16,25 @@ vi.mock('../logic', () => ({
 describe('eventHandlers', () => {
   describe('setupKeyboardEvents', () => {
     const mockVideoEl = {} as HTMLVideoElement;
+    const mockEstimateHands = vi.fn();
     const mockDetector = {
-      estimateHands: vi.fn()
-    };
+      estimateHands: mockEstimateHands,
+      dispose: vi.fn(),
+      reset: vi.fn()
+    } as unknown as HandDetector;
     const mockLandmarks = [{ x: 0, y: 0, z: 0 }];
 
     beforeEach(() => {
       vi.resetAllMocks();
       vi.useFakeTimers();
-      (getDetector as any).mockReturnValue(mockDetector);
-      (detectHandsOnce as any).mockResolvedValue('手が検出されました');
-      (toRelativeLandmarks as any).mockReturnValue([[0, 0, 0]]);
-      mockDetector.estimateHands.mockResolvedValue([{ keypoints: mockLandmarks }]);
+      (getDetector as MockedFunction<typeof getDetector>).mockReturnValue(mockDetector);
+      (detectHandsOnce as MockedFunction<typeof detectHandsOnce>).mockResolvedValue('手が検出されました');
+      (toRelativeLandmarks as MockedFunction<typeof toRelativeLandmarks>).mockReturnValue([[0, 0, 0]]);
+      mockEstimateHands.mockResolvedValue([{ keypoints: mockLandmarks }]);
     });
 
     it('should not capture when detector is not available', async () => {
-      (getDetector as any).mockReturnValue(null);
+      (getDetector as MockedFunction<typeof getDetector>).mockReturnValue(null);
       setupKeyboardEvents(mockVideoEl);
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
       await vi.runAllTimersAsync();
@@ -39,7 +43,7 @@ describe('eventHandlers', () => {
 
     it('should not capture when no hand is detected', async () => {
       setupKeyboardEvents(mockVideoEl);
-      (detectHandsOnce as any).mockResolvedValue('手が検出されていません');
+      (detectHandsOnce as MockedFunction<typeof detectHandsOnce>).mockResolvedValue('手が検出されていません');
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
       await vi.runAllTimersAsync();
       expect(toRelativeLandmarks).not.toBeCalled();
@@ -47,7 +51,7 @@ describe('eventHandlers', () => {
 
     it('should not capture when estimateHands returns empty array', async () => {
       setupKeyboardEvents(mockVideoEl);
-      mockDetector.estimateHands.mockResolvedValue([]);
+      mockEstimateHands.mockResolvedValue([]);
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'c' }));
       await vi.runAllTimersAsync();
       expect(toRelativeLandmarks).not.toBeCalled();
