@@ -64,7 +64,7 @@ class MimeTypeArrayMock {
 
 // getUserMediaのモック
 if (!global.navigator) {
-  (global as typeof globalThis).navigator = {
+  global.navigator = {
     mediaDevices: createMediaDevicesMock(),
     clipboard: {} as Clipboard,
     credentials: {} as CredentialsContainer,
@@ -91,6 +91,14 @@ if (!global.navigator) {
     userActivation: {} as UserActivation,
     wakeLock: {} as WakeLock,
     // その他のNavigatorプロパティも必要に応じて追加
+
+    // テスト環境では使用しないメソッドをスタブ化
+    canShare: () => false,
+    getGamepads: () => [],
+    requestMIDIAccess: () => Promise.reject(new Error('Not implemented')),
+    requestMediaKeySystemAccess: () => Promise.reject(new Error('Not implemented')),
+    share: () => Promise.reject(new Error('Not implemented')),
+    vibrate: () => false
   } as unknown as Navigator;
 } else if (!global.navigator.mediaDevices) {
   Object.defineProperty(global.navigator, 'mediaDevices', {
