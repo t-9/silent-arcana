@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 
+/* istanbul ignore file */
 export default defineConfig({
   test: {
     environment: 'jsdom',
@@ -14,7 +15,8 @@ export default defineConfig({
         'dist/**',
         '**/node_modules/**',
         '**/*.test.ts',
-        'webpack.config.js'
+        'webpack.config.js',
+        'vitest.config.ts'
       ]
     }
   },
