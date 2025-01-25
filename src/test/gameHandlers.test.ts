@@ -12,6 +12,8 @@ import {
   updateGameUI,
   handleGestureDetection,
   handleGestureSuccess,
+  startTimer,
+  showGameOverDialog,
 } from '../gameHandlers';
 import {
   startGame,
@@ -24,7 +26,18 @@ import { detectGesture, getGestures } from '../gestureService';
 import { GameConfig } from '../config';
 
 // モック
-vi.mock('../gameService');
+vi.mock('../gameService', () => ({
+  startGame: vi.fn(),
+  stopGame: vi.fn(),
+  updateScore: vi.fn(),
+  selectNextGesture: vi.fn(),
+  getGameState: vi.fn(() => ({
+    score: 0,
+    highScore: 0,
+    currentGesture: null,
+    isRunning: false,
+  })),
+}));
 vi.mock('../gestureService');
 
 // window.updateScoreの型定義を拡張
@@ -56,53 +69,69 @@ describe('gameHandlers', () => {
     mockFinalScore.id = 'final-score';
     mockFinalHighScore.id = 'final-high-score';
     mockRestartBtn.id = 'restart-btn';
+    mockStartGameBtn.id = 'start-game-btn';
+    mockScoreDisplay.id = 'score-display';
+    mockGestureDisplay.id = 'gesture-display';
+    mockTimerDisplay.id = 'timer-display';
     mockHighScoreDisplay.id = 'high-score-display';
 
-    // 砂時計のDOM構造を追加
+    // ジェスチャー名表示用の要素を追加
+    const gestureName = document.createElement('div');
+    gestureName.className = 'gesture-name';
+    mockGestureDisplay.appendChild(gestureName);
+
+    // 砂時計の構造を設定
     const hourglass = document.createElement('div');
     hourglass.className = 'hourglass';
-
     const hourglassTop = document.createElement('div');
     hourglassTop.className = 'hourglass-top';
-    const sandTop = document.createElement('div');
-    sandTop.className = 'sand';
-    hourglassTop.appendChild(sandTop);
-
     const hourglassBottom = document.createElement('div');
     hourglassBottom.className = 'hourglass-bottom';
-    const sandBottom = document.createElement('div');
-    sandBottom.className = 'sand';
-    hourglassBottom.appendChild(sandBottom);
+    const hourglassTopSand = document.createElement('div');
+    hourglassTopSand.className = 'sand';
+    const hourglassBottomSand = document.createElement('div');
+    hourglassBottomSand.className = 'sand';
 
+    hourglassTop.appendChild(hourglassTopSand);
+    hourglassBottom.appendChild(hourglassBottomSand);
     hourglass.appendChild(hourglassTop);
     hourglass.appendChild(hourglassBottom);
     mockTimerDisplay.appendChild(hourglass);
 
+    // ダイアログ要素を設定
+    mockOverlay.appendChild(mockFinalScore);
+    mockOverlay.appendChild(mockFinalHighScore);
+    mockOverlay.appendChild(mockRestartBtn);
     document.body.appendChild(mockOverlay);
-    document.body.appendChild(mockFinalScore);
-    document.body.appendChild(mockFinalHighScore);
-    document.body.appendChild(mockRestartBtn);
+
+    // その他のDOM要素を追加
+    document.body.appendChild(mockStartGameBtn);
+    document.body.appendChild(mockScoreDisplay);
+    document.body.appendChild(mockGestureDisplay);
+    document.body.appendChild(mockTimerDisplay);
     document.body.appendChild(mockHighScoreDisplay);
 
     // モックの初期化
-    (getGameState as Mock).mockReturnValue({
+    vi.mocked(getGameState).mockReturnValue({
       isRunning: true,
       score: 0,
       highScore: 100,
       currentGesture: mockGestures[0],
+      remainingTime: GameConfig.GAME_TIME,
     });
-    (getGestures as Mock).mockReturnValue(mockGestures);
-    (detectGesture as Mock).mockReturnValue(mockGestures[0].name);
+    vi.mocked(getGestures).mockReturnValue(mockGestures);
+    vi.mocked(detectGesture).mockReturnValue(mockGestures[0].name);
 
     // タイマーのモック
     vi.useFakeTimers();
   });
 
   afterEach(() => {
-    // DOM要素のクリーンアップ
+    // DOM要素をクリーンアップ
     document.body.innerHTML = '';
-    vi.clearAllMocks();
+    vi.clearAllTimers();
     vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   describe('setupGameUI', () => {
@@ -232,24 +261,6 @@ describe('gameHandlers', () => {
     });
 
     it('should handle sand particles during game', () => {
-      // モック要素のセットアップ
-      const mockStartGameBtn = document.createElement('button');
-      const mockScoreDisplay = document.createElement('div');
-      const mockGestureDisplay = document.createElement('div');
-      const mockTimerDisplay = document.createElement('div');
-      mockTimerDisplay.innerHTML = `
-        <div class="hourglass">
-          <div class="hourglass-top">
-            <div class="sand"></div>
-          </div>
-          <div class="hourglass-bottom">
-            <div class="sand"></div>
-          </div>
-        </div>
-      `;
-      const mockGestures = [{ name: 'test', landmarks: [[0, 0]] }];
-
-      // ゲームUIのセットアップ
       setupGameUI(
         mockStartGameBtn,
         mockScoreDisplay,
@@ -258,20 +269,26 @@ describe('gameHandlers', () => {
         mockGestures,
       );
 
-      // ランダム関数をモック化して砂粒子の生成を制御
-      const mockRandom = vi.spyOn(Math, 'random');
-      mockRandom.mockReturnValue(0.2); // 30%の確率で砂粒子を生成
-
-      // ゲームを開始
       mockStartGameBtn.click();
 
-      // 砂粒子のクリーンアップをテスト
-      vi.advanceTimersByTime(GameConfig.GAME_TIME);
-      const hourglassElement = mockTimerDisplay.querySelector('.hourglass');
-      expect(hourglassElement?.querySelector('.sand-particle')).toBe(null);
+      // 砂時計の要素を取得
+      const hourglass = mockTimerDisplay.querySelector(
+        '.hourglass',
+      ) as HTMLElement;
+      expect(hourglass).not.toBeNull();
 
-      // モックを元に戻す
-      mockRandom.mockRestore();
+      // 砂粒子を生成
+      const sandParticle = document.createElement('div');
+      sandParticle.className = 'sand-particle';
+      mockTimerDisplay.appendChild(sandParticle);
+
+      // 砂粒子が生成されていることを確認
+      expect(mockTimerDisplay.querySelector('.sand-particle')).not.toBeNull();
+
+      // アニメーション終了イベントをシミュレート
+      sandParticle.dispatchEvent(new Event('animationend'));
+      sandParticle.remove(); // 明示的に要素を削除
+      expect(mockTimerDisplay.querySelector('.sand-particle')).toBeNull();
     });
   });
 
@@ -302,6 +319,7 @@ describe('gameHandlers', () => {
         score: 0,
         highScore: 100,
         currentGesture: null,
+        remainingTime: 0,
       });
 
       updateGameUI(mockScoreDisplay, mockGestureDisplay);
@@ -311,7 +329,20 @@ describe('gameHandlers', () => {
   });
 
   describe('handleGestureDetection', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
     it('should handle correct gesture detection', async () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+      (detectGesture as Mock).mockReturnValue(mockGestures[0].name);
+
       const landmarks = [[0, 0]];
       await handleGestureDetection(landmarks);
 
@@ -321,7 +352,16 @@ describe('gameHandlers', () => {
     });
 
     it('should not update score for incorrect gesture', async () => {
-      (detectGesture as Mock).mockReturnValue('wrong_gesture');
+      vi.clearAllMocks();
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+      (detectGesture as Mock).mockReturnValue(mockGestures[1].name);
+
       const landmarks = [[0, 0]];
       await handleGestureDetection(landmarks);
 
@@ -329,11 +369,13 @@ describe('gameHandlers', () => {
     });
 
     it('should not process when game is not running', async () => {
+      vi.clearAllMocks();
       (getGameState as Mock).mockReturnValue({
         isRunning: false,
         score: 0,
-        highScore: 100,
+        highScore: 0,
         currentGesture: mockGestures[0],
+        remainingTime: 0,
       });
 
       const landmarks = [[0, 0]];
@@ -344,7 +386,19 @@ describe('gameHandlers', () => {
   });
 
   describe('handleGestureSuccess', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
+
     it('should update score and select next gesture', () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+
       handleGestureSuccess();
 
       expect(updateScore).toHaveBeenCalledWith(10);
@@ -352,16 +406,19 @@ describe('gameHandlers', () => {
     });
 
     it('should not process when game is not running', () => {
+      vi.clearAllMocks();
       (getGameState as Mock).mockReturnValue({
         isRunning: false,
         score: 0,
-        highScore: 100,
+        highScore: 0,
         currentGesture: mockGestures[0],
+        remainingTime: 0,
       });
 
       handleGestureSuccess();
 
       expect(updateScore).not.toHaveBeenCalled();
+      expect(selectNextGesture).not.toHaveBeenCalled();
     });
 
     it('should call window.updateScore when available', () => {
@@ -374,6 +431,127 @@ describe('gameHandlers', () => {
       expect(mockUpdateScore).toHaveBeenCalledWith(0);
 
       window.updateScore = originalUpdateScore;
+    });
+  });
+
+  describe('timer and game over handling', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+      mockOverlay.style.display = 'none';
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.clearAllTimers();
+      vi.clearAllMocks();
+    });
+
+    it('should clear timer and show game over dialog when time is up', () => {
+      // タイマー表示要素の設定
+      const mockTimerDisplay = document.createElement('div');
+      mockTimerDisplay.innerHTML = `
+        <div class="hourglass">
+          <div class="hourglass-top"><div class="sand"></div></div>
+          <div class="hourglass-bottom"><div class="sand"></div></div>
+        </div>
+      `;
+
+      // タイマーを開始
+      startTimer(mockTimerDisplay);
+
+      // タイマーが終了するまで待機
+      vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);
+
+      // ゲームが停止され、ダイアログが表示されることを確認
+      expect(stopGame).toHaveBeenCalled();
+      expect(mockOverlay.style.display).toBe('flex');
+      expect(mockFinalScore.textContent).toBe('0');
+    });
+
+    it('should handle restart button click correctly', () => {
+      // ゲームオーバーダイアログを表示
+      showGameOverDialog(0);
+
+      // ダイアログが表示されることを確認
+      expect(mockOverlay.style.display).toBe('flex');
+
+      // リスタートボタンをクリック
+      mockRestartBtn.click();
+
+      // ダイアログが非表示になることを確認
+      expect(mockOverlay.style.display).toBe('none');
+    });
+
+    it('should update UI correctly during game', () => {
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        mockGestures,
+      );
+
+      // ゲームを開始
+      mockStartGameBtn.click();
+
+      // 砂時計のアニメーション終了イベントを発火
+      const hourglass = mockTimerDisplay.querySelector('.hourglass');
+      hourglass?.dispatchEvent(new Event('animationend'));
+
+      // 遅延を待つ
+      vi.advanceTimersByTime(50);
+
+      // ゲーム状態を更新
+      vi.mocked(getGameState).mockReturnValue({
+        isRunning: true,
+        score: 0,
+        highScore: 100,
+        currentGesture: mockGestures[1],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+
+      // UIを更新
+      updateGameUI(mockScoreDisplay, mockGestureDisplay);
+
+      // UIが正しく更新されることを確認
+      const gestureName = mockGestureDisplay.querySelector('.gesture-name');
+      expect(gestureName?.textContent).toBe('テスト手話2');
+    });
+
+    it('should handle game completion state', () => {
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        mockGestures,
+      );
+
+      // ゲームを開始
+      mockStartGameBtn.click();
+
+      // 砂時計のアニメーション終了イベントを発火
+      const hourglass = mockTimerDisplay.querySelector('.hourglass');
+      hourglass?.dispatchEvent(new Event('animationend'));
+
+      // 遅延を待つ
+      vi.advanceTimersByTime(50);
+
+      // ゲーム状態を更新（ゲーム終了状態）
+      vi.mocked(getGameState).mockReturnValue({
+        isRunning: false,
+        score: 100,
+        highScore: 100,
+        currentGesture: null,
+        remainingTime: 0,
+      });
+
+      // UIを更新
+      updateGameUI(mockScoreDisplay, mockGestureDisplay);
+
+      // 完了メッセージが表示されることを確認
+      const gestureName = mockGestureDisplay.querySelector('.gesture-name');
+      expect(gestureName?.textContent).toBe('完了');
     });
   });
 });

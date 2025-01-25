@@ -24,8 +24,12 @@ let sandParticles: HTMLElement[] = [];
 /**
  * ゲーム終了時のダイアログを表示
  */
-function showGameOverDialog(score: number) {
+export function showGameOverDialog(score: number) {
   const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
+  if (!overlay) {
+    console.error('Dialog overlay element not found');
+    return;
+  }
   const finalScore = document.getElementById('final-score') as HTMLElement;
   const finalHighScore = document.getElementById(
     'final-high-score',
@@ -273,7 +277,7 @@ export function handleGestureSuccess(): void {
 /**
  * タイマーを開始する関数
  */
-function startTimer(timerDisplay: HTMLElement) {
+export function startTimer(timerDisplay: HTMLElement) {
   const hourglassTopSand = timerDisplay.querySelector(
     '.hourglass-top .sand',
   ) as HTMLElement;
@@ -306,8 +310,8 @@ function startTimer(timerDisplay: HTMLElement) {
       // 残っている砂粒子を削除
       sandParticles.forEach((particle) => particle.remove());
       sandParticles = [];
-      stopGame();
       showGameOverDialog(getGameState().score);
+      stopGame();
     }
   }, 1000);
 }
