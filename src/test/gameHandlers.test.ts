@@ -58,6 +58,26 @@ describe('gameHandlers', () => {
     mockRestartBtn.id = 'restart-btn';
     mockHighScoreDisplay.id = 'high-score-display';
 
+    // 砂時計のDOM構造を追加
+    const hourglass = document.createElement('div');
+    hourglass.className = 'hourglass';
+
+    const hourglassTop = document.createElement('div');
+    hourglassTop.className = 'hourglass-top';
+    const sandTop = document.createElement('div');
+    sandTop.className = 'sand';
+    hourglassTop.appendChild(sandTop);
+
+    const hourglassBottom = document.createElement('div');
+    hourglassBottom.className = 'hourglass-bottom';
+    const sandBottom = document.createElement('div');
+    sandBottom.className = 'sand';
+    hourglassBottom.appendChild(sandBottom);
+
+    hourglass.appendChild(hourglassTop);
+    hourglass.appendChild(hourglassBottom);
+    mockTimerDisplay.appendChild(hourglass);
+
     document.body.appendChild(mockOverlay);
     document.body.appendChild(mockFinalScore);
     document.body.appendChild(mockFinalHighScore);
@@ -98,15 +118,22 @@ describe('gameHandlers', () => {
       mockStartGameBtn.click();
 
       expect(startGame).toHaveBeenCalledWith(mockGestures);
-      expect(mockTimerDisplay.textContent).toBe(
-        `残り時間: ${GameConfig.GAME_TIME} 秒`,
-      );
+
+      // 砂時計の初期状態をテスト
+      const hourglassTop = mockTimerDisplay.querySelector(
+        '.hourglass-top .sand',
+      ) as HTMLElement;
+      const hourglassBottom = mockTimerDisplay.querySelector(
+        '.hourglass-bottom .sand',
+      ) as HTMLElement;
+      expect(hourglassTop.style.height).toBe('100%');
+      expect(hourglassBottom.style.height).toBe('0%');
 
       // タイマーのテスト
       vi.advanceTimersByTime(1000);
-      expect(mockTimerDisplay.textContent).toBe(
-        `残り時間: ${GameConfig.GAME_TIME - 1} 秒`,
-      );
+      const progress = 1 / GameConfig.GAME_TIME;
+      expect(hourglassTop.style.height).toBe(`${(1 - progress) * 100}%`);
+      expect(hourglassBottom.style.height).toBe(`${progress * 100}%`);
 
       // ゲーム終了のテスト
       vi.advanceTimersByTime(GameConfig.GAME_TIME * 1000);

@@ -974,3 +974,113 @@ button:hover~.cursor-wrapper .wand-gem {
 .tarot-card:hover .card-inner {
   transform: rotateY(10deg);
 }
+
+/* 砂時計のスタイル */
+#timer-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid rgba(128, 0, 128, 0.2);
+}
+
+.hourglass {
+  position: relative;
+  width: 60px;
+  height: 100px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2px;
+}
+
+.hourglass::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 2px;
+  background: rgba(201, 160, 220, 0.5);
+  z-index: 2;
+}
+
+.hourglass-top,
+.hourglass-bottom {
+  position: relative;
+  width: 100%;
+  height: 49px;
+  background: transparent;
+  overflow: hidden;
+}
+
+.hourglass-top {
+  clip-path: polygon(10% 0%, 90% 0%, 50% 100%);
+  border-top: 2px solid rgba(201, 160, 220, 0.5);
+}
+
+.hourglass-bottom {
+  clip-path: polygon(50% 0%, 90% 100%, 10% 100%);
+  border-bottom: 2px solid rgba(201, 160, 220, 0.5);
+}
+
+.hourglass-top::before,
+.hourglass-bottom::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(201, 160, 220, 0.5);
+}
+
+.hourglass-top .sand {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(201, 160, 220, 0.8), rgba(128, 0, 128, 0.8));
+  transform-origin: bottom center;
+  transition: height 0.1s linear;
+}
+
+.hourglass-bottom .sand {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(201, 160, 220, 0.8), rgba(128, 0, 128, 0.8));
+  transform-origin: top center;
+  height: 0;
+  transition: height 0.1s linear;
+}
+
+/* 砂時計のホバーエフェクト */
+.hourglass:hover {
+  transform: scale(1.05);
+}
+
+.hourglass:hover::before {
+  background: rgba(201, 160, 220, 0.8);
+}
+
+/* 砂時計の光沢効果 */
+.hourglass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 45%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 100%);
+  pointer-events: none;
+}

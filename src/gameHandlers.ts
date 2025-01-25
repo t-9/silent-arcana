@@ -70,12 +70,28 @@ export function setupGameUI(
     }
 
     let timeRemaining = GameConfig.GAME_TIME;
-    timerDisplay.textContent = `残り時間: ${timeRemaining} 秒`;
+    const totalTime = GameConfig.GAME_TIME;
+
+    // 砂時計の要素を取得
+    const hourglassTop = timerDisplay.querySelector(
+      '.hourglass-top .sand',
+    ) as HTMLElement;
+    const hourglassBottom = timerDisplay.querySelector(
+      '.hourglass-bottom .sand',
+    ) as HTMLElement;
+
+    // 初期状態: 上部が満タン、下部が空
+    hourglassTop.style.height = '100%';
+    hourglassBottom.style.height = '0%';
 
     // タイマー処理
     timerInterval = setInterval(() => {
       timeRemaining -= 1;
-      timerDisplay.textContent = `残り時間: ${timeRemaining} 秒`;
+
+      // 砂時計のアニメーション
+      const progress = (totalTime - timeRemaining) / totalTime;
+      hourglassTop.style.height = `${(1 - progress) * 100}%`;
+      hourglassBottom.style.height = `${progress * 100}%`;
 
       if (timeRemaining <= 0) {
         clearInterval(timerInterval);
