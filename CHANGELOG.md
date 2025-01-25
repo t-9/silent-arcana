@@ -1,3 +1,11 @@
+## [1.4.19](https://github.com/t-9/silent-arcana/compare/v1.4.18...v1.4.19) (2025-01-25)
+
+
+### Bug Fixes
+
+* install vitest coverage ([6811969](https://github.com/t-9/silent-arcana/commit/68119694750fff830a088e4fc0dd2b2fca3646e5))
+* lintエラー対応 ([53bd1d5](https://github.com/t-9/silent-arcana/commit/53bd1d57fb423081668501e5ad8b2f938609886a))
+
 ## [1.4.18](https://github.com/t-9/silent-arcana/compare/v1.4.17...v1.4.18) (2025-01-22)
 
 
