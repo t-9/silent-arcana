@@ -54,6 +54,24 @@ export function setupGameUI(
   gestures: Gesture[],
 ) {
   let timerInterval: NodeJS.Timeout;
+  let sandParticles: HTMLElement[] = [];
+
+  // 砂粒子を追加する関数
+  function addSandParticle() {
+    const particle = document.createElement('div');
+    particle.className = 'sand-particle';
+    const hourglass = timerDisplay.querySelector('.hourglass');
+    if (hourglass) {
+      hourglass.appendChild(particle);
+      sandParticles.push(particle);
+
+      // アニメーション終了時に粒子を削除
+      particle.addEventListener('animationend', () => {
+        particle.remove();
+        sandParticles = sandParticles.filter(p => p !== particle);
+      });
+    }
+  }
 
   // ゲーム開始ボタンの動作
   startGameBtn.addEventListener('click', () => {
@@ -73,12 +91,8 @@ export function setupGameUI(
     const totalTime = GameConfig.GAME_TIME;
 
     // 砂時計の要素を取得
-    const hourglassTop = timerDisplay.querySelector(
-      '.hourglass-top .sand',
-    ) as HTMLElement;
-    const hourglassBottom = timerDisplay.querySelector(
-      '.hourglass-bottom .sand',
-    ) as HTMLElement;
+    const hourglassTop = timerDisplay.querySelector('.hourglass-top .sand') as HTMLElement;
+    const hourglassBottom = timerDisplay.querySelector('.hourglass-bottom .sand') as HTMLElement;
 
     // 初期状態: 上部が満タン、下部が空
     hourglassTop.style.height = '100%';
@@ -90,11 +104,22 @@ export function setupGameUI(
 
       // 砂時計のアニメーション
       const progress = (totalTime - timeRemaining) / totalTime;
-      hourglassTop.style.height = `${(1 - progress) * 100}%`;
-      hourglassBottom.style.height = `${progress * 100}%`;
+      const topHeight = (1 - progress) * 100;
+      const bottomHeight = progress * 100;
+
+      hourglassTop.style.height = `${topHeight}%`;
+      hourglassBottom.style.height = `${bottomHeight}%`;
+
+      // 砂粒子のアニメーション
+      if (timeRemaining > 0 && Math.random() < 0.3) { // 30%の確率で粒子を生成
+        addSandParticle();
+      }
 
       if (timeRemaining <= 0) {
         clearInterval(timerInterval);
+        // 残っている砂粒子を削除
+        sandParticles.forEach(particle => particle.remove());
+        sandParticles = [];
         stopGame();
         showGameOverDialog(getGameState().score);
       }
