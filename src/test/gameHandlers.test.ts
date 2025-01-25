@@ -24,6 +24,8 @@ import {
 } from '../gameService';
 import { detectGesture, getGestures } from '../gestureService';
 import { GameConfig } from '../config';
+import * as gameService from '../gameService';
+import * as gestureService from '../gestureService';
 
 // モック
 vi.mock('../gameService', () => ({
@@ -383,6 +385,31 @@ describe('gameHandlers', () => {
 
       expect(gestureName.textContent).toBe('完了');
     });
+
+    it('should handle missing gesture display and name elements', () => {
+      // モックの設定
+      const mockScoreDisplay = document.createElement('div');
+      const mockGestureDisplay = document.createElement('div');
+      const mockState = {
+        score: 10,
+        highScore: 20,
+        isRunning: true,
+        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        remainingTime: GameConfig.GAME_TIME,
+      };
+      vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
+
+      // window.updateScoreを空の関数として設定
+      window.updateScore = () => {};
+      const mockUpdateScore = vi.spyOn(window, 'updateScore');
+
+      // UIの更新を実行
+      updateGameUI(mockScoreDisplay, mockGestureDisplay);
+
+      // 検証
+      expect(mockScoreDisplay.textContent).toBe('スコア: 10');
+      expect(mockUpdateScore).not.toHaveBeenCalled();
+    });
   });
 
   describe('handleGestureDetection', () => {
@@ -510,6 +537,80 @@ describe('gameHandlers', () => {
 
       window.updateScore = originalUpdateScore;
     });
+
+    it('should handle missing gesture display and name elements', async () => {
+      // モックの設定
+      const mockState = {
+        score: 10,
+        highScore: 20,
+        isRunning: true,
+        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        remainingTime: GameConfig.GAME_TIME,
+      };
+      vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
+      vi.spyOn(gestureService, 'getGestures').mockReturnValue([
+        { name: 'テスト手話', landmarks: [[0, 0]] },
+      ]);
+      vi.spyOn(gestureService, 'detectGesture').mockReturnValue('テスト手話');
+      vi.spyOn(gameService, 'selectNextGesture').mockReturnValue({
+        name: 'テスト手話2',
+        landmarks: [[0, 0]],
+      });
+
+      // window.updateScoreを空の関数として設定
+      window.updateScore = () => {};
+      const mockUpdateScore = vi.spyOn(window, 'updateScore');
+
+      // gesture-displayを削除
+      const gestureDisplay = document.getElementById('gesture-display');
+      if (gestureDisplay) {
+        gestureDisplay.remove();
+      }
+
+      // ジェスチャー検出を実行
+      await handleGestureDetection([[0, 0, 0]]);
+
+      // 検証
+      expect(mockUpdateScore).toHaveBeenCalledWith(10);
+    });
+
+    it('should handle missing gesture name element', async () => {
+      // モックの設定
+      const mockState = {
+        score: 10,
+        highScore: 20,
+        isRunning: true,
+        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        remainingTime: GameConfig.GAME_TIME,
+      };
+      vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
+      vi.spyOn(gestureService, 'getGestures').mockReturnValue([
+        { name: 'テスト手話', landmarks: [[0, 0]] },
+      ]);
+      vi.spyOn(gestureService, 'detectGesture').mockReturnValue('テスト手話');
+      vi.spyOn(gameService, 'selectNextGesture').mockReturnValue({
+        name: 'テスト手話2',
+        landmarks: [[0, 0]],
+      });
+
+      // window.updateScoreを空の関数として設定
+      window.updateScore = () => {};
+      const mockUpdateScore = vi.spyOn(window, 'updateScore');
+
+      // gesture-displayは存在するが、gesture-nameは存在しない状態を作成
+      const gestureDisplay = document.createElement('div');
+      gestureDisplay.id = 'gesture-display';
+      document.body.appendChild(gestureDisplay);
+
+      // ジェスチャー検出を実行
+      await handleGestureDetection([[0, 0, 0]]);
+
+      // 検証
+      expect(mockUpdateScore).toHaveBeenCalledWith(10);
+
+      // クリーンアップ
+      gestureDisplay.remove();
+    });
   });
 
   describe('handleGestureSuccess', () => {
@@ -598,10 +699,10 @@ describe('gameHandlers', () => {
       expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
     });
 
-    it('should handle gesture success with missing UI elements', () => {
+    it('should handle gesture success with missing UI elements and window.updateScore', () => {
       (getGameState as Mock).mockReturnValue({
         isRunning: true,
-        score: 0,
+        score: 10,
         highScore: 0,
         currentGesture: mockGestures[0],
         remainingTime: GameConfig.GAME_TIME,
@@ -611,15 +712,78 @@ describe('gameHandlers', () => {
       const gestureDisplay = document.getElementById('gesture-display');
       gestureDisplay?.remove();
 
-      const mockUpdateScore = vi.fn();
+      // window.updateScoreを空の関数に設定
       const originalUpdateScore = window.updateScore;
-      window.updateScore = mockUpdateScore;
+      window.updateScore = () => {};
 
       handleGestureSuccess();
 
-      expect(mockUpdateScore).toHaveBeenCalledWith(0);
+      // window.updateScoreが空の関数の場合でもエラーにならないことを確認
+      expect(updateScore).toHaveBeenCalledWith(10);
+      expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
 
       window.updateScore = originalUpdateScore;
+    });
+
+    it('should handle gesture success with missing gesture name element and window.updateScore', () => {
+      (getGameState as Mock).mockReturnValue({
+        isRunning: true,
+        score: 10,
+        highScore: 0,
+        currentGesture: mockGestures[0],
+        remainingTime: GameConfig.GAME_TIME,
+      });
+
+      // Remove gesture-name element
+      const gestureName = document.querySelector('.gesture-name');
+      gestureName?.remove();
+
+      // window.updateScoreを空の関数に設定
+      const originalUpdateScore = window.updateScore;
+      window.updateScore = () => {};
+
+      handleGestureSuccess();
+
+      // window.updateScoreが空の関数の場合でもエラーにならないことを確認
+      expect(updateScore).toHaveBeenCalledWith(10);
+      expect(selectNextGesture).toHaveBeenCalledWith(mockGestures);
+
+      window.updateScore = originalUpdateScore;
+    });
+
+    it('should handle missing gesture display and name elements', () => {
+      // モックの設定
+      const mockState = {
+        score: 10,
+        highScore: 20,
+        isRunning: true,
+        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        remainingTime: GameConfig.GAME_TIME,
+      };
+      vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
+      vi.spyOn(gestureService, 'getGestures').mockReturnValue([
+        { name: 'テスト手話', landmarks: [[0, 0]] },
+      ]);
+      vi.spyOn(gameService, 'selectNextGesture').mockReturnValue({
+        name: 'テスト手話2',
+        landmarks: [[0, 0]],
+      });
+
+      // window.updateScoreを空の関数として設定
+      window.updateScore = () => {};
+      const mockUpdateScore = vi.spyOn(window, 'updateScore');
+
+      // gesture-displayを削除
+      const gestureDisplay = document.getElementById('gesture-display');
+      if (gestureDisplay) {
+        gestureDisplay.remove();
+      }
+
+      // ジェスチャー成功処理を実行
+      handleGestureSuccess();
+
+      // 検証
+      expect(mockUpdateScore).toHaveBeenCalledWith(10);
     });
   });
 
@@ -797,6 +961,24 @@ describe('gameHandlers', () => {
         // 砂粒子が削除されたことを確認
         expect(mockTimerDisplay.querySelector('.sand-particle')).toBeNull();
       }
+    });
+  });
+
+  describe('showGameOverDialog', () => {
+    it('should handle missing dialog overlay', () => {
+      // ダイアログオーバーレイを削除
+      const overlay = document.querySelector('.dialog-overlay');
+      overlay?.remove();
+
+      // エラーログを監視
+      const consoleSpy = vi.spyOn(console, 'error');
+      showGameOverDialog(0);
+
+      // エラーメッセージが出力されることを確認
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Dialog overlay element not found',
+      );
+      consoleSpy.mockRestore();
     });
   });
 });
