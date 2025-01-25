@@ -1009,7 +1009,6 @@ button:hover~.cursor-wrapper .wand-gem {
   height: 2px;
   background: rgba(201, 160, 220, 0.5);
   z-index: 2;
-  transform-origin: center center;
 }
 
 .hourglass-top,
@@ -1176,17 +1175,11 @@ button:hover~.cursor-wrapper .wand-gem {
 }
 
 .hourglass.flipping::before {
-  animation: flipHourglassDivider 1s ease-in-out forwards;
+  animation: none;
 }
 
-@keyframes flipHourglassDivider {
-  0% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-
-  100% {
-    transform: translate(-50%, -50%) rotate(180deg);
-  }
+.hourglass.animation-completed::before {
+  transform: translate(-50%, -50%) rotate(180deg);
 }
 
 .hourglass.flipping .hourglass-top,
