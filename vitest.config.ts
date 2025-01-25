@@ -13,13 +13,19 @@ export default defineConfig({
       exclude: [
         'coverage/**',
         'dist/**',
+        'node_modules/**',
         '**/node_modules/**',
         '**/*.test.ts',
         'webpack.config.js',
         'vitest.config.ts',
         'eslint.config.js',
         'release.config.js',
-        '*.config.{js,ts}'  // 全ての設定ファイルを除外
+        '*.config.{js,ts}',
+        '**/node_modules/@mediapipe/**',
+        'public/**'  // publicディレクトリも除外
+      ],
+      include: [
+        'src/**/*.{js,jsx,ts,tsx}'  // srcディレクトリのみを含める
       ]
     }
   },
