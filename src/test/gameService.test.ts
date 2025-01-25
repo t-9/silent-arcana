@@ -1,6 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getGameState, resetState } from '../gameService';
+import {
+  getGameState,
+  startGame,
+  stopGame,
+  updateScore,
+  selectNextGesture,
+  resetState,
+} from '../gameService';
 import { GameConfig } from '../config';
+import type { Gesture } from '../gestureService';
 
 // getGesturesのモック
 vi.mock('../gestureService', () => ({
@@ -138,14 +146,28 @@ vi.mock('../gestureService', () => ({
   ]),
 }));
 
-describe('GameService', () => {
+describe('gameService', () => {
+  const localStorageMock = {
+    getItem: vi.fn(),
+    setItem: vi.fn(),
+  };
+
   beforeEach(() => {
     // LocalStorageのモック
-    Storage.prototype.getItem = vi.fn(() => '100');
-    Storage.prototype.setItem = vi.fn();
+    Object.defineProperty(global, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
+    });
 
-    // ゲームの状態をリセット
-    resetState();
+    // コンソール出力のモック
+    console.log = vi.fn();
+    console.error = vi.fn();
+
+    // モックをリセット
+    vi.clearAllMocks();
+
+    // 各テスト前に状態をリセット
+    resetState(0);
   });
 
   afterEach(() => {
@@ -153,13 +175,150 @@ describe('GameService', () => {
   });
 
   describe('getGameState', () => {
-    it('初期状態のゲーム状態を返すこと', () => {
+    it('should return current game state', () => {
       const state = getGameState();
+      expect(state).toEqual({
+        score: 0,
+        highScore: 0,
+        currentGesture: null,
+        remainingTime: GameConfig.GAME_TIME,
+        isRunning: false,
+      });
+    });
+  });
+
+  describe('startGame', () => {
+    it('should initialize game state with gestures', () => {
+      const mockGestures: Gesture[] = [
+        { name: 'test1', landmarks: [[0, 0]] },
+        { name: 'test2', landmarks: [[1, 1]] },
+      ];
+
+      startGame(mockGestures);
+
+      const state = getGameState();
+      expect(state.isRunning).toBe(true);
       expect(state.score).toBe(0);
-      expect(state.highScore).toBe(100);
-      expect(state.currentGesture).toBeNull();
       expect(state.remainingTime).toBe(GameConfig.GAME_TIME);
+      expect(state.currentGesture).toBeTruthy();
+      expect(mockGestures).toContainEqual(state.currentGesture);
+    });
+
+    it('should handle empty gestures array', () => {
+      startGame([]);
+
+      const state = getGameState();
       expect(state.isRunning).toBe(false);
+      expect(console.error).toHaveBeenCalledWith(
+        'ジェスチャーデータが読み込まれていません',
+      );
+    });
+
+    it('should handle undefined gestures', () => {
+      // @ts-expect-error: テストのために意図的にundefinedを渡す
+      startGame(undefined);
+
+      const state = getGameState();
+      expect(state.isRunning).toBe(false);
+      expect(console.error).toHaveBeenCalledWith(
+        'ジェスチャーデータが読み込まれていません',
+      );
+    });
+  });
+
+  describe('stopGame', () => {
+    it('should stop game and update high score if current score is higher', () => {
+      // ゲームを開始して得点を追加
+      startGame([{ name: 'test', landmarks: [[0, 0]] }]);
+      updateScore(150);
+
+      stopGame();
+
+      const state = getGameState();
+      expect(state.isRunning).toBe(false);
+      expect(state.highScore).toBe(150);
+      expect(localStorage.setItem).toHaveBeenCalledWith('highScore', '150');
+    });
+
+    it('should not update high score if current score is lower', () => {
+      // 初期ハイスコアを設定
+      localStorageMock.getItem.mockReturnValue('200');
+      resetState();
+
+      // ゲームを開始して低い得点を追加
+      startGame([{ name: 'test', landmarks: [[0, 0]] }]);
+      updateScore(100);
+
+      stopGame();
+
+      const state = getGameState();
+      expect(state.isRunning).toBe(false);
+      expect(state.highScore).toBe(200);
+      expect(localStorage.setItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateScore', () => {
+    it('should add points to current score', () => {
+      updateScore(100);
+      expect(getGameState().score).toBe(100);
+
+      updateScore(50);
+      expect(getGameState().score).toBe(150);
+    });
+  });
+
+  describe('selectNextGesture', () => {
+    it('should select random gesture from array', () => {
+      const mockGestures = [
+        { name: 'test1', landmarks: [[0, 0]] },
+        { name: 'test2', landmarks: [[1, 1]] },
+      ];
+
+      const gesture = selectNextGesture(mockGestures);
+
+      expect(gesture).toBeTruthy();
+      expect(mockGestures).toContainEqual(gesture);
+      expect(getGameState().currentGesture).toBe(gesture);
+    });
+
+    it('should handle empty gestures array', () => {
+      const gesture = selectNextGesture([]);
+      expect(gesture).toBeUndefined();
+      expect(getGameState().currentGesture).toBeUndefined();
+    });
+  });
+
+  describe('resetState', () => {
+    it('should reset state with provided high score', () => {
+      resetState(500);
+
+      const state = getGameState();
+      expect(state).toEqual({
+        score: 0,
+        highScore: 500,
+        currentGesture: null,
+        remainingTime: GameConfig.GAME_TIME,
+        isRunning: false,
+      });
+    });
+
+    it('should use localStorage high score if not provided', () => {
+      localStorageMock.getItem.mockReturnValue('300');
+
+      resetState();
+
+      const state = getGameState();
+      expect(state.highScore).toBe(300);
+    });
+
+    it('should use default high score if localStorage is empty', () => {
+      localStorageMock.getItem.mockReturnValue(null);
+
+      resetState();
+
+      const state = getGameState();
+      expect(state.highScore).toBe(100);
     });
   });
 });
