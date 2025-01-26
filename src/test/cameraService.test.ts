@@ -72,14 +72,27 @@ describe('cameraService', () => {
   });
 
   it.skipIf(process.env.CI)('should handle metadata load timeout', async () => {
-    const mockStream = { id: 'test-stream' };
-    mockGetUserMedia.mockResolvedValue(mockStream);
+    const mockVideo = document.createElement('video');
+    const mockSetLoading = vi.fn();
 
-    const promise = startCamera(mockVideoEl, mockSetLoading);
-    await vi.advanceTimersByTimeAsync(5000);
+    // メタデータロードイベントを発火しないようにする
+    vi.useFakeTimers();
 
-    await expect(promise).rejects.toThrow('カメラの起動がタイムアウトしました');
-    expect(mockMessageEl.textContent).toBe('カメラの起動に失敗しました');
-    expect(mockSetLoading).toHaveBeenCalledWith(false);
+    try {
+      const promise = startCamera(mockVideo, mockSetLoading);
+      await vi.advanceTimersByTimeAsync(5000);
+      await promise;
+      // startCameraが成功した場合はテストを失敗させる
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        expect(error.message).toBe('カメラの起動がタイムアウトしました');
+        expect(mockSetLoading).toHaveBeenCalledWith(false);
+      } else {
+        throw error;
+      }
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

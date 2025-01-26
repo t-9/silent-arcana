@@ -95,3 +95,6 @@ IssueやPull Requestでの改善提案やバグ報告を歓迎します。
 
 ## ライセンス
 This project is licensed under the [MIT License](LICENSE).
+
+## クレジット
+効果音提供　オトロジック(https://otologic.jp)

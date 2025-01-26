@@ -43,10 +43,17 @@ export async function loadModel(
 
     // ジェスチャーデータの読み込み
     try {
-      await loadGestureData();
-      console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
+      const gestures = await loadGestureData();
+      if (gestures && gestures.length > 0) {
+        loadedGestures.length = 0; // 既存のデータをクリア
+        loadedGestures.push(...gestures); // 新しいデータを追加
+        console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
+      } else {
+        throw new Error('ジェスチャーデータが空です');
+      }
     } catch (e) {
       console.error('ジェスチャーデータの読み込みに失敗:', e);
+      throw e;
     }
 
     return detector;
@@ -88,11 +95,15 @@ async function handleNonGameDetection(
   const hands = await detector.estimateHands(videoEl);
   if (hands && hands.length > 0) {
     const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
-    const gestureName = detectGesture(normalizedKeypoints, loadedGestures);
-    if (gestureName) {
-      setLoadingText(messageEl, `検出された手話: ${gestureName}`);
+    if (loadedGestures.length > 0) {
+      const gestureName = detectGesture(normalizedKeypoints, loadedGestures);
+      if (gestureName) {
+        setLoadingText(messageEl, `検出された手話: ${gestureName}`);
+      } else {
+        setLoadingText(messageEl, '該当する手話が見つかりません');
+      }
     } else {
-      setLoadingText(messageEl, '該当する手話が見つかりません');
+      setLoadingText(messageEl, '手話データが読み込まれていません');
     }
   } else {
     setLoadingText(messageEl, '手が検出されていません');

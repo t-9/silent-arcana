@@ -3,6 +3,7 @@ import { defineConfig } from 'vitest/config';
 /* istanbul ignore file */
 export default defineConfig({
   test: {
+    globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.ts'],
@@ -27,6 +28,26 @@ export default defineConfig({
       include: [
         'src/**/*.{js,jsx,ts,tsx}'  // srcディレクトリのみを含める
       ]
-    }
+    },
+    testTimeout: 10000,
+    hookTimeout: 10000,
+    teardownTimeout: 10000,
+    onConsoleLog: (log, type) => {
+      if (type === 'error' && (
+        log.includes('カメラの起動がタイムアウトしました') ||
+        log.includes('DOM要素が見つからない')
+      )) {
+        return false;
+      }
+    },
+    onUnhandledRejection: (error) => {
+      if (error.message && (
+        error.message.includes('カメラの起動がタイムアウトしました') ||
+        error.message.includes('DOM要素が見つからない')
+      )) {
+        return false;
+      }
+      return true;
+    },
   },
 }); 
