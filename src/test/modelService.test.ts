@@ -52,7 +52,9 @@ describe('modelService', () => {
 
     // デフォルトのモック実装
     (createHandDetector as Mock).mockResolvedValue(mockDetector);
-    (loadGestureData as Mock).mockResolvedValue([]);
+    (loadGestureData as Mock).mockResolvedValue([
+      { name: 'テスト手話', landmarks: [[0, 0, 0]] },
+    ]);
     (getGameState as unknown as Mock).mockReturnValue({ isRunning: false });
     mockDetector.estimateHands.mockResolvedValue([
       {
@@ -113,10 +115,13 @@ describe('modelService', () => {
       const error = new Error('Gesture data loading failed');
       (loadGestureData as Mock).mockRejectedValue(error);
 
-      const detector = await loadModel(mockSetLoading);
-      expect(detector).toBe(mockDetector);
-      // エラーがキャッチされ、処理が続行されることを確認
+      await expect(loadModel(mockSetLoading)).rejects.toThrow(
+        'Gesture data loading failed',
+      );
       expect(createHandDetector).toHaveBeenCalled();
+      expect(mockSetLoading).toHaveBeenCalledWith(
+        'モデルを読み込んでいます...',
+      );
     });
 
     it('should handle missing message element', async () => {

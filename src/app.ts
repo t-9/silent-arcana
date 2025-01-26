@@ -41,21 +41,23 @@ export async function init(): Promise<void> {
     setLoadingText(loadingEl, String(text)),
   );
 
+  // 手話データを読み込み
   const gestures = await loadGestureData();
-  setupGameUI(
-    startGameBtn,
-    scoreDisplay,
-    gestureDisplay,
-    timerDisplay,
-    gestures,
-  );
+  if (!gestures || gestures.length === 0) {
+    console.error('手話データの読み込みに失敗しました');
+    setLoadingText(
+      messageEl,
+      '手話データの読み込みに失敗しました。ページを再読み込みしてください。',
+    );
+    return;
+  }
 
   // カメラを自動的に開始
-  startDetection();
   try {
     await startCamera(videoEl, (text: string | boolean) =>
       setLoadingText(loadingEl, String(text)),
     );
+    startDetection(); // 手話認識を開始
     detectLoop(videoEl, messageEl);
     // カメラの開始が成功したらボタンを有効化
     startGameBtn.disabled = false;
@@ -65,7 +67,17 @@ export async function init(): Promise<void> {
       messageEl,
       'カメラの開始に失敗しました。ページを再読み込みしてください。',
     );
+    return;
   }
+
+  // ゲームUIの設定
+  setupGameUI(
+    startGameBtn,
+    scoreDisplay,
+    gestureDisplay,
+    timerDisplay,
+    gestures,
+  );
 
   // キーボードイベントの設定
   setupKeyboardEvents(videoEl);
