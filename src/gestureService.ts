@@ -6,9 +6,11 @@ export interface Gesture {
 
 let gestures: Gesture[] = [];
 
-export async function loadGestureData(): Promise<Gesture[]> {
+export async function loadGestureData(
+  url: string = './templates/normalizedGestures.json',
+): Promise<Gesture[]> {
   try {
-    const response = await fetch('/templates/normalizedGestures.json');
+    const response = await fetch(url);
     const data = await response.json();
     gestures = data.gestures;
     return gestures;
