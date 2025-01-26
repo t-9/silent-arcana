@@ -88,6 +88,10 @@ export async function init(): Promise<void> {
 }
 
 // ブラウザ実行時のみ初期化
-if (typeof window !== 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  process.env.NODE_ENV !== 'ci' &&
+  process.env.NODE_ENV !== 'test'
+) {
   init();
 }
