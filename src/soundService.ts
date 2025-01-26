@@ -15,11 +15,14 @@ export const preloadedSounds = new Map<string, HTMLAudioElement>();
  */
 export async function preloadSounds(): Promise<void> {
   try {
-    // テストのために、START_GAMEのみをプリロード
-    const audio = new Audio(SoundEffects.START_GAME);
-    // load()を呼び出して明示的にロードを開始
-    await audio.load();
-    preloadedSounds.set(SoundEffects.START_GAME, audio);
+    const loadPromises = Object.values(SoundEffects).map(async (soundPath) => {
+      const audio = new Audio(soundPath);
+      // load()を呼び出して明示的にロードを開始
+      await audio.load();
+      preloadedSounds.set(soundPath, audio);
+    });
+
+    await Promise.all(loadPromises);
     console.log('サウンドのプリロードが完了しました');
   } catch (error) {
     console.error('サウンドのプリロードに失敗しました:', error);
@@ -37,7 +40,8 @@ export async function playSound(soundPath: string): Promise<void> {
     // プリロードされた音声があればそれを使用
     const preloadedAudio = preloadedSounds.get(soundPath);
     if (preloadedAudio) {
-      audio = preloadedAudio;
+      // プリロードされた音声をクローンして使用（同時再生のため）
+      audio = preloadedAudio.cloneNode(true) as HTMLAudioElement;
     } else {
       // プリロードされていない場合は新しいAudioインスタンスを作成
       audio = new Audio(soundPath);
@@ -56,15 +60,7 @@ export async function playSound(soundPath: string): Promise<void> {
  */
 export async function playStartGameSound(): Promise<void> {
   try {
-    // プリロードされた音声を直接取得
-    const preloadedAudio = preloadedSounds.get(SoundEffects.START_GAME);
-    if (preloadedAudio) {
-      preloadedAudio.currentTime = 0;
-      await preloadedAudio.play();
-    } else {
-      // プリロードされていない場合のみplaySound関数を使用
-      await playSound(SoundEffects.START_GAME);
-    }
+    await playSound(SoundEffects.START_GAME);
   } catch (error) {
     console.error('ゲーム開始音の再生に失敗しました:', error);
     throw error;
@@ -76,17 +72,35 @@ export async function playStartGameSound(): Promise<void> {
  */
 export async function playCardChangeSound(): Promise<void> {
   try {
-    // プリロードされた音声を直接取得
-    const preloadedAudio = preloadedSounds.get(SoundEffects.CARD_CHANGE);
-    if (preloadedAudio) {
-      preloadedAudio.currentTime = 0;
-      await preloadedAudio.play();
-    } else {
-      // プリロードされていない場合のみplaySound関数を使用
-      await playSound(SoundEffects.CARD_CHANGE);
-    }
+    await playSound(SoundEffects.CARD_CHANGE);
   } catch (error) {
     console.error('カード切り替え音の再生に失敗しました:', error);
+    throw error;
+  }
+}
+
+/**
+ * 複数の音声を同時に再生する関数
+ * @param soundPaths 再生する音声ファイルのパスの配列
+ * @returns 再生の成功・失敗を示すPromise
+ */
+export async function playMultipleSounds(soundPaths: string[]): Promise<void> {
+  try {
+    await Promise.all(soundPaths.map(playSound));
+  } catch (error) {
+    console.error('複数の音声の再生に失敗しました:', error);
+    throw error;
+  }
+}
+
+/**
+ * ゲーム開始時とカード切り替え時のサウンドを同時に再生
+ */
+export async function playStartGameAndCardChangeSound(): Promise<void> {
+  try {
+    await playMultipleSounds([SoundEffects.START_GAME, SoundEffects.CARD_CHANGE]);
+  } catch (error) {
+    console.error('ゲーム開始音とカード切り替え音の再生に失敗しました:', error);
     throw error;
   }
 }
