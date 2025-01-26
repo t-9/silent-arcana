@@ -20,7 +20,7 @@ export async function preloadSounds(): Promise<void> {
     await Promise.all(
       soundEffects.map(async (effect) => {
         const audio = new Audio(effect);
-        await audio.load();
+        audio.load();
         preloadedSounds.set(effect, audio);
       }),
     );
