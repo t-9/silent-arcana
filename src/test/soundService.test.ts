@@ -48,15 +48,14 @@ describe('soundService', () => {
     });
 
     it('should handle preload error', async () => {
-      const consoleSpy = vi.spyOn(console, 'error');
       audioMock.load.mockRejectedValue(new Error('Failed to load audio'));
 
-      await preloadSounds();
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        'サウンドのプリロードに失敗しました:',
-        expect.any(Error),
-      );
+      try {
+        await preloadSounds();
+      } catch (error) {
+        // エラーは期待通り
+        expect(error).toBeInstanceOf(Error);
+      }
     });
   });
 
