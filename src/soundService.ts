@@ -2,9 +2,9 @@
  * サウンドファイルのパスを定義
  */
 export const SoundEffects = {
-  START_GAME: '/sounds/Cluster_Chimes01-02(Short).mp3',
-  CARD_CHANGE: '/sounds/Time_Card_Rack01-1(Take_Out).mp3',
-  GAME_OVER: '/sounds/Bell_Accent08-2(Bell_Only).mp3',
+  START_GAME: './sounds/Cluster_Chimes01-02(Short).mp3',
+  CARD_CHANGE: './sounds/Time_Card_Rack01-1(Take_Out).mp3',
+  GAME_OVER: './sounds/Bell_Accent08-2(Bell_Only).mp3',
 } as const;
 
 // プリロードされた音声を保持するMap
