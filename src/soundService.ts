@@ -6,7 +6,7 @@ export const SoundEffects = {
 } as const;
 
 // プリロードされた音声を保持するMap
-const preloadedSounds = new Map<string, HTMLAudioElement>();
+export const preloadedSounds = new Map<string, HTMLAudioElement>();
 
 /**
  * サウンドファイルをプリロードする
@@ -41,11 +41,12 @@ export async function playSound(soundPath: string): Promise<void> {
       // 再生位置をリセット（同じ音声を連続で再生できるように）
       preloadedAudio.currentTime = 0;
       await preloadedAudio.play();
-    } else {
-      // プリロードされていない場合は従来通り新しいAudioインスタンスを作成
-      const audio = new Audio(soundPath);
-      await audio.play();
+      return;
     }
+
+    // プリロードされていない場合は新しいAudioインスタンスを作成
+    const audio = new Audio(soundPath);
+    await audio.play();
   } catch (error) {
     console.error('サウンド再生に失敗しました:', error);
     throw error;
@@ -56,5 +57,10 @@ export async function playSound(soundPath: string): Promise<void> {
  * ゲーム開始時のサウンドを再生
  */
 export async function playStartGameSound(): Promise<void> {
-  await playSound(SoundEffects.START_GAME);
+  try {
+    await playSound(SoundEffects.START_GAME);
+  } catch (error) {
+    console.error('ゲーム開始音の再生に失敗しました:', error);
+    throw error;
+  }
 }
