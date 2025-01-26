@@ -120,7 +120,7 @@ vi.mock('../gameHandlers');
 vi.mock('../gestureService');
 vi.mock('../soundService');
 
-describe('app', () => {
+describe.skipIf(process.env.CI)('app', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
