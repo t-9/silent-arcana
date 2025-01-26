@@ -8,6 +8,7 @@ import {
 } from './gameService';
 import { detectGesture, Gesture, getGestures } from './gestureService';
 import { GameConfig } from './config';
+import { playStartGameSound } from './soundService';
 
 // windowオブジェクトの型を拡張
 declare global {
@@ -117,6 +118,9 @@ export function showGameOverDialog(score: number) {
     // ゲームを直接再開始
     const gestures = getGestures();
     startGame(gestures);
+    playStartGameSound().catch((error) => {
+      console.error('ゲーム開始音の再生に失敗しました:', error);
+    });
 
     // ゲーム開始ボタンを無効化したままにする
     const startGameBtn = document.getElementById(
@@ -158,6 +162,9 @@ export function setupGameUI(
 
     startGame(gestures); // ゲームロジックの初期化
     updateGameUI(scoreDisplay, gestureDisplay); // UIの初期更新
+    playStartGameSound().catch((error) => {
+      console.error('ゲーム開始音の再生に失敗しました:', error);
+    });
 
     // ゲーム開始ボタンを無効化
     startGameBtn.setAttribute('disabled', 'true');
