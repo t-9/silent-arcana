@@ -61,7 +61,7 @@ describe('gestureService', () => {
       const result = await loadGestureData();
       expect(result).toEqual(mockGestures.gestures);
       expect(mockFetch).toHaveBeenCalledWith(
-        '/templates/normalizedGestures.json',
+        './templates/normalizedGestures.json',
       );
     });
 
@@ -71,7 +71,7 @@ describe('gestureService', () => {
 
       await expect(loadGestureData()).rejects.toThrow('Fetch failed');
       expect(mockFetch).toHaveBeenCalledWith(
-        '/templates/normalizedGestures.json',
+        './templates/normalizedGestures.json',
       );
     });
 
