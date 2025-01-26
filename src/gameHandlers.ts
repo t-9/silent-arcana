@@ -83,7 +83,7 @@ function updateGameScore(score: number) {
 /**
  * 次のジェスチャーを設定する共通関数
  */
-function setNextGesture() {
+export function setNextGesture() {
   const gestures = getGestures();
   const nextGesture = selectNextGesture(gestures);
   const gestureDisplay = document.getElementById('gesture-display');
