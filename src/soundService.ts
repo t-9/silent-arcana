@@ -16,17 +16,18 @@ export const preloadedSounds = new Map<string, HTMLAudioElement>();
  */
 export async function preloadSounds(): Promise<void> {
   try {
-    const loadPromises = Object.values(SoundEffects).map(async (soundPath) => {
-      const audio = new Audio(soundPath);
-      // load()を呼び出して明示的にロードを開始
-      await audio.load();
-      preloadedSounds.set(soundPath, audio);
-    });
-
-    await Promise.all(loadPromises);
+    const soundEffects = Object.values(SoundEffects);
+    await Promise.all(
+      soundEffects.map(async (effect) => {
+        const audio = new Audio(effect);
+        await audio.load();
+        preloadedSounds.set(effect, audio);
+      }),
+    );
     console.log('サウンドのプリロードが完了しました');
   } catch (error) {
     console.error('サウンドのプリロードに失敗しました:', error);
+    throw error;
   }
 }
 

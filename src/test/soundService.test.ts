@@ -51,7 +51,12 @@ describe('soundService', () => {
       const consoleSpy = vi.spyOn(console, 'error');
       audioMock.load.mockRejectedValue(new Error('Failed to load audio'));
 
-      await preloadSounds();
+      try {
+        await preloadSounds();
+      } catch (error) {
+        // エラーは期待通り
+        expect(error).toBeInstanceOf(Error);
+      }
 
       expect(consoleSpy).toHaveBeenCalledWith(
         'サウンドのプリロードに失敗しました:',
