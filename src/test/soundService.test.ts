@@ -85,7 +85,8 @@ describe('soundService', () => {
       await playStartGameSound();
 
       // Audio インスタンスが新しく作られていないことを確認
-      expect(window.Audio).toHaveBeenCalledTimes(1);
+      // preloadSoundsで3つのインスタンスが作成され、playStartGameSoundでは新しいインスタンスは作成されない
+      expect(window.Audio).toHaveBeenCalledTimes(3);
 
       // currentTime がリセットされ、再生されたことを確認
       expect(audioMock.currentTime).toBe(0);

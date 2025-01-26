@@ -4,6 +4,7 @@
 export const SoundEffects = {
   START_GAME: '/sounds/Cluster_Chimes01-02(Short).mp3',
   CARD_CHANGE: '/sounds/Time_Card_Rack01-1(Take_Out).mp3',
+  GAME_OVER: '/sounds/Bell_Accent08-2(Bell_Only).mp3',
 } as const;
 
 // プリロードされた音声を保持するMap
@@ -40,8 +41,7 @@ export async function playSound(soundPath: string): Promise<void> {
     // プリロードされた音声があればそれを使用
     const preloadedAudio = preloadedSounds.get(soundPath);
     if (preloadedAudio) {
-      // プリロードされた音声をクローンして使用（同時再生のため）
-      audio = preloadedAudio.cloneNode(true) as HTMLAudioElement;
+      audio = preloadedAudio;
     } else {
       // プリロードされていない場合は新しいAudioインスタンスを作成
       audio = new Audio(soundPath);
@@ -98,9 +98,24 @@ export async function playMultipleSounds(soundPaths: string[]): Promise<void> {
  */
 export async function playStartGameAndCardChangeSound(): Promise<void> {
   try {
-    await playMultipleSounds([SoundEffects.START_GAME, SoundEffects.CARD_CHANGE]);
+    await playMultipleSounds([
+      SoundEffects.START_GAME,
+      SoundEffects.CARD_CHANGE,
+    ]);
   } catch (error) {
     console.error('ゲーム開始音とカード切り替え音の再生に失敗しました:', error);
+    throw error;
+  }
+}
+
+/**
+ * ゲーム終了時のサウンドを再生
+ */
+export async function playGameOverSound(): Promise<void> {
+  try {
+    await playSound(SoundEffects.GAME_OVER);
+  } catch (error) {
+    console.error('ゲーム終了音の再生に失敗しました:', error);
     throw error;
   }
 }
