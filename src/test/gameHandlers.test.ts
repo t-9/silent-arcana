@@ -400,7 +400,7 @@ describe('gameHandlers', () => {
       vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // UIの更新を実行
@@ -558,7 +558,7 @@ describe('gameHandlers', () => {
       });
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // gesture-displayを削除
@@ -594,7 +594,7 @@ describe('gameHandlers', () => {
       });
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // gesture-displayは存在するが、gesture-nameは存在しない状態を作成
@@ -714,7 +714,7 @@ describe('gameHandlers', () => {
 
       // window.updateScoreを空の関数に設定
       const originalUpdateScore = window.updateScore;
-      window.updateScore = () => {};
+      window.updateScore = () => { };
 
       handleGestureSuccess();
 
@@ -740,7 +740,7 @@ describe('gameHandlers', () => {
 
       // window.updateScoreを空の関数に設定
       const originalUpdateScore = window.updateScore;
-      window.updateScore = () => {};
+      window.updateScore = () => { };
 
       handleGestureSuccess();
 
@@ -770,7 +770,7 @@ describe('gameHandlers', () => {
       });
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // gesture-displayを削除
