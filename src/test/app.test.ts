@@ -109,7 +109,7 @@ vi.mock('@tensorflow/tfjs', () => ({
 vi.mock('../modelService');
 vi.mock('../domUtils', () => ({
   getElement: vi.fn(),
-  setLoadingText: vi.fn()
+  setLoadingText: vi.fn(),
 }));
 vi.mock('../eventHandlers');
 vi.mock('../uiUtils');
@@ -122,7 +122,7 @@ describe('app', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+    consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     document.body.innerHTML = `
       <video id="video"></video>
       <div id="loading"></div>
@@ -130,6 +130,10 @@ describe('app', () => {
       <div id="timer"></div>
       <div id="score"></div>
       <div id="dialog-overlay"></div>
+      <button id="start-game-btn"></button>
+      <div id="score-display"></div>
+      <div id="gesture-display"></div>
+      <div id="timer-display"></div>
     `;
   });
 
@@ -157,13 +161,13 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     const mockHandDetector = {
-      estimateHands: vi.fn()
+      estimateHands: vi.fn(),
     } as unknown as HandDetector;
 
     vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
     vi.mocked(loadGestureData).mockResolvedValue([
       { name: 'テスト手話1', landmarks: [[0, 0, 0]] },
-      { name: 'テスト手話2', landmarks: [[1, 1, 1]] }
+      { name: 'テスト手話2', landmarks: [[1, 1, 1]] },
     ]);
     vi.mocked(startCamera).mockResolvedValue(undefined);
     vi.mocked(preloadSounds).mockResolvedValue(undefined);
@@ -181,8 +185,8 @@ describe('app', () => {
 
   it('should handle missing DOM elements', async () => {
     vi.mocked(getElement)
-      .mockReturnValueOnce(null)  // video
-      .mockReturnValueOnce(document.createElement('div'))  // loading
+      .mockReturnValueOnce(null) // video
+      .mockReturnValueOnce(document.createElement('div')) // loading
       .mockReturnValueOnce(document.createElement('div')); // message
 
     await expect(init()).rejects.toThrow('DOM要素が見つからない');
@@ -208,16 +212,18 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     const mockHandDetector = {
-      estimateHands: vi.fn()
+      estimateHands: vi.fn(),
     } as unknown as HandDetector;
 
     vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
-    vi.mocked(loadGestureData).mockRejectedValue(new Error('ジェスチャーデータの読み込みに失敗'));
+    vi.mocked(loadGestureData).mockRejectedValue(
+      new Error('ジェスチャーデータの読み込みに失敗'),
+    );
 
     await expect(init()).rejects.toThrow('ジェスチャーデータの読み込みに失敗');
     expect(consoleSpy).toHaveBeenCalledWith(
       '初期化に失敗しました:',
-      new Error('ジェスチャーデータの読み込みに失敗')
+      new Error('ジェスチャーデータの読み込みに失敗'),
     );
   });
 
@@ -244,7 +250,7 @@ describe('app', () => {
     await expect(init()).rejects.toThrow('モデルの読み込みに失敗');
     expect(consoleSpy).toHaveBeenCalledWith(
       '初期化に失敗しました:',
-      new Error('モデルの読み込みに失敗')
+      new Error('モデルの読み込みに失敗'),
     );
   });
 
@@ -267,13 +273,13 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     const mockHandDetector = {
-      estimateHands: vi.fn()
+      estimateHands: vi.fn(),
     } as unknown as HandDetector;
 
     vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
     vi.mocked(loadGestureData).mockResolvedValue([
       { name: 'テスト手話1', landmarks: [[0, 0, 0]] },
-      { name: 'テスト手話2', landmarks: [[1, 1, 1]] }
+      { name: 'テスト手話2', landmarks: [[1, 1, 1]] },
     ]);
     vi.mocked(startCamera).mockResolvedValue(undefined);
     vi.mocked(preloadSounds).mockResolvedValue(undefined);
@@ -305,13 +311,13 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     const mockHandDetector = {
-      estimateHands: vi.fn()
+      estimateHands: vi.fn(),
     } as unknown as HandDetector;
 
     vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
     vi.mocked(loadGestureData).mockResolvedValue([
       { name: 'テスト手話1', landmarks: [[0, 0, 0]] },
-      { name: 'テスト手話2', landmarks: [[1, 1, 1]] }
+      { name: 'テスト手話2', landmarks: [[1, 1, 1]] },
     ]);
     vi.mocked(startCamera).mockResolvedValue(undefined);
 
@@ -333,7 +339,7 @@ describe('app', () => {
 
     const mockGestures: Gesture[] = [
       { name: 'テスト手話1', landmarks: [[0, 0, 0]] },
-      { name: 'テスト手話2', landmarks: [[1, 1, 1]] }
+      { name: 'テスト手話2', landmarks: [[1, 1, 1]] },
     ];
 
     vi.mocked(getElement)
@@ -346,7 +352,7 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     const mockHandDetector = {
-      estimateHands: vi.fn()
+      estimateHands: vi.fn(),
     } as unknown as HandDetector;
 
     vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
@@ -360,7 +366,7 @@ describe('app', () => {
       mockScoreDisplay,
       mockGestureDisplay,
       mockTimerDisplay,
-      mockGestures
+      mockGestures,
     );
   });
 
@@ -383,13 +389,13 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     const mockHandDetector = {
-      estimateHands: vi.fn()
+      estimateHands: vi.fn(),
     } as unknown as HandDetector;
 
     vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
     vi.mocked(loadGestureData).mockResolvedValue([
       { name: 'テスト手話1', landmarks: [[0, 0, 0]] },
-      { name: 'テスト手話2', landmarks: [[1, 1, 1]] }
+      { name: 'テスト手話2', landmarks: [[1, 1, 1]] },
     ]);
     vi.mocked(startCamera).mockResolvedValue(undefined);
 
