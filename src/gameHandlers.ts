@@ -8,7 +8,7 @@ import {
 } from './gameService';
 import { detectGesture, Gesture, getGestures } from './gestureService';
 import { GameConfig } from './config';
-import { playStartGameSound } from './soundService';
+import { playStartGameSound, playCardChangeSound } from './soundService';
 
 // windowオブジェクトの型を拡張
 declare global {
@@ -87,6 +87,10 @@ function setNextGesture() {
     const gestureName = gestureDisplay.querySelector('.gesture-name');
     if (gestureName) {
       gestureName.textContent = nextGesture.name;
+      // ジェスチャー切り替え時に音声を再生
+      playCardChangeSound().catch((error) => {
+        console.error('カード切り替え音の再生に失敗しました:', error);
+      });
     }
   }
   return nextGesture;
