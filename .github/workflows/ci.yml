@@ -211,6 +211,11 @@ jobs:
 
       - name: Build
         run: npm run build
+      
+      - name: Insert base href for GitHub Pages
+        run: |
+          # もし public/index.html に <head> があれば、その直後に <base href="/silent-arcana/"> を挿入する
+          sed -i 's|<head>|<head><base href="/silent-arcana/">|' public/index.html
 
       # Webpack等のビルド成果物がpublic/に出力される想定
       - name: Upload artifact for Pages
