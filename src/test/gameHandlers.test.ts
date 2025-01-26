@@ -14,6 +14,7 @@ import {
   handleGestureSuccess,
   startTimer,
   showGameOverDialog,
+  setNextGesture,
 } from '../gameHandlers';
 import {
   startGame,
@@ -22,7 +23,7 @@ import {
   selectNextGesture,
   getGameState,
 } from '../gameService';
-import { detectGesture, getGestures } from '../gestureService';
+import { detectGesture } from '../gestureService';
 import { GameConfig } from '../config';
 import * as gameService from '../gameService';
 import * as gestureService from '../gestureService';
@@ -41,6 +42,11 @@ vi.mock('../gameService', () => ({
   })),
 }));
 vi.mock('../gestureService');
+vi.mock('../soundService', () => ({
+  playStartGameSound: vi.fn().mockResolvedValue(undefined),
+  playGameOverSound: vi.fn().mockResolvedValue(undefined),
+  playCardChangeSound: vi.fn().mockResolvedValue(undefined),
+}));
 
 // window.updateScoreの型定義を拡張
 declare global {
@@ -61,8 +67,8 @@ describe('gameHandlers', () => {
 
   // テスト用のジェスチャーデータ
   const mockGestures = [
-    { name: 'テスト手話1', landmarks: [[0, 0]] },
-    { name: 'テスト手話2', landmarks: [[1, 1]] },
+    { name: 'gesture1', landmarks: [[1, 1]] },
+    { name: 'gesture2', landmarks: [[2, 2]] },
   ];
 
   beforeEach(() => {
@@ -121,7 +127,8 @@ describe('gameHandlers', () => {
       currentGesture: mockGestures[0],
       remainingTime: GameConfig.GAME_TIME,
     });
-    vi.mocked(getGestures).mockReturnValue(mockGestures);
+    vi.spyOn(gestureService, 'getGestures').mockReturnValue(mockGestures);
+    vi.spyOn(gameService, 'selectNextGesture').mockReturnValue(mockGestures[1]);
     vi.mocked(detectGesture).mockReturnValue(mockGestures[0].name);
 
     // タイマーのモック
@@ -369,7 +376,7 @@ describe('gameHandlers', () => {
 
       expect(mockScoreDisplay.textContent).toBe('スコア: 0');
       expect(mockHighScoreDisplay.textContent).toBe('ハイスコア: 100');
-      expect(gestureName.textContent).toBe('テスト手話1');
+      expect(gestureName.textContent).toBe('gesture1');
     });
 
     it('should handle game end state', () => {
@@ -394,7 +401,7 @@ describe('gameHandlers', () => {
         score: 10,
         highScore: 20,
         isRunning: true,
-        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        currentGesture: { name: 'gesture1', landmarks: [[0, 0]] },
         remainingTime: GameConfig.GAME_TIME,
       };
       vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
@@ -544,16 +551,16 @@ describe('gameHandlers', () => {
         score: 10,
         highScore: 20,
         isRunning: true,
-        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        currentGesture: { name: 'gesture1', landmarks: [[0, 0]] },
         remainingTime: GameConfig.GAME_TIME,
       };
       vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
       vi.spyOn(gestureService, 'getGestures').mockReturnValue([
-        { name: 'テスト手話', landmarks: [[0, 0]] },
+        { name: 'gesture1', landmarks: [[0, 0]] },
       ]);
-      vi.spyOn(gestureService, 'detectGesture').mockReturnValue('テスト手話');
+      vi.spyOn(gestureService, 'detectGesture').mockReturnValue('gesture1');
       vi.spyOn(gameService, 'selectNextGesture').mockReturnValue({
-        name: 'テスト手話2',
+        name: 'gesture2',
         landmarks: [[0, 0]],
       });
 
@@ -580,16 +587,16 @@ describe('gameHandlers', () => {
         score: 10,
         highScore: 20,
         isRunning: true,
-        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        currentGesture: { name: 'gesture1', landmarks: [[0, 0]] },
         remainingTime: GameConfig.GAME_TIME,
       };
       vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
       vi.spyOn(gestureService, 'getGestures').mockReturnValue([
-        { name: 'テスト手話', landmarks: [[0, 0]] },
+        { name: 'gesture1', landmarks: [[0, 0]] },
       ]);
-      vi.spyOn(gestureService, 'detectGesture').mockReturnValue('テスト手話');
+      vi.spyOn(gestureService, 'detectGesture').mockReturnValue('gesture1');
       vi.spyOn(gameService, 'selectNextGesture').mockReturnValue({
-        name: 'テスト手話2',
+        name: 'gesture2',
         landmarks: [[0, 0]],
       });
 
@@ -757,15 +764,15 @@ describe('gameHandlers', () => {
         score: 10,
         highScore: 20,
         isRunning: true,
-        currentGesture: { name: 'テスト手話', landmarks: [[0, 0]] },
+        currentGesture: { name: 'gesture1', landmarks: [[0, 0]] },
         remainingTime: GameConfig.GAME_TIME,
       };
       vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
       vi.spyOn(gestureService, 'getGestures').mockReturnValue([
-        { name: 'テスト手話', landmarks: [[0, 0]] },
+        { name: 'gesture1', landmarks: [[0, 0]] },
       ]);
       vi.spyOn(gameService, 'selectNextGesture').mockReturnValue({
-        name: 'テスト手話2',
+        name: 'gesture2',
         landmarks: [[0, 0]],
       });
 
@@ -868,7 +875,7 @@ describe('gameHandlers', () => {
 
       // UIが正しく更新されることを確認
       const gestureName = mockGestureDisplay.querySelector('.gesture-name');
-      expect(gestureName?.textContent).toBe('テスト手話2');
+      expect(gestureName?.textContent).toBe('gesture2');
     });
 
     it('should handle game completion state', () => {
@@ -979,6 +986,111 @@ describe('gameHandlers', () => {
         'Dialog overlay element not found',
       );
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('setNextGesture', () => {
+    it('should return next gesture', () => {
+      document.body.innerHTML = `
+        <div id="gesture-display">
+          <div class="gesture-name"></div>
+        </div>
+      `;
+
+      const mockGestures = [
+        { name: 'gesture1', landmarks: [[1, 1]] },
+        { name: 'gesture2', landmarks: [[2, 2]] },
+      ];
+
+      // モックの設定を修正
+      vi.spyOn(gestureService, 'getGestures').mockReturnValue(mockGestures);
+      vi.spyOn(gameService, 'selectNextGesture').mockReturnValue(
+        mockGestures[1],
+      );
+
+      const nextGesture = setNextGesture();
+
+      // 期待される結果の検証
+      expect(gestureService.getGestures).toHaveBeenCalled();
+      expect(gameService.selectNextGesture).toHaveBeenCalledWith(mockGestures);
+      expect(nextGesture).toBe(mockGestures[1]);
+
+      // UIの更新を検証
+      const gestureName = document.querySelector('.gesture-name');
+      expect(gestureName?.textContent).toBe('gesture2');
+    });
+  });
+
+  describe('showGameOverDialog and restart', () => {
+    beforeEach(() => {
+      document.body.innerHTML = `
+        <div class="dialog-overlay" style="display: flex;">
+          <div id="final-score"></div>
+          <div id="final-high-score"></div>
+          <button id="restart-btn"></button>
+        </div>
+        <button id="start-game-btn"></button>
+        <div id="score-display"></div>
+        <div id="gesture-display">
+          <div class="gesture-name"></div>
+        </div>
+        <div id="timer-display">
+          <div class="hourglass">
+            <div class="hourglass-top">
+              <div class="sand"></div>
+            </div>
+            <div class="hourglass-bottom">
+              <div class="sand"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    it('should handle restart button click correctly', () => {
+      const mockGestures = [{ name: 'test', landmarks: [[1, 1]] }];
+      vi.spyOn(gestureService, 'getGestures').mockReturnValue(mockGestures);
+
+      showGameOverDialog(100);
+      const restartBtn = document.getElementById('restart-btn');
+      const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
+      const startGameBtn = document.getElementById('start-game-btn');
+
+      if (restartBtn && overlay && startGameBtn) {
+        // リスタートボタンをクリック
+        restartBtn.click();
+
+        // オーバーレイが非表示になることを確認
+        expect(overlay.style.display).toBe('none');
+        // スタートボタンが無効化されることを確認
+        expect(startGameBtn.getAttribute('disabled')).toBe('true');
+      }
+    });
+  });
+
+  describe('updateGameUI', () => {
+    beforeEach(() => {
+      document.body.innerHTML = `
+        <div id="score-display"></div>
+        <div id="high-score-display"></div>
+        <div id="gesture-display">
+          <div class="gesture-name"></div>
+        </div>
+      `;
+    });
+
+    it('should update UI when no gesture is available', () => {
+      const scoreDisplay = document.getElementById('score-display')!;
+      const gestureDisplay = document.getElementById('gesture-display')!;
+      const state = getGameState();
+      state.currentGesture = null;
+      state.score = 0;
+      state.highScore = 100;
+
+      updateGameUI(scoreDisplay, gestureDisplay);
+
+      const gestureName = gestureDisplay.querySelector('.gesture-name');
+      expect(gestureName?.textContent).toBe('完了');
     });
   });
 });

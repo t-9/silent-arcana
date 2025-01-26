@@ -8,7 +8,11 @@ import {
 } from './gameService';
 import { detectGesture, Gesture, getGestures } from './gestureService';
 import { GameConfig } from './config';
-import { playStartGameSound } from './soundService';
+import {
+  playStartGameSound,
+  playCardChangeSound,
+  playGameOverSound,
+} from './soundService';
 
 // windowオブジェクトの型を拡張
 declare global {
@@ -79,7 +83,7 @@ function updateGameScore(score: number) {
 /**
  * 次のジェスチャーを設定する共通関数
  */
-function setNextGesture() {
+export function setNextGesture() {
   const gestures = getGestures();
   const nextGesture = selectNextGesture(gestures);
   const gestureDisplay = document.getElementById('gesture-display');
@@ -87,6 +91,10 @@ function setNextGesture() {
     const gestureName = gestureDisplay.querySelector('.gesture-name');
     if (gestureName) {
       gestureName.textContent = nextGesture.name;
+      // ジェスチャー切り替え時に音声を再生
+      playCardChangeSound().catch((error) => {
+        console.error('カード切り替え音の再生に失敗しました:', error);
+      });
     }
   }
   return nextGesture;
@@ -111,6 +119,11 @@ export function showGameOverDialog(score: number) {
   finalScore.textContent = score.toString();
   finalHighScore.textContent = state.highScore.toString();
   overlay.style.display = 'flex';
+
+  // ゲーム終了音を再生
+  playGameOverSound().catch((error) => {
+    console.error('ゲーム終了音の再生に失敗しました:', error);
+  });
 
   // リスタートボタンのイベントリスナー
   restartBtn.onclick = () => {
