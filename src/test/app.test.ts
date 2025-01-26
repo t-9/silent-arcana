@@ -102,10 +102,12 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
 });
 
 // モックの設定
-vi.mock('@tensorflow/tfjs', () => ({
-  setBackend: vi.fn().mockResolvedValue(undefined),
-  ready: vi.fn().mockResolvedValue(undefined),
-}));
+vi.mock('@tensorflow/tfjs', async () => {
+  return {
+    setBackend: vi.fn().mockResolvedValue(undefined),
+    ready: vi.fn().mockResolvedValue(undefined),
+  };
+});
 vi.mock('../modelService');
 vi.mock('../domUtils', () => ({
   getElement: vi.fn(),
@@ -130,10 +132,6 @@ describe('app', () => {
       <div id="timer"></div>
       <div id="score"></div>
       <div id="dialog-overlay"></div>
-      <button id="start-game-btn"></button>
-      <div id="score-display"></div>
-      <div id="gesture-display"></div>
-      <div id="timer-display"></div>
     `;
   });
 
@@ -184,13 +182,28 @@ describe('app', () => {
   });
 
   it('should handle missing DOM elements', async () => {
+    // 必要なDOM要素をクリア
+    document.body.innerHTML = '';
+
+    // getElementのモックを設定
     vi.mocked(getElement)
       .mockReturnValueOnce(null) // video
       .mockReturnValueOnce(document.createElement('div')) // loading
       .mockReturnValueOnce(document.createElement('div')); // message
 
-    await expect(init()).rejects.toThrow('DOM要素が見つからない');
-    expect(consoleSpy).toHaveBeenCalledWith('DOM要素が見つからない');
+    // エラーをキャッチして検証
+    try {
+      await init();
+      // initが成功した場合はテストを失敗させる
+      expect(true).toBe(false);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        expect(error.message).toBe('DOM要素が見つからない');
+        expect(consoleSpy).toHaveBeenCalledWith('DOM要素が見つからない');
+      } else {
+        throw error;
+      }
+    }
   });
 
   it('should handle gesture data loading failure', async () => {
@@ -220,7 +233,8 @@ describe('app', () => {
       new Error('ジェスチャーデータの読み込みに失敗'),
     );
 
-    await expect(init()).rejects.toThrow('ジェスチャーデータの読み込みに失敗');
+    const promise = init();
+    await expect(promise).rejects.toThrow('ジェスチャーデータの読み込みに失敗');
     expect(consoleSpy).toHaveBeenCalledWith(
       '初期化に失敗しました:',
       new Error('ジェスチャーデータの読み込みに失敗'),
