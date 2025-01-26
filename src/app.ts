@@ -27,11 +27,11 @@ export async function init(): Promise<void> {
   // 必須要素が見つからない場合はエラー
   if (!videoEl || !loadingEl || !messageEl) {
     console.error('DOM要素が見つからない');
-    return;
+    throw new Error('DOM要素が見つからない');
   }
   if (!startGameBtn || !scoreDisplay || !gestureDisplay || !timerDisplay) {
     console.error('ゲームUI要素が見つかりません');
-    return;
+    throw new Error('ゲームUI要素が見つかりません');
   }
 
   // ゲーム開始ボタンを一時的に無効化
@@ -54,7 +54,7 @@ export async function init(): Promise<void> {
         messageEl,
         '手話データの読み込みに失敗しました。ページを再読み込みしてください。',
       );
-      return;
+      throw new Error('手話データの読み込みに失敗しました');
     }
 
     // カメラを自動的に開始
@@ -83,7 +83,7 @@ export async function init(): Promise<void> {
       messageEl,
       '初期化に失敗しました。ページを再読み込みしてください。',
     );
-    return;
+    throw error;
   }
 }
 
