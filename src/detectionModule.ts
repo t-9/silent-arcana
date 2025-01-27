@@ -1,38 +1,49 @@
 // src/detectionModule.ts
+/**
+ * 手の検出モデルの作成と管理を行うモジュール
+ * TensorFlow.jsのMediaPipeHandsモデルを使用
+ */
+
 import {
   createDetector as realCreateDetector,
   SupportedModels,
   HandDetector,
 } from '@tensorflow-models/hand-pose-detection';
 
-// デフォルト設定
+/**
+ * デフォルトの検出器設定
+ * @type {{runtime: 'tfjs', modelType: 'full'}}
+ */
 const defaultConfig = {
   runtime: 'tfjs' as const,
   modelType: 'full' as const,
 };
 
 /**
- * 依存注入用の内部変数。初期値は本物の createDetector
+ * 依存注入用の内部変数
+ * @type {typeof realCreateDetector}
  */
 let _createDetector = realCreateDetector;
 
 /**
- * getter関数: 外部から現在の createDetector を取得する
+ * 現在の検出器作成関数を取得する
+ * @returns {typeof realCreateDetector} 現在の検出器作成関数
  */
 export function getCreateDetector(): typeof realCreateDetector {
   return _createDetector;
 }
 
 /**
- * setter関数: テスト時などにモック版 createDetector を差し替える
+ * 検出器作成関数を設定する（主にテスト用）
+ * @param {typeof realCreateDetector} fn - 設定する検出器作成関数
  */
 export function setCreateDetector(fn: typeof realCreateDetector) {
   _createDetector = fn;
 }
 
 /**
- * 実際にモデルを取得する関数
- * app.ts からはこれを呼ぶだけ
+ * MediaPipeHandsモデルを使用して手の検出器を作成する
+ * @returns {Promise<HandDetector>} 作成された手の検出器
  */
 export async function createHandDetector(): Promise<HandDetector> {
   const detector = await getCreateDetector()(

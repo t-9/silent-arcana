@@ -14,6 +14,10 @@ import {
   playGameOverSound,
 } from './soundService';
 
+/**
+ * ゲームのUI操作とイベントハンドリングを管理するモジュール
+ */
+
 // windowオブジェクトの型を拡張
 declare global {
   interface Window {
@@ -27,7 +31,8 @@ let timeRemaining: number;
 let sandParticles: HTMLElement[] = [];
 
 /**
- * 砂時計の初期化と開始を行う共通関数
+ * 砂時計のアニメーションを初期化する
+ * @param {HTMLElement} timerDisplay - タイマー表示要素
  */
 function initializeHourglass(timerDisplay: HTMLElement) {
   const hourglass = timerDisplay.querySelector('.hourglass') as HTMLElement;
@@ -71,7 +76,8 @@ function initializeHourglass(timerDisplay: HTMLElement) {
 }
 
 /**
- * スコアの更新を行う共通関数
+ * ゲームスコアを更新する
+ * @param {number} score - 更新するスコア
  */
 function updateGameScore(score: number) {
   updateScore(score);
@@ -81,7 +87,7 @@ function updateGameScore(score: number) {
 }
 
 /**
- * 次のジェスチャーを設定する共通関数
+ * 次のジェスチャーを設定し、UIを更新する
  */
 export function setNextGesture() {
   const gestures = getGestures();
@@ -101,7 +107,8 @@ export function setNextGesture() {
 }
 
 /**
- * ゲーム終了時のダイアログを表示
+ * ゲームオーバーダイアログを表示する
+ * @param {number} score - 最終スコア
  */
 export function showGameOverDialog(score: number) {
   const overlay = document.querySelector('.dialog-overlay') as HTMLElement;
@@ -158,7 +165,12 @@ export function showGameOverDialog(score: number) {
 }
 
 /**
- * ゲームのUIを設定し、開始ボタンの動作を実装
+ * ゲームのUIコンポーネントを初期化し、イベントリスナーを設定する
+ * @param {HTMLElement} startGameBtn - ゲーム開始ボタン
+ * @param {HTMLElement} scoreDisplay - スコア表示要素
+ * @param {HTMLElement} gestureDisplay - ジェスチャー表示要素
+ * @param {HTMLElement} timerDisplay - タイマー表示要素
+ * @param {Gesture[]} gestures - 利用可能なジェスチャーの配列
  */
 export function setupGameUI(
   startGameBtn: HTMLElement,
@@ -188,7 +200,9 @@ export function setupGameUI(
 }
 
 /**
- * UIのスコアやジェスチャー表示を更新
+ * ゲームのUI要素を更新する
+ * @param {HTMLElement} scoreDisplay - スコア表示要素
+ * @param {HTMLElement} gestureDisplay - ジェスチャー表示要素
  */
 export function updateGameUI(
   scoreDisplay: HTMLElement,
@@ -220,7 +234,9 @@ export function updateGameUI(
 }
 
 /**
- * 手話の検出を処理 (ゲーム中はこちらを呼ぶ)
+ * 検出されたランドマークに基づいてジェスチャーを判定する
+ * @param {number[][]} landmarks - 検出された手のランドマーク座標
+ * @returns {Promise<void>}
  */
 export async function handleGestureDetection(
   landmarks: number[][],
@@ -236,6 +252,9 @@ export async function handleGestureDetection(
   }
 }
 
+/**
+ * ジェスチャーが正しく認識された時の処理を行う
+ */
 export function handleGestureSuccess(): void {
   const state = getGameState();
   if (!state.isRunning) return;
@@ -245,7 +264,8 @@ export function handleGestureSuccess(): void {
 }
 
 /**
- * タイマーを開始する関数
+ * ゲームタイマーを開始する
+ * @param {HTMLElement} timerDisplay - タイマー表示要素
  */
 export function startTimer(timerDisplay: HTMLElement) {
   const hourglassTopSand = timerDisplay.querySelector(
@@ -287,7 +307,8 @@ export function startTimer(timerDisplay: HTMLElement) {
 }
 
 /**
- * 砂粒子を追加する関数
+ * 砂時計のアニメーションに砂粒子を追加する
+ * @param {HTMLElement} timerDisplay - タイマー表示要素
  */
 function addSandParticle(timerDisplay: HTMLElement) {
   const particle = document.createElement('div');

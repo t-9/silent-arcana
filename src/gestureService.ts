@@ -1,4 +1,15 @@
 // src/gestureService.ts
+
+/**
+ * ジェスチャー認識に関連する型定義とユーティリティ関数を提供するモジュール
+ */
+
+/**
+ * ジェスチャーを表すインターフェース
+ * @interface Gesture
+ * @property {string} name - ジェスチャーの名前
+ * @property {number[][]} landmarks - ジェスチャーを構成する座標点の配列
+ */
 export interface Gesture {
   name: string;
   landmarks: number[][];
@@ -6,6 +17,12 @@ export interface Gesture {
 
 let gestures: Gesture[] = [];
 
+/**
+ * 指定されたURLからジェスチャーデータを読み込む
+ * @param {string} url - ジェスチャーデータのJSON URLパス
+ * @returns {Promise<Gesture[]>} 読み込まれたジェスチャーデータの配列
+ * @throws {Error} データの読み込みに失敗した場合
+ */
 export async function loadGestureData(
   url: string = './templates/normalizedGestures.json',
 ): Promise<Gesture[]> {
@@ -20,12 +37,19 @@ export async function loadGestureData(
   }
 }
 
+/**
+ * 現在読み込まれているジェスチャーデータを取得する
+ * @returns {Gesture[]} ジェスチャーデータの配列
+ */
 export function getGestures(): Gesture[] {
   return gestures;
 }
 
 /**
- * 2つの landmarks 配列のユークリッド距離を合計して返す
+ * 2つのランドマーク配列間のユークリッド距離を計算する
+ * @param {number[][]} ptsA - 比較する最初のランドマーク配列
+ * @param {number[][]} ptsB - 比較する2番目のランドマーク配列
+ * @returns {number} 2つの配列間の総ユークリッド距離
  */
 function calcDistance(ptsA: number[][], ptsB: number[][]): number {
   let sum = 0;
@@ -38,8 +62,11 @@ function calcDistance(ptsA: number[][], ptsB: number[][]): number {
 }
 
 /**
- * 推定された手と、あらかじめ用意したジェスチャー一覧を比較し、
- * 最も近いジェスチャーの name を返す。
+ * 入力されたキーポイントに最も近いジェスチャーを検出する
+ * @param {number[][]} keypoints - 検出された手のキーポイント配列
+ * @param {Gesture[]} gestures - 比較対象のジェスチャーデータ配列
+ * @param {number} distanceThreshold - ジェスチャーとして認識する最大距離の閾値
+ * @returns {string | null} 検出されたジェスチャーの名前、または検出失敗時はnull
  */
 export function detectGesture(
   keypoints: number[][],

@@ -1,6 +1,17 @@
 // src/cameraService.ts
 import { getGetUserMedia } from './cameraModule';
 
+/**
+ * カメラの起動と管理を行うモジュール
+ */
+
+/**
+ * カメラを起動し、ビデオ要素にストリームを設定する
+ * @param {HTMLVideoElement} videoEl - カメラ映像を表示するビデオ要素
+ * @param {function} setLoading - ローディング状態を更新するコールバック関数
+ * @returns {Promise<void>} カメラの起動が完了したことを示すPromise
+ * @throws {Error} カメラの起動に失敗した場合、タイムアウトした場合、またはビデオ解像度が不正な場合
+ */
 export async function startCamera(
   videoEl: HTMLVideoElement,
   setLoading: (text: string | boolean) => void,

@@ -1,4 +1,8 @@
 // src/logic.ts
+/**
+ * 手の検出とジェスチャー認識に関する主要なロジックを提供するモジュール
+ */
+
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
 import {
   getGestures,
@@ -9,7 +13,9 @@ import {
 import { detectGesture } from './gestureService';
 
 /**
- * 推定結果から表示用の文字列を作る純粋関数
+ * 検出された手の情報から表示用メッセージを生成する
+ * @param {Hand[]} hands - 検出された手の配列
+ * @returns {string} 手の検出状態を示すメッセージ
  */
 export function handsToMessage(hands: Hand[]): string {
   if (!hands || hands.length === 0) {
@@ -19,9 +25,10 @@ export function handsToMessage(hands: Hand[]): string {
 }
 
 /**
- * 推論を一度だけ実行し、テキストを返す関数
- * - detector: 依存注入 (本物 or モック)
- * - video: カメラ映像を受け取るHTMLVideoElement (本物 or モック)
+ * カメラ映像から1フレームの手の検出を実行する
+ * @param {HandDetector} detector - TensorFlow.jsの手検出モデル
+ * @param {HTMLVideoElement} video - カメラ映像を表示するビデオ要素
+ * @returns {Promise<string>} 検出結果を示すメッセージ
  */
 export async function detectHandsOnce(
   detector: HandDetector,
@@ -89,9 +96,9 @@ const KEYPOINT_ORDER = [
 ];
 
 /**
- * 推定結果 keypoints: {x, y, name} の配列を
- * dummyGestures と同じ [ [x, y], ..., [x, y] ] の形に変換し、
- * かつ keypoint の順序 (KEYPOINT_ORDER) を揃えて返す
+ * 検出されたキーポイントを配列形式に変換する
+ * @param {Array<{x: number, y: number, name?: string}>} detectedKeypoints - 検出されたキーポイント
+ * @returns {number[][]} 変換された座標配列
  */
 export function convertHandKeypointsToArray(
   detectedKeypoints: { x: number; y: number; name?: string }[],
@@ -113,6 +120,8 @@ export function convertHandKeypointsToArray(
 
 /**
  * キーポイントを相対座標に変換する
+ * @param {Array<{x: number, y: number, name?: string}>} keypoints - 変換するキーポイント
+ * @returns {number[][]} 相対座標に変換されたキーポイント配列
  */
 export function toRelativeLandmarks(
   keypoints: { x: number; y: number; name?: string }[],

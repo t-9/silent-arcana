@@ -1,9 +1,15 @@
 // src/eventHandlers.ts
+/**
+ * アプリケーションのイベントハンドラを管理するモジュール
+ */
+
 import { getDetector } from './modelService';
 import { detectHandsOnce } from './logic';
 
 /**
- * キーボードイベントのセットアップ
+ * キーボードイベントのリスナーを設定する
+ * @param {HTMLVideoElement} videoEl - カメラ映像を表示するビデオ要素
+ * @description 'c'キーを押下すると手の検出を実行する
  */
 export function setupKeyboardEvents(videoEl: HTMLVideoElement): void {
   document.addEventListener('keydown', async (event) => {
