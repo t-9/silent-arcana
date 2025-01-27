@@ -1,3 +1,8 @@
+/**
+ * アプリケーションのメインモジュール
+ * TensorFlow.js、カメラ、UI、ゲームロジックの初期化を行う
+ */
+
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import { loadModel, startDetection, detectLoop } from './modelService';
@@ -9,6 +14,20 @@ import { setupGameUI } from './gameHandlers';
 import { loadGestureData } from './gestureService';
 import { preloadSounds } from './soundService';
 
+/**
+ * アプリケーションの初期化を行う
+ * @returns {Promise<void>} 初期化の完了を示すPromise
+ * @throws {Error} DOM要素が見つからない場合、またはゲームUI要素が見つからない場合
+ * @description
+ * 以下の初期化を順番に実行:
+ * 1. TensorFlow.jsの初期化
+ * 2. DOM要素の取得と検証
+ * 3. サウンドファイルのプリロード
+ * 4. 手検出モデルの読み込み
+ * 5. ジェスチャーデータの読み込み
+ * 6. カメラの起動
+ * 7. UIイベントハンドラの設定
+ */
 export async function init(): Promise<void> {
   // TensorFlowの初期化
   await tf.setBackend('webgl');

@@ -1,8 +1,15 @@
 // src/cameraModule.ts
 
 /**
- * 依存注入用の getUserMedia 関数。
- * 本番では navigator.mediaDevices.getUserMedia を使うが、テスト時には差し替え可能。
+ * カメラのメディアストリーム取得機能を管理するモジュール
+ * 依存性注入パターンを使用してテスト可能な設計を提供
+ */
+
+/**
+ * メディアストリームを取得する関数
+ * @param {MediaStreamConstraints} constraints - メディアストリームの制約条件
+ * @returns {Promise<MediaStream>} 取得したメディアストリーム
+ * @private
  */
 let _getUserMedia = async (
   constraints: MediaStreamConstraints,
@@ -28,14 +35,16 @@ let _getUserMedia = async (
 };
 
 /**
- * getter: 外部から現在の getUserMedia 関数を取得
+ * 現在のメディアストリーム取得関数を返す
+ * @returns {function} メディアストリーム取得関数
  */
 export function getGetUserMedia() {
   return _getUserMedia;
 }
 
 /**
- * setter: テスト時などにモック版 getUserMedia を差し替える
+ * メディアストリーム取得関数を設定する（主にテスト用）
+ * @param {function} fn - 設定するメディアストリーム取得関数
  */
 export function setGetUserMedia(fn: typeof _getUserMedia) {
   _getUserMedia = fn;
