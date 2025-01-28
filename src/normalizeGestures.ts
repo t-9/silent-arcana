@@ -1,15 +1,27 @@
 // src/normalizeGestures.ts
+/**
+ * ジェスチャーデータの正規化に関する機能を提供するモジュール
+ */
+
 import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 import { toRelativeLandmarks } from './logic'; // 正規化関数をインポート
 
+/**
+ * ジェスチャーの基本情報を表すインターフェース
+ */
 interface Gesture {
+  /** ジェスチャーの名前 */
   name: string;
+  /** ジェスチャーのランドマーク座標の配列（[x, y]の配列） */
   landmarks: [number, number][];
 }
 
-// logic.ts と同じ順序でキーポイント名を定義
+/**
+ * 手のキーポイントの順序を定義する配列
+ * logic.ts と同じ順序で定義されている
+ */
 const KEYPOINT_ORDER = [
   'wrist',
   'thumb_cmc',
@@ -38,24 +50,34 @@ const KEYPOINT_ORDER = [
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// パスの解決
+/** ダミーのジェスチャーデータファイルのパス */
 const dummyGesturesPath = resolve(
   __dirname,
   '../public/templates/dummyGestures.json',
 );
+
+/** 正規化されたジェスチャーデータファイルのパス */
 const normalizedGesturesPath = resolve(
   __dirname,
   '../public/templates/normalizedGestures.json',
 );
 
+/**
+ * 3次元空間上のキーポイントを表すインターフェース
+ */
 interface Keypoint {
+  /** X座標 */
   x: number;
+  /** Y座標 */
   y: number;
+  /** Z座標 */
   z: number;
 }
 
 /**
- * キーポイントを正規化する関数
+ * キーポイントの配列を正規化する
+ * @param {Keypoint[]} keypoints - 正規化するキーポイントの配列
+ * @returns {number[][]} 手首を基準とした相対座標の配列
  */
 export function normalizeKeypoints(keypoints: Keypoint[]): number[][] {
   if (!keypoints || keypoints.length === 0) {
@@ -76,6 +98,11 @@ export function normalizeKeypoints(keypoints: Keypoint[]): number[][] {
   ]);
 }
 
+/**
+ * ジェスチャーデータを正規化してファイルに保存する
+ * @param {string} [srcPath] - 入力ジェスチャーデータファイルのパス
+ * @param {string} [dstPath] - 出力ジェスチャーデータファイルのパス
+ */
 export function normalizeGestures(
   srcPath: string = dummyGesturesPath,
   dstPath: string = normalizedGesturesPath,
