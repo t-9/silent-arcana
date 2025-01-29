@@ -197,7 +197,9 @@ describe('modelService', () => {
 
       // handsが検出されるモック → loadedGestures.length === 0 → 該当の分岐を通る
       expect(mockDetector.estimateHands).toHaveBeenCalledWith(mockVideoEl);
-      expect(mockMessageEl.textContent).toBe('手話データが読み込まれていません');
+      expect(mockMessageEl.textContent).toBe(
+        '手話データが読み込まれていません',
+      );
     });
   });
 
