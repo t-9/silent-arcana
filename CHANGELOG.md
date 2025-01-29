@@ -1,3 +1,10 @@
+## [1.4.24](https://github.com/t-9/silent-arcana/compare/v1.4.23...v1.4.24) (2025-01-29)
+
+
+### Bug Fixes
+
+* skipIf(process.env.CI)を外してみる ([4ae533b](https://github.com/t-9/silent-arcana/commit/4ae533b383586ddf4c96843ca41c96626a482b19))
+
 ## [1.4.23](https://github.com/t-9/silent-arcana/compare/v1.4.22...v1.4.23) (2025-01-29)
 
 
