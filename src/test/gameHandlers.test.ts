@@ -27,7 +27,7 @@ import { detectGesture, getGestures } from '../gestureService';
 import { GameConfig } from '../config';
 import * as gameService from '../gameService';
 import * as gestureService from '../gestureService';
-import { playCardChangeSound, playGameOverSound } from '../soundService';
+import { playCardChangeSound, playGameOverSound, playStartGameSound } from '../soundService';
 
 // モック
 vi.mock('../gameService', () => ({
@@ -408,7 +408,7 @@ describe('gameHandlers', () => {
       vi.spyOn(gameService, 'getGameState').mockReturnValue(mockState);
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // UIの更新を実行
@@ -442,7 +442,7 @@ describe('gameHandlers', () => {
       // (4) console.error をスパイ
       const consoleErrorSpy = vi
         .spyOn(console, 'error')
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
 
       // (5) 実行
       setNextGesture();
@@ -469,7 +469,7 @@ describe('gameHandlers', () => {
       // 2) console.error をスパイ
       const consoleErrorSpy = vi
         .spyOn(console, 'error')
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
 
       // 3) showGameOverDialog() を呼ぶと内部で playGameOverSound() → 失敗→ catch(...)予想
       showGameOverDialog(999);
@@ -484,6 +484,45 @@ describe('gameHandlers', () => {
       );
 
       // 6) 後片付け
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('ゲーム開始音が失敗したら console.error が呼び出される (start button)', async () => {
+      // 1) ゲーム開始音を故意に失敗
+      vi.mocked(playStartGameSound).mockRejectedValueOnce(new Error('Test Start Error'));
+
+      // 2) console.error をスパイ
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+
+      // 3) テスト用のDOM要素（startGameBtnなど）を用意
+      const mockStartGameBtn = document.createElement('button');
+      mockStartGameBtn.id = 'start-game-btn';
+      const mockScoreDisplay = document.createElement('div');
+      const mockGestureDisplay = document.createElement('div');
+      const mockTimerDisplay = document.createElement('div');
+
+      // 4) setupGameUI() でイベントを仕込む
+      setupGameUI(
+        mockStartGameBtn,
+        mockScoreDisplay,
+        mockGestureDisplay,
+        mockTimerDisplay,
+        [],
+      );
+
+      // 5) ボタンをクリック → 内部で playStartGameSound() → 失敗 → catch(...) 予想
+      mockStartGameBtn.click();
+
+      // 6) 非同期完了を待つ
+      await Promise.resolve();
+
+      // 7) console.error の呼び出しを確認
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'ゲーム開始音の再生に失敗しました:',
+        expect.any(Error),
+      );
+
+      // 8) 後片付け
       consoleErrorSpy.mockRestore();
     });
   });
@@ -634,7 +673,7 @@ describe('gameHandlers', () => {
       });
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // gesture-displayを削除
@@ -670,7 +709,7 @@ describe('gameHandlers', () => {
       });
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // gesture-displayは存在するが、gesture-nameは存在しない状態を作成
@@ -790,7 +829,7 @@ describe('gameHandlers', () => {
 
       // window.updateScoreを空の関数に設定
       const originalUpdateScore = window.updateScore;
-      window.updateScore = () => {};
+      window.updateScore = () => { };
 
       handleGestureSuccess();
 
@@ -816,7 +855,7 @@ describe('gameHandlers', () => {
 
       // window.updateScoreを空の関数に設定
       const originalUpdateScore = window.updateScore;
-      window.updateScore = () => {};
+      window.updateScore = () => { };
 
       handleGestureSuccess();
 
@@ -846,7 +885,7 @@ describe('gameHandlers', () => {
       });
 
       // window.updateScoreを空の関数として設定
-      window.updateScore = () => {};
+      window.updateScore = () => { };
       const mockUpdateScore = vi.spyOn(window, 'updateScore');
 
       // gesture-displayを削除
