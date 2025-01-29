@@ -1,3 +1,10 @@
+## [1.4.23](https://github.com/t-9/silent-arcana/compare/v1.4.22...v1.4.23) (2025-01-29)
+
+
+### Bug Fixes
+
+* cameraディレクトリ作成 ([aedbd35](https://github.com/t-9/silent-arcana/commit/aedbd3574c48affafbcdcd8e95624b922b2e6fe3))
+
 ## [1.4.22](https://github.com/t-9/silent-arcana/compare/v1.4.21...v1.4.22) (2025-01-25)
 
 
