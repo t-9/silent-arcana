@@ -23,10 +23,11 @@ import {
   selectNextGesture,
   getGameState,
 } from '../gameService';
-import { detectGesture } from '../gestureService';
+import { detectGesture, getGestures } from '../gestureService';
 import { GameConfig } from '../config';
 import * as gameService from '../gameService';
 import * as gestureService from '../gestureService';
+import { playCardChangeSound } from '../soundService';
 
 // モック
 vi.mock('../gameService', () => ({
@@ -416,6 +417,47 @@ describe('gameHandlers', () => {
       // 検証
       expect(mockScoreDisplay.textContent).toBe('スコア: 10');
       expect(mockUpdateScore).not.toHaveBeenCalled();
+    });
+
+    it('カード切り替え音が失敗したら console.error が呼び出される', async () => {
+      // (1) DOMを整備
+      document.body.innerHTML = `
+        <div id="gesture-display">
+          <div class="gesture-name"></div>
+        </div>
+      `;
+
+      // (2) getGestures / selectNextGesture が返す値を指定
+      vi.mocked(getGestures).mockReturnValue([
+        { name: 'test1', landmarks: [[0, 0]] },
+      ]);
+      vi.mocked(selectNextGesture).mockReturnValue({
+        name: 'test1',
+        landmarks: [[0, 0]],
+      });
+
+      // (3) サウンドを故意に reject
+      vi.mocked(playCardChangeSound).mockRejectedValue(new Error('Test Error'));
+
+      // (4) console.error をスパイ
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      // (5) 実行
+      setNextGesture();
+
+      // (6) 非同期完了を待つ
+      await Promise.resolve();
+
+      // (7) 実行結果を検証
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'カード切り替え音の再生に失敗しました:',
+        expect.any(Error),
+      );
+
+      // (8) 後片付け
+      consoleErrorSpy.mockRestore();
     });
   });
 
