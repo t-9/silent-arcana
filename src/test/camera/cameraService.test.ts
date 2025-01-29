@@ -1,9 +1,8 @@
-// src/test/cameraService.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { startCamera } from '../cameraService';
-import * as cameraModule from '../cameraModule';
+import { startCamera } from '../../camera/cameraService';
+import * as cameraModule from '../../camera/cameraModule';
 
-vi.mock('../cameraModule');
+vi.mock('../../camera/cameraModule');
 
 describe('cameraService', () => {
   const mockVideoEl = {
@@ -72,27 +71,19 @@ describe('cameraService', () => {
   });
 
   it.skipIf(process.env.CI)('should handle metadata load timeout', async () => {
-    const mockVideo = document.createElement('video');
-    const mockSetLoading = vi.fn();
+    const mockStream = { id: 'test-stream' };
+    mockGetUserMedia.mockResolvedValue(mockStream);
 
-    // メタデータロードイベントを発火しないようにする
-    vi.useFakeTimers();
+    const promise = startCamera(mockVideoEl, mockSetLoading);
 
-    try {
-      const promise = startCamera(mockVideo, mockSetLoading);
-      await vi.advanceTimersByTimeAsync(5000);
-      await promise;
-      // startCameraが成功した場合はテストを失敗させる
-      expect(true).toBe(false);
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        expect(error.message).toBe('カメラの起動がタイムアウトしました');
-        expect(mockSetLoading).toHaveBeenCalledWith(false);
-      } else {
-        throw error;
-      }
-    } finally {
-      vi.useRealTimers();
-    }
+    // いったん未処理のままにしないために catch だけしておく
+    promise.catch(() => {
+      /* 何もしない */
+    });
+
+    await vi.advanceTimersByTimeAsync(6000);
+
+    await expect(promise).rejects.toThrow('カメラの起動がタイムアウトしました');
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
   });
 });
