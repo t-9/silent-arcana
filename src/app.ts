@@ -9,7 +9,7 @@ import { loadModel, startDetection, detectLoop } from './modelService';
 import { getElement } from './domUtils';
 import { setupKeyboardEvents } from './eventHandlers';
 import { setLoadingText } from './uiUtils';
-import { startCamera } from './cameraService';
+import { startCamera } from './camera/cameraService';
 import { setupGameUI } from './gameHandlers';
 import { loadGestureData } from './gestureService';
 import { preloadSounds } from './soundService';

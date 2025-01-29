@@ -5,7 +5,7 @@ import { init } from '../app';
 import { loadModel, startDetection, detectLoop } from '../modelService';
 import { getElement } from '../domUtils';
 import { setupKeyboardEvents } from '../eventHandlers';
-import { startCamera } from '../cameraService';
+import { startCamera } from '../camera/cameraService';
 import { setupGameUI } from '../gameHandlers';
 import { loadGestureData } from '../gestureService';
 import { preloadSounds } from '../soundService';
@@ -115,7 +115,7 @@ vi.mock('../domUtils', () => ({
 }));
 vi.mock('../eventHandlers');
 vi.mock('../uiUtils');
-vi.mock('../cameraService');
+vi.mock('../camera/cameraService');
 vi.mock('../gameHandlers');
 vi.mock('../gestureService');
 vi.mock('../soundService');

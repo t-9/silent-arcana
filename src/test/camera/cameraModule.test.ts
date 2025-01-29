@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getGetUserMedia, setGetUserMedia } from '../cameraModule';
+import { getGetUserMedia, setGetUserMedia } from '../../camera/cameraModule';
 
 describe('cameraModule', () => {
   it('should use default constraints when none provided', async () => {
