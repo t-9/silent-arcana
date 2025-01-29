@@ -49,7 +49,8 @@ export async function loadModel(
         loadedGestures.push(...gestures); // 新しいデータを追加
         console.log('ジェスチャーデータ読み込み完了:', loadedGestures);
       } else {
-        throw new Error('ジェスチャーデータが空です');
+        loadedGestures.length = 0;
+        console.warn('ジェスチャーデータが空です');
       }
     } catch (e) {
       console.error('ジェスチャーデータの読み込みに失敗:', e);

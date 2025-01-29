@@ -67,6 +67,7 @@ describe('modelService', () => {
 
     // requestAnimationFrameのモック
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      // 即座にコールバックを実行する
       cb(0);
       return 0;
     });
@@ -180,6 +181,23 @@ describe('modelService', () => {
 
       expect(mockMessageEl.textContent).toBe('ビデオの初期化に失敗しました');
       expect(window.requestAnimationFrame).toHaveBeenCalled();
+    });
+
+    //
+    // ★ ここから追加テスト (行 106-107 のカバレッジを取得) ★
+    //
+    it('should show "手話データが読み込まれていません" if gestures are not loaded when hands are detected', async () => {
+      // まず stopDetection + モデルを再読み込みして loadedGestures を空にする
+      stopDetection();
+      (loadGestureData as Mock).mockResolvedValue([]); // 空配列にモック変更
+      await loadModel(mockSetLoading); // ここでloadedGesturesが空になる
+      startDetection();
+
+      await detectLoop(mockVideoEl, mockMessageEl);
+
+      // handsが検出されるモック → loadedGestures.length === 0 → 該当の分岐を通る
+      expect(mockDetector.estimateHands).toHaveBeenCalledWith(mockVideoEl);
+      expect(mockMessageEl.textContent).toBe('手話データが読み込まれていません');
     });
   });
 
