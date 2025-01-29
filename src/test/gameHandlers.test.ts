@@ -27,7 +27,7 @@ import { detectGesture, getGestures } from '../gestureService';
 import { GameConfig } from '../config';
 import * as gameService from '../gameService';
 import * as gestureService from '../gestureService';
-import { playCardChangeSound } from '../soundService';
+import { playCardChangeSound, playGameOverSound } from '../soundService';
 
 // モック
 vi.mock('../gameService', () => ({
@@ -457,6 +457,33 @@ describe('gameHandlers', () => {
       );
 
       // (8) 後片付け
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('ゲーム終了音が失敗したら console.error が呼び出される', async () => {
+      // 1) サウンド再生を故意に失敗
+      vi.mocked(playGameOverSound).mockRejectedValueOnce(
+        new Error('Test GameOver Error'),
+      );
+
+      // 2) console.error をスパイ
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      // 3) showGameOverDialog() を呼ぶと内部で playGameOverSound() → 失敗→ catch(...)予想
+      showGameOverDialog(999);
+
+      // 4) 非同期完了を待つ
+      await Promise.resolve();
+
+      // 5) console.error の呼び出しを検証
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'ゲーム終了音の再生に失敗しました:',
+        expect.any(Error),
+      );
+
+      // 6) 後片付け
       consoleErrorSpy.mockRestore();
     });
   });
