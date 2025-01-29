@@ -73,9 +73,7 @@ async function handleGameDetection(
   videoEl: HTMLVideoElement,
   messageEl: HTMLElement,
 ): Promise<void> {
-  if (!detector) return;
-
-  const hands = await detector.estimateHands(videoEl);
+  const hands = await detector?.estimateHands(videoEl);
   if (hands && hands.length > 0) {
     const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
     await handleGestureDetection(normalizedKeypoints);
@@ -91,9 +89,7 @@ async function handleNonGameDetection(
   videoEl: HTMLVideoElement,
   messageEl: HTMLElement,
 ): Promise<void> {
-  if (!detector) return;
-
-  const hands = await detector.estimateHands(videoEl);
+  const hands = await detector?.estimateHands(videoEl);
   if (hands && hands.length > 0) {
     const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
     if (loadedGestures.length > 0) {
