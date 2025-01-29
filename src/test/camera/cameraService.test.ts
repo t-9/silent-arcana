@@ -86,4 +86,56 @@ describe('cameraService', () => {
     await expect(promise).rejects.toThrow('カメラの起動がタイムアウトしました');
     expect(mockSetLoading).toHaveBeenCalledWith(false);
   });
+
+  it('should handle video error event', async () => {
+    const mockStream = { id: 'test-stream' };
+    mockGetUserMedia.mockResolvedValue(mockStream);
+
+    const promise = startCamera(mockVideoEl, mockSetLoading);
+
+    // getUserMediaの結果を待つ
+    await vi.advanceTimersByTimeAsync(100);
+
+    // getUserMediaが成功したことを確認
+    expect(mockVideoEl.srcObject).toBe(mockStream);
+
+    // エラーイベントをシミュレート
+    if (mockVideoEl.onerror) {
+      mockVideoEl.onerror(new Event('error'));
+    }
+
+    await expect(promise).rejects.toThrow('カメラ使用許可が必要です');
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
+  });
+
+  it('should handle invalid video dimensions', async () => {
+    const mockStream = { id: 'test-stream' };
+    mockGetUserMedia.mockResolvedValue(mockStream);
+
+    const invalidVideoEl = {
+      ...mockVideoEl,
+      videoWidth: 0,
+      videoHeight: 0,
+      onloadedmetadata: null,
+      onerror: null,
+      srcObject: null,
+      play: vi.fn().mockResolvedValue(undefined),
+    } as unknown as HTMLVideoElement;
+
+    const promise = startCamera(invalidVideoEl, mockSetLoading);
+
+    // getUserMediaの結果を待つ
+    await vi.advanceTimersByTimeAsync(100);
+
+    // getUserMediaが成功したことを確認
+    expect(invalidVideoEl.srcObject).toBe(mockStream);
+
+    // メタデータロードイベントをシミュレート
+    if (invalidVideoEl.onloadedmetadata) {
+      invalidVideoEl.onloadedmetadata({} as Event);
+    }
+
+    await expect(promise).rejects.toThrow('カメラ使用許可が必要です');
+    expect(mockSetLoading).toHaveBeenCalledWith(false);
+  });
 });
