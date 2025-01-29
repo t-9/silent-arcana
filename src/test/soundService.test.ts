@@ -31,13 +31,18 @@ describe('soundService', () => {
       load: vi.fn().mockResolvedValue(undefined),
       currentTime: 0,
     };
-    vi.spyOn(window, 'Audio').mockImplementation(
-      () => audioMock as unknown as HTMLAudioElement,
-    );
+
+    // window.Audioのモックを作成
+    const audioConstructorMock = vi.fn().mockImplementation(() => audioMock);
+    vi.stubGlobal('Audio', audioConstructorMock);
+
+    // プリロードされた音声をクリア
+    preloadedSounds.clear();
   });
 
   afterEach(() => {
     vi.clearAllMocks();
+    vi.unstubAllGlobals();
   });
 
   describe('preloadSounds', () => {
@@ -48,14 +53,23 @@ describe('soundService', () => {
     });
 
     it('should handle preload error', async () => {
-      audioMock.load.mockRejectedValue(new Error('Failed to load audio'));
+      // Audio#load を失敗させ、同期的に throw するようにする
+      const error = new Error('Failed to load audio');
+      audioMock.load.mockImplementation(() => {
+        throw error; // これが同期的に発生する
+      });
 
-      try {
-        await preloadSounds();
-      } catch (error) {
-        // エラーは期待通り
-        expect(error).toBeInstanceOf(Error);
-      }
+      // console.error をスパイ
+      const consoleSpy = vi.spyOn(console, 'error');
+
+      // preloadSounds が例外を投げることを検証
+      await expect(preloadSounds()).rejects.toThrow('Failed to load audio');
+
+      // console.error が正しく呼ばれたことを検証
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'サウンドのプリロードに失敗しました:',
+        error,
+      );
     });
   });
 
@@ -98,15 +112,15 @@ describe('soundService', () => {
   });
 
   describe('playStartGameSound', () => {
-    let audioMock: { play: Mock; currentTime: number };
+    let audioMockLocal: { play: Mock; currentTime: number };
 
     beforeEach(() => {
-      audioMock = {
+      audioMockLocal = {
         play: vi.fn().mockResolvedValue(undefined),
         currentTime: 1,
       };
       vi.spyOn(window, 'Audio').mockImplementation(
-        () => audioMock as unknown as HTMLAudioElement,
+        () => audioMockLocal as unknown as HTMLAudioElement,
       );
       preloadedSounds.clear();
     });
@@ -114,7 +128,7 @@ describe('soundService', () => {
     it('should play start game sound when not preloaded', async () => {
       await playStartGameSound();
       expect(window.Audio).toHaveBeenCalledWith(SoundEffects.START_GAME);
-      expect(audioMock.play).toHaveBeenCalled();
+      expect(audioMockLocal.play).toHaveBeenCalled();
     });
 
     it('should reuse preloaded audio', async () => {
@@ -135,7 +149,7 @@ describe('soundService', () => {
 
     it('should handle playback error', async () => {
       const error = new Error('rejected promise');
-      audioMock.play.mockRejectedValue(error);
+      audioMockLocal.play.mockRejectedValue(error);
       const consoleSpy = vi.spyOn(console, 'error');
 
       await expect(playStartGameSound()).rejects.toThrow(error);
