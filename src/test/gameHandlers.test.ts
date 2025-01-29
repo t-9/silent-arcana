@@ -503,11 +503,32 @@ describe('gameHandlers', () => {
         .mockImplementation(() => {});
 
       // 3) テスト用のDOM要素（startGameBtnなど）を用意
+
+      // (3-1) 必要な要素を作る
       const mockStartGameBtn = document.createElement('button');
       mockStartGameBtn.id = 'start-game-btn';
+
       const mockScoreDisplay = document.createElement('div');
       const mockGestureDisplay = document.createElement('div');
       const mockTimerDisplay = document.createElement('div');
+
+      // (3-2) 砂時計の構造を組み立てて mockTimerDisplay に入れる
+      const hourglass = document.createElement('div');
+      hourglass.className = 'hourglass';
+      const hourglassTop = document.createElement('div');
+      hourglassTop.className = 'hourglass-top';
+      const hourglassBottom = document.createElement('div');
+      hourglassBottom.className = 'hourglass-bottom';
+      const hourglassTopSand = document.createElement('div');
+      hourglassTopSand.className = 'sand';
+      const hourglassBottomSand = document.createElement('div');
+      hourglassBottomSand.className = 'sand';
+
+      hourglassTop.appendChild(hourglassTopSand);
+      hourglassBottom.appendChild(hourglassBottomSand);
+      hourglass.appendChild(hourglassTop);
+      hourglass.appendChild(hourglassBottom);
+      mockTimerDisplay.appendChild(hourglass);
 
       // 4) setupGameUI() でイベントを仕込む
       setupGameUI(
