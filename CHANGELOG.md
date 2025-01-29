@@ -1,3 +1,10 @@
+## [1.4.25](https://github.com/t-9/silent-arcana/compare/v1.4.24...v1.4.25) (2025-01-29)
+
+
+### Bug Fixes
+
+* soundService.test.tsのカバレッジを100%にする ([ae5f3cb](https://github.com/t-9/silent-arcana/commit/ae5f3cb44b627ef9941a0d16409c1413abda51d2))
+
 ## [1.4.24](https://github.com/t-9/silent-arcana/compare/v1.4.23...v1.4.24) (2025-01-29)
 
 
