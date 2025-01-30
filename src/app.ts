@@ -106,11 +106,18 @@ export async function init(): Promise<void> {
   }
 }
 
-// ブラウザ実行時のみ初期化
-if (
-  typeof window !== 'undefined' &&
-  process.env.NODE_ENV !== 'ci' &&
-  process.env.NODE_ENV !== 'test'
-) {
-  init();
+// グローバルに公開するための型定義
+declare global {
+  interface Window {
+    silentArcana: {
+      init: () => Promise<void>;
+    };
+  }
+}
+
+// グローバルオブジェクトに init 関数を追加
+if (typeof window !== 'undefined') {
+  window.silentArcana = {
+    init,
+  };
 }

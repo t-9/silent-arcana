@@ -241,6 +241,16 @@
 
   <!-- バンドル後のJS -->
   <script src="./bundle.js"></script>
+  <script>
+    // アプリケーションの初期化
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        await window.silentArcana.init();
+      } catch (error) {
+        console.error('アプリケーションの初期化に失敗しました:', error);
+      }
+    });
+  </script>
 
   <!-- クレジット -->
   <div class="credits">
