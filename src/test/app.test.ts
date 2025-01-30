@@ -282,7 +282,7 @@ describe('app', () => {
       .mockReturnValueOnce(mockTimerDisplay);
 
     // startCameraをモックし、コールバックを手動で呼ぶ
-    vi.mocked(startCamera).mockImplementation(async (video, cb) => {
+    vi.mocked(startCamera).mockImplementation(async (_video, cb) => {
       cb('カメラ起動中…');
       return;
     });
