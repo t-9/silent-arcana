@@ -301,6 +301,43 @@ describe('app', () => {
     await init();
   });
 
+  it('should handle empty gesture data (line 71-77)', async () => {
+    const mockVideo = document.createElement('video');
+    const mockLoading = document.createElement('div');
+    const mockMessage = document.createElement('div');
+    const mockStartGameBtn = document.createElement('button');
+    const mockScoreDisplay = document.createElement('div');
+    const mockGestureDisplay = document.createElement('div');
+    const mockTimerDisplay = document.createElement('div');
+
+    vi.mocked(getElement)
+      .mockReturnValueOnce(mockVideo)
+      .mockReturnValueOnce(mockLoading)
+      .mockReturnValueOnce(mockMessage)
+      .mockReturnValueOnce(mockStartGameBtn)
+      .mockReturnValueOnce(mockScoreDisplay)
+      .mockReturnValueOnce(mockGestureDisplay)
+      .mockReturnValueOnce(mockTimerDisplay);
+
+    // modelとcamera系は成功すると仮定
+    // ここが修正ポイント：型を指定
+    vi.mocked(loadModel).mockResolvedValue({
+      estimateHands: vi.fn(),
+    } as unknown as HandDetector);
+
+    vi.mocked(startCamera).mockResolvedValue(undefined);
+
+    // "空配列" を返す -> 行71-77 が通る
+    vi.mocked(loadGestureData).mockResolvedValue([]);
+
+    await expect(init()).rejects.toThrow('手話データの読み込みに失敗しました');
+
+    // console.error が呼ばれたかもチェック
+    expect(console.error).toHaveBeenCalledWith(
+      '手話データの読み込みに失敗しました',
+    );
+  });
+
   it('should handle gesture data loading failure', async () => {
     const mockVideo = document.createElement('video');
     const mockLoading = document.createElement('div');
