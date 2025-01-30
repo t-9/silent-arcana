@@ -263,6 +263,44 @@ describe('app', () => {
     await init();
   });
 
+  it('should call setLoadingText for camera start (line 81)', async () => {
+    const mockVideo = document.createElement('video');
+    const mockLoading = document.createElement('div');
+    const mockMessage = document.createElement('div');
+    const mockStartGameBtn = document.createElement('button');
+    const mockScoreDisplay = document.createElement('div');
+    const mockGestureDisplay = document.createElement('div');
+    const mockTimerDisplay = document.createElement('div');
+
+    vi.mocked(getElement)
+      .mockReturnValueOnce(mockVideo)
+      .mockReturnValueOnce(mockLoading)
+      .mockReturnValueOnce(mockMessage)
+      .mockReturnValueOnce(mockStartGameBtn)
+      .mockReturnValueOnce(mockScoreDisplay)
+      .mockReturnValueOnce(mockGestureDisplay)
+      .mockReturnValueOnce(mockTimerDisplay);
+
+    // startCameraをモックし、コールバックを手動で呼ぶ
+    vi.mocked(startCamera).mockImplementation(async (video, cb) => {
+      cb('カメラ起動中…');
+      return;
+    });
+
+    // 他モック
+    const mockHandDetector: HandDetector = {
+      estimateHands: vi.fn(),
+      // 必要なら他のプロパティやメソッドを追加
+    } as unknown as HandDetector;
+
+    vi.mocked(loadModel).mockResolvedValue(mockHandDetector);
+    vi.mocked(loadGestureData).mockResolvedValue([
+      { name: 'gesture', landmarks: [[0, 0]] },
+    ]);
+
+    await init();
+  });
+
   it('should handle gesture data loading failure', async () => {
     const mockVideo = document.createElement('video');
     const mockLoading = document.createElement('div');
