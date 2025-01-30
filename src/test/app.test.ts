@@ -305,6 +305,8 @@ describe('app', () => {
     ]);
 
     await init();
+
+    expect(setLoadingText).toHaveBeenCalledWith(mockLoading, 'カメラ起動中…');
   });
 
   it('should handle empty gesture data (line 71-77)', async () => {
