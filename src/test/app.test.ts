@@ -206,6 +206,23 @@ describe('app', () => {
     }
   });
 
+  it('should handle missing game UI elements', async () => {
+    // video, loading, message は正しく返すが…
+    const mockVideo = document.createElement('video');
+    const mockLoading = document.createElement('div');
+    const mockMessage = document.createElement('div');
+
+    vi.mocked(getElement)
+      .mockReturnValueOnce(mockVideo) // video
+      .mockReturnValueOnce(mockLoading) // loading
+      .mockReturnValueOnce(mockMessage) // message
+      // ここまではOK, だが次でゲームUI要素がnullを返す
+      .mockReturnValueOnce(null); // start-game-btnがnullになる、と仮定
+
+    await expect(init()).rejects.toThrow('ゲームUI要素が見つかりません');
+    expect(console.error).toHaveBeenCalledWith('ゲームUI要素が見つかりません');
+  });
+
   it('should handle gesture data loading failure', async () => {
     const mockVideo = document.createElement('video');
     const mockLoading = document.createElement('div');
