@@ -11,7 +11,7 @@ import { loadGestureData } from '../gestureService';
 import { preloadSounds } from '../soundService';
 import * as tf from '@tensorflow/tfjs';
 import type { Gesture } from '../types';
-
+import { setLoadingText } from '../uiUtils';
 // WebGLのモック
 const mockWebGLContext = {
   getParameter: vi.fn(),
@@ -261,6 +261,12 @@ describe('app', () => {
     vi.mocked(startCamera).mockResolvedValue(undefined);
 
     await init();
+
+    // domUtils から import している setLoadingText が mockされているはず
+    expect(setLoadingText).toHaveBeenCalledWith(
+      mockLoading,
+      'モデル読み込み中…',
+    );
   });
 
   it('should call setLoadingText for camera start (line 81)', async () => {
