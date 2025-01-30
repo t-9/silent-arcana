@@ -1,3 +1,14 @@
+## [1.4.26](https://github.com/t-9/silent-arcana/compare/v1.4.25...v1.4.26) (2025-01-30)
+
+
+### Bug Fixes
+
+* app.ts test 52-54 ([031e2af](https://github.com/t-9/silent-arcana/commit/031e2afe12b4ca9b1cc8216b40e7f86bb1a2e245))
+* cover app.ts test 65 ([2972305](https://github.com/t-9/silent-arcana/commit/29723059fc11db5f44d0bd4c5024162790149086))
+* cover app.ts test 71-77 ([7e5bc24](https://github.com/t-9/silent-arcana/commit/7e5bc2481feb09537fcf612aa79221c994191459))
+* cover app.ts test 81 ([82b9976](https://github.com/t-9/silent-arcana/commit/82b997681f14bb49c75332165fd0a11c17909779))
+* unused error ([51716e0](https://github.com/t-9/silent-arcana/commit/51716e09b3f0033f63fad230eb5a469b31e99ce1))
+
 ## [1.4.25](https://github.com/t-9/silent-arcana/compare/v1.4.24...v1.4.25) (2025-01-29)
 
 
