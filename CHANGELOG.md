@@ -1,3 +1,10 @@
+## [1.4.27](https://github.com/t-9/silent-arcana/compare/v1.4.26...v1.4.27) (2025-01-30)
+
+
+### Bug Fixes
+
+* initは実行時に呼び出す ([d3cec45](https://github.com/t-9/silent-arcana/commit/d3cec45f7e7efc8126c62146c7493d20c276cf5b))
+
 ## [1.4.26](https://github.com/t-9/silent-arcana/compare/v1.4.25...v1.4.26) (2025-01-30)
 
 
