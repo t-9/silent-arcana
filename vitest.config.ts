@@ -17,6 +17,8 @@ export default defineConfig({
         'node_modules/**',
         '**/node_modules/**',
         '**/*.test.ts',
+        'src/types.ts',
+        'src/typings/**',
         'webpack.config.js',
         'vitest.config.ts',
         'eslint.config.js',
