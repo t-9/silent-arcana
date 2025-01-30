@@ -223,6 +223,46 @@ describe('app', () => {
     expect(console.error).toHaveBeenCalledWith('ゲームUI要素が見つかりません');
   });
 
+  it('should call setLoadingText for model loading (line 65)', async () => {
+    // DOM要素準備
+    const mockVideo = document.createElement('video');
+    const mockLoading = document.createElement('div');
+    const mockMessage = document.createElement('div');
+    const mockStartGameBtn = document.createElement('button');
+    const mockScoreDisplay = document.createElement('div');
+    const mockGestureDisplay = document.createElement('div');
+    const mockTimerDisplay = document.createElement('div');
+
+    vi.mocked(getElement)
+      .mockReturnValueOnce(mockVideo)
+      .mockReturnValueOnce(mockLoading)
+      .mockReturnValueOnce(mockMessage)
+      .mockReturnValueOnce(mockStartGameBtn)
+      .mockReturnValueOnce(mockScoreDisplay)
+      .mockReturnValueOnce(mockGestureDisplay)
+      .mockReturnValueOnce(mockTimerDisplay);
+
+    vi.mocked(loadModel).mockImplementation(async (cb) => {
+      // コールバックを明示的に呼ぶ: これで line65 の setLoadingText が走る
+      cb('モデル読み込み中…');
+      // HandDetector の代わりに必要最低限のダミーオブジェクトを作る
+      const mockHandDetector: HandDetector = {
+        // 例: estimateHands など最低限必要なメソッドを定義
+        estimateHands: vi.fn(),
+      } as unknown as HandDetector;
+
+      return mockHandDetector;
+    });
+
+    // 他のモック
+    vi.mocked(loadGestureData).mockResolvedValue([
+      { name: 'gesture', landmarks: [[0, 0]] },
+    ]);
+    vi.mocked(startCamera).mockResolvedValue(undefined);
+
+    await init();
+  });
+
   it('should handle gesture data loading failure', async () => {
     const mockVideo = document.createElement('video');
     const mockLoading = document.createElement('div');
