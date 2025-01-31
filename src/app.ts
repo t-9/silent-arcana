@@ -5,7 +5,11 @@
 
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
-import { loadModel, startDetection, detectLoop } from './modelService';
+import {
+  loadModel,
+  startDetection,
+  detectLoop,
+} from './detection/modelService';
 import { getElement } from './domUtils';
 import { setupKeyboardEvents } from './eventHandlers';
 import { setLoadingText } from './uiUtils';

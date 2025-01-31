@@ -3,7 +3,7 @@
  * アプリケーションのイベントハンドラを管理するモジュール
  */
 
-import { getDetector } from './modelService';
+import { getDetector } from './detection/modelService';
 import { detectHandsOnce } from './logic';
 
 /**

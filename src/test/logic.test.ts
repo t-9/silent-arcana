@@ -13,7 +13,7 @@ import {
   convertHandKeypointsToArray,
   toRelativeLandmarks,
 } from '../logic';
-import { getDetector } from '../modelService';
+import { getDetector } from '../detection/modelService';
 import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
 import {
   getGestures,
@@ -23,7 +23,7 @@ import {
 } from '../gameState';
 import { detectGesture } from '../gestureService';
 
-vi.mock('../modelService', () => ({
+vi.mock('../detection/modelService', () => ({
   getDetector: vi.fn(),
 }));
 

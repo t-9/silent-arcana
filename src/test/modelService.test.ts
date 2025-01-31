@@ -14,7 +14,7 @@ import {
   detectLoop,
   startDetection,
   stopDetection,
-} from '../modelService';
+} from '../detection/modelService';
 import { createHandDetector } from '../detection/detectionModule';
 import { loadGestureData, detectGesture } from '../gestureService';
 import { getGameState } from '../gameService';

@@ -2,7 +2,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { HandDetector } from '@tensorflow-models/hand-pose-detection';
 import { init } from '../app';
-import { loadModel, startDetection, detectLoop } from '../modelService';
+import {
+  loadModel,
+  startDetection,
+  detectLoop,
+} from '../detection/modelService';
 import { getElement } from '../domUtils';
 import { setupKeyboardEvents } from '../eventHandlers';
 import { startCamera } from '../camera/cameraService';
@@ -108,7 +112,7 @@ vi.mock('@tensorflow/tfjs', async () => {
     ready: vi.fn().mockResolvedValue(undefined),
   };
 });
-vi.mock('../modelService');
+vi.mock('../detection/modelService');
 vi.mock('../domUtils', () => ({
   getElement: vi.fn(),
   setLoadingText: vi.fn(),

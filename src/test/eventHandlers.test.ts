@@ -7,11 +7,11 @@ import {
   type MockedFunction,
 } from 'vitest';
 import { setupKeyboardEvents } from '../eventHandlers';
-import { getDetector } from '../modelService';
+import { getDetector } from '../detection/modelService';
 import { detectHandsOnce, toRelativeLandmarks } from '../logic';
 import { HandDetector } from '@tensorflow-models/hand-pose-detection';
 
-vi.mock('../modelService', () => ({
+vi.mock('../detection/modelService', () => ({
   getDetector: vi.fn(),
 }));
 
