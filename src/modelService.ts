@@ -1,6 +1,6 @@
 // modelService.ts
 import { HandDetector } from '@tensorflow-models/hand-pose-detection';
-import { createHandDetector } from './detectionModule';
+import { createHandDetector } from './detection/detectionModule';
 import { Gesture, loadGestureData, detectGesture } from './gestureService';
 import { getGameState } from './gameService'; // ★追加: ゲーム状態を参照
 import { handleGestureDetection } from './gameHandlers'; // ★追加: ゲーム用ハンドラを呼ぶ

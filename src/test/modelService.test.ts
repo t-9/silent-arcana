@@ -15,7 +15,7 @@ import {
   startDetection,
   stopDetection,
 } from '../modelService';
-import { createHandDetector } from '../detectionModule';
+import { createHandDetector } from '../detection/detectionModule';
 import { loadGestureData, detectGesture } from '../gestureService';
 import { getGameState } from '../gameService';
 import { handleGestureDetection } from '../gameHandlers';
@@ -26,7 +26,7 @@ type MockDetector = {
 };
 
 // モック
-vi.mock('../detectionModule');
+vi.mock('../detection/detectionModule');
 vi.mock('../gestureService');
 vi.mock('../gameService');
 vi.mock('../gameHandlers');

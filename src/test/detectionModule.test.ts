@@ -3,7 +3,7 @@ import {
   getCreateDetector,
   setCreateDetector,
   createHandDetector,
-} from '../detectionModule';
+} from '../detection/detectionModule';
 import {
   SupportedModels,
   HandDetector,
