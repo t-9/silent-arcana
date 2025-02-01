@@ -31,7 +31,7 @@ import {
   playCardChangeSound,
   playGameOverSound,
   playStartGameSound,
-} from '../soundService';
+} from '../services/soundService';
 
 // モック
 vi.mock('../gameService', () => ({
@@ -47,7 +47,7 @@ vi.mock('../gameService', () => ({
   })),
 }));
 vi.mock('../gestureService');
-vi.mock('../soundService', () => ({
+vi.mock('../services/soundService', () => ({
   playStartGameSound: vi.fn().mockResolvedValue(undefined),
   playGameOverSound: vi.fn().mockResolvedValue(undefined),
   playCardChangeSound: vi.fn().mockResolvedValue(undefined),

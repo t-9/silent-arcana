@@ -16,7 +16,7 @@ import { setLoadingText } from './uiUtils';
 import { startCamera } from './camera/cameraService';
 import { setupGameUI } from './gameHandlers';
 import { loadGestureData } from './gestureService';
-import { preloadSounds } from './soundService';
+import { preloadSounds } from './services/soundService';
 
 /**
  * アプリケーションの初期化を行う

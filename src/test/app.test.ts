@@ -12,7 +12,7 @@ import { setupKeyboardEvents } from '../eventHandlers';
 import { startCamera } from '../camera/cameraService';
 import { setupGameUI } from '../gameHandlers';
 import { loadGestureData } from '../gestureService';
-import { preloadSounds } from '../soundService';
+import { preloadSounds } from '../services/soundService';
 import * as tf from '@tensorflow/tfjs';
 import type { Gesture } from '../types';
 import { setLoadingText } from '../uiUtils';
@@ -122,7 +122,7 @@ vi.mock('../uiUtils');
 vi.mock('../camera/cameraService');
 vi.mock('../gameHandlers');
 vi.mock('../gestureService');
-vi.mock('../soundService');
+vi.mock('../services/soundService');
 
 describe('app', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
