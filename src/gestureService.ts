@@ -88,22 +88,13 @@ export function detectGesture(
   let bestGesture: string | null = null;
   let minDistance = Number.MAX_VALUE;
 
-  console.log('Input keypoints:', keypoints);
-  console.log(
-    'Available gestures:',
-    gestures.map((g) => ({ name: g.name, landmarks: g.landmarks })),
-  );
-
   for (const gesture of gestures) {
     const dist = calcDistance(keypoints, gesture.landmarks);
-    console.log(`Distance for gesture ${gesture.name}:`, dist);
     if (dist < minDistance) {
       minDistance = dist;
       bestGesture = gesture.name;
     }
   }
 
-  console.log('Best gesture:', bestGesture, 'with distance:', minDistance);
-  console.log('Threshold:', distanceThreshold);
   return minDistance < distanceThreshold ? bestGesture : null;
 }
