@@ -14,11 +14,11 @@ import {
   detectLoop,
   startDetection,
   stopDetection,
-} from '../modelService';
-import { createHandDetector } from '../detectionModule';
-import { loadGestureData, detectGesture } from '../gestureService';
-import { getGameState } from '../gameService';
-import { handleGestureDetection } from '../gameHandlers';
+} from '../../detection/modelService';
+import { createHandDetector } from '../../detection/detectionModule';
+import { loadGestureData, detectGesture } from '../../gestureService';
+import { getGameState } from '../../gameService';
+import { handleGestureDetection } from '../../gameHandlers';
 
 // モック用の型定義
 type MockDetector = {
@@ -26,10 +26,10 @@ type MockDetector = {
 };
 
 // モック
-vi.mock('../detectionModule');
-vi.mock('../gestureService');
-vi.mock('../gameService');
-vi.mock('../gameHandlers');
+vi.mock('../../detection/detectionModule');
+vi.mock('../../gestureService');
+vi.mock('../../gameService');
+vi.mock('../../gameHandlers');
 
 describe('modelService', () => {
   const mockDetector = {

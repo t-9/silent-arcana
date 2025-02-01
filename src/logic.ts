@@ -12,6 +12,10 @@ import {
 } from './gameState';
 import { detectGesture } from './gestureService';
 
+interface ExtendedHand extends Hand {
+  keypoints3D?: { x: number; y: number; z?: number }[];
+}
+
 /**
  * 検出された手の情報から表示用メッセージを生成する
  * @param {Hand[]} hands - 検出された手の配列
@@ -38,11 +42,11 @@ export async function detectHandsOnce(
   if (!hands || hands.length === 0) {
     return '手が検出されていません';
   }
+  // ExtendedHand としてキャストする
+  const hand = hands[0] as ExtendedHand;
+  const keypoints = hand.keypoints3D ?? hand.keypoints;
 
-  // ここで「最初の手」だけを判定対象にする
-  const keypoints = hands[0].keypoints;
   console.log('Raw keypoints:', keypoints);
-
   const rel = toRelativeLandmarks(keypoints);
   console.log('Relative landmarks:', rel);
 
@@ -97,22 +101,21 @@ const KEYPOINT_ORDER = [
 
 /**
  * 検出されたキーポイントを配列形式に変換する
- * @param {Array<{x: number, y: number, name?: string}>} detectedKeypoints - 検出されたキーポイント
+ * @param {Array<{x: number, y: number, z?: number, name?: string}>} detectedKeypoints - 検出されたキーポイント
  * @returns {number[][]} 変換された座標配列
  */
 export function convertHandKeypointsToArray(
-  detectedKeypoints: { x: number; y: number; name?: string }[],
+  detectedKeypoints: { x: number; y: number; z?: number; name?: string }[],
 ): number[][] {
   const result: number[][] = [];
 
   for (const kpName of KEYPOINT_ORDER) {
-    // name:kpName が見つかったらそれを [x, y] として追加
     const match = detectedKeypoints.find((k) => k.name === kpName);
     if (match) {
-      result.push([match.x, match.y]);
+      // z が存在しない場合は 0 を補完
+      result.push([match.x, match.y, match.z ?? 0]);
     } else {
-      // 見つからなければ [0, 0] 等で埋める
-      result.push([0, 0]);
+      result.push([0, 0, 0]);
     }
   }
   return result;
@@ -120,54 +123,37 @@ export function convertHandKeypointsToArray(
 
 /**
  * キーポイントを相対座標に変換する
- * @param {Array<{x: number, y: number, name?: string}>} keypoints - 変換するキーポイント
+ * @param {Array<{x: number, y: number, z?: number, name?: string}>} keypoints - 変換するキーポイント
  * @returns {number[][]} 相対座標に変換されたキーポイント配列
  */
 export function toRelativeLandmarks(
-  keypoints: { x: number; y: number; name?: string }[],
+  keypoints: { x: number; y: number; z?: number; name?: string }[],
 ): number[][] {
-  // まずキーポイントを配列形式に変換
   const points = convertHandKeypointsToArray(keypoints);
+  const wrist = points[0]; // ここでは [x, y, z] として扱う
 
-  // 手首の位置を基準点として取得
-  const wrist = points[0]; // KEYPOINT_ORDERの最初が'wrist'
-
-  // 手首を原点とした相対座標に変換
+  // 手首を原点とした相対座標に変換（zも含む）
   const relativePoints = points.map((point) => [
     point[0] - wrist[0],
     point[1] - wrist[1],
+    point[2] - wrist[2],
   ]);
 
-  // 相対座標の最大絶対値を計算
+  // 各成分の絶対値の最大値を取得（3次元全体から求める）
   const absValues = relativePoints.flatMap((p) => [
     Math.abs(p[0]),
     Math.abs(p[1]),
+    Math.abs(p[2]),
   ]);
   const maxAbs = Math.max(...absValues);
-
-  // スケール係数を計算（最大絶対値が1になるように）
   const SCALE = maxAbs;
 
-  // デバッグ用のログ
-  console.log('Before normalization:', {
-    maxAbs,
-    SCALE,
-    points: relativePoints,
-  });
-
-  // 正規化（-1から1の範囲に収める）
+  // 正規化：各成分を SCALE で割る
   const normalizedPoints = relativePoints.map((point) => [
     point[0] / SCALE,
     point[1] / SCALE,
+    point[2] / SCALE,
   ]);
-
-  // デバッグ用のログ
-  const xValues = normalizedPoints.map((p) => p[0]);
-  const yValues = normalizedPoints.map((p) => p[1]);
-  console.log('After normalization:', {
-    x: { min: Math.min(...xValues), max: Math.max(...xValues) },
-    y: { min: Math.min(...yValues), max: Math.max(...yValues) },
-  });
 
   return normalizedPoints;
 }

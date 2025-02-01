@@ -12,7 +12,7 @@ import {
   playStartGameSound,
   playCardChangeSound,
   playGameOverSound,
-} from './soundService';
+} from './services/soundService';
 
 /**
  * ゲームのUI操作とイベントハンドリングを管理するモジュール

@@ -10,7 +10,7 @@ import {
   playStartGameAndCardChangeSound,
   playGameOverSound,
   preloadedSounds,
-} from '../soundService';
+} from '../../services/soundService';
 
 // プライベートな変数にアクセスするためのインターフェース
 declare global {

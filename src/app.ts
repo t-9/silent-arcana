@@ -5,14 +5,18 @@
 
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
-import { loadModel, startDetection, detectLoop } from './modelService';
+import {
+  loadModel,
+  startDetection,
+  detectLoop,
+} from './detection/modelService';
 import { getElement } from './domUtils';
 import { setupKeyboardEvents } from './eventHandlers';
 import { setLoadingText } from './uiUtils';
 import { startCamera } from './camera/cameraService';
 import { setupGameUI } from './gameHandlers';
 import { loadGestureData } from './gestureService';
-import { preloadSounds } from './soundService';
+import { preloadSounds } from './services/soundService';
 
 /**
  * アプリケーションの初期化を行う

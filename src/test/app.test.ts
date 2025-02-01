@@ -2,13 +2,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { HandDetector } from '@tensorflow-models/hand-pose-detection';
 import { init } from '../app';
-import { loadModel, startDetection, detectLoop } from '../modelService';
+import {
+  loadModel,
+  startDetection,
+  detectLoop,
+} from '../detection/modelService';
 import { getElement } from '../domUtils';
 import { setupKeyboardEvents } from '../eventHandlers';
 import { startCamera } from '../camera/cameraService';
 import { setupGameUI } from '../gameHandlers';
 import { loadGestureData } from '../gestureService';
-import { preloadSounds } from '../soundService';
+import { preloadSounds } from '../services/soundService';
 import * as tf from '@tensorflow/tfjs';
 import type { Gesture } from '../types';
 import { setLoadingText } from '../uiUtils';
@@ -108,7 +112,7 @@ vi.mock('@tensorflow/tfjs', async () => {
     ready: vi.fn().mockResolvedValue(undefined),
   };
 });
-vi.mock('../modelService');
+vi.mock('../detection/modelService');
 vi.mock('../domUtils', () => ({
   getElement: vi.fn(),
   setLoadingText: vi.fn(),
@@ -118,7 +122,7 @@ vi.mock('../uiUtils');
 vi.mock('../camera/cameraService');
 vi.mock('../gameHandlers');
 vi.mock('../gestureService');
-vi.mock('../soundService');
+vi.mock('../services/soundService');
 
 describe('app', () => {
   let consoleSpy: ReturnType<typeof vi.spyOn>;
