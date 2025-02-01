@@ -142,7 +142,7 @@ describe('gestureService', () => {
       // ここでは detectGesture を利用して間接的に calcDistance の動作を確認します
       // たとえば、threshold を 10 に設定すれば、計算結果 5 < 10 となるので該当ジェスチャーが選ばれるはずです
       const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
-      const result = detectGesture(keypointsA, gestures, 10);
+      const result = detectGesture(keypointsA, gestures, 10, 0.5);
       expect(result).toBe('testGesture');
     });
 
@@ -156,7 +156,7 @@ describe('gestureService', () => {
         [0, 0],
       ];
       const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
-      const result = detectGesture(keypointsA, gestures, 10);
+      const result = detectGesture(keypointsA, gestures, 10, 0.5);
       expect(result).toBe('testGesture');
     });
   });
