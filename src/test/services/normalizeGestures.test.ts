@@ -5,13 +5,13 @@ import * as fs from 'fs';
 import {
   normalizeKeypoints,
   normalizeGestures,
-} from '../services/normalizeGestures';
+} from '../../services/normalizeGestures';
 import {
   defaultMockData,
   mockDataWithUnknownKeypoints,
   mockDataWithEmptyGestures,
   mockDataWithoutWrist,
-} from './fixtures/gestureData';
+} from '../fixtures/gestureData';
 
 vi.mock('fs');
 const mockedFs = vi.mocked(fs);
