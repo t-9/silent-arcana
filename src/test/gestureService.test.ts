@@ -126,5 +126,38 @@ describe('gestureService', () => {
       const result = detectGesture(farKeypoints, gestures, 1.0); // 小さいしきい値を設定
       expect(result).toBeNull();
     });
+
+    it('should calculate distance correctly when z values are undefined', () => {
+      // ptsA は z 成分を持たない（undefined とみなされる）配列
+      const keypointsA: number[][] = [
+        [0, 0], // 3番目の要素がない → (0,0,0) として扱われる
+        [3, 4], // → (3,4,0)
+      ];
+      // ptsB はすべてゼロの座標（明示的に3要素で定義）
+      const keypointsB: number[][] = [
+        [0, 0, 0],
+        [0, 0, 0],
+      ];
+      // この場合、calcDistance は 0 + sqrt((3-0)²+(4-0)²+(0-0)²) = 5 を返すはず
+      // ここでは detectGesture を利用して間接的に calcDistance の動作を確認します
+      // たとえば、threshold を 10 に設定すれば、計算結果 5 < 10 となるので該当ジェスチャーが選ばれるはずです
+      const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
+      const result = detectGesture(keypointsA, gestures, 10);
+      expect(result).toBe('testGesture');
+    });
+
+    it('should calculate distance correctly when z values are undefined(ptsB)', () => {
+      const keypointsA: number[][] = [
+        [0, 0, 0],
+        [3, 4, 0],
+      ];
+      const keypointsB: number[][] = [
+        [0, 0],
+        [0, 0],
+      ];
+      const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
+      const result = detectGesture(keypointsA, gestures, 10);
+      expect(result).toBe('testGesture');
+    });
   });
 });
