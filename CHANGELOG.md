@@ -1,3 +1,12 @@
+## [1.4.28](https://github.com/t-9/silent-arcana/compare/v1.4.27...v1.4.28) (2025-02-01)
+
+
+### Bug Fixes
+
+* detectionModule.test.tsを移動する ([3fd071d](https://github.com/t-9/silent-arcana/commit/3fd071d79bb39ab6140a19bab506088509e9cad8))
+* detectionModuleを移動する ([7e97947](https://github.com/t-9/silent-arcana/commit/7e97947c64d22c3cf23b0da4410ad3868ac67aeb))
+* modelService.tsを移動 ([63f44ad](https://github.com/t-9/silent-arcana/commit/63f44ad70061e1aca9fec256d722a9b2c8e235f7))
+
 ## [1.4.27](https://github.com/t-9/silent-arcana/compare/v1.4.26...v1.4.27) (2025-01-30)
 
 
