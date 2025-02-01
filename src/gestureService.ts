@@ -1,5 +1,11 @@
 // src/gestureService.ts
 
+/**
+ * ジェスチャーを表すインターフェース
+ * @interface Gesture
+ * @property {string} name - ジェスチャーの名前
+ * @property {number[][]} landmarks - ジェスチャーを構成する座標点の配列（各点は [x, y, z]）
+ */
 export interface Gesture {
   name: string;
   landmarks: number[][];
@@ -33,8 +39,8 @@ export function getGestures(): Gesture[] {
 
 /**
  * 入力されたキーポイントに最も近いジェスチャーを検出する。
- * 各指ごとにユークリッド距離、コサイン類似度、角度差によるスコアを計算し、
- * その各指のスコアの最小値（＝最も弱い指のスコア）を全体の評価スコアとする。
+ * 各指（親指、人差し指、中指、薬指、小指）ごとにユークリッド距離、コサイン類似度、角度差からスコアを計算し、
+ * 各指グループのスコアの「最小値」を全体の評価スコアとする。
  *
  * @param keypoints - 検出された手のキーポイント配列（手首を原点として正規化済み）
  * @param gestures - 比較対象のジェスチャーデータ配列
@@ -54,38 +60,54 @@ export function detectGesture(
   weightCosine = 0.4,
   weightAngle = 0.3,
 ): string | null {
-  if (!keypoints || keypoints.length === 0 || !gestures || gestures.length === 0) {
+  if (
+    !keypoints ||
+    keypoints.length === 0 ||
+    !gestures ||
+    gestures.length === 0
+  ) {
     console.log('Invalid input:', { keypoints, gestures });
     return null;
   }
 
-  // 各指のグループ（手首（index 0）は除く）：
-  // 1～4: 親指、5～8: 人差し指、9～12: 中指、13～16: 薬指、17～20: 小指
+  // 各指グループ（手首（index 0）は除く）
+  // ※各グループは「指根～指先」として、例えば親指はインデックス1～4
   const fingerGroups = [
-    [1, 2, 3, 4],    // 親指
-    [5, 6, 7, 8],    // 人差し指
+    [1, 2, 3, 4], // 親指
+    [5, 6, 7, 8], // 人差し指
     [9, 10, 11, 12], // 中指
-    [13, 14, 15, 16],// 薬指
-    [17, 18, 19, 20] // 小指
+    [13, 14, 15, 16], // 薬指
+    [17, 18, 19, 20], // 小指
   ];
 
   let bestGesture: string | null = null;
   let bestMinScore = -Infinity;
 
-  // ヘルパー関数：指定されたインデックスの点群を取得
-  function getFingerPoints(points: number[][], indices: number[]): number[][] {
-    return indices.map(i => points[i] ? points[i] : [0, 0, 0]);
+  // 指定されたインデックス群から、元の配列の値を取り出す
+  // ※ここでは足りない場合は undefined を返す（後でチェックする）
+  function getFingerPoints(
+    points: number[][],
+    indices: number[],
+  ): (number[] | undefined)[] {
+    return indices.map((i) => points[i]);
   }
 
-  // ヘルパー関数：ユークリッド距離からスコアを算出
+  // ユークリッド距離からスコアを算出する関数
   const scoreFromDistance = (dist: number): number => {
     return Math.max(0, (distanceThreshold - dist) / distanceThreshold);
   };
 
-  // ヘルパー関数：各サブ配列を必ず3要素に補完して平坦化
+  // 各サブ配列を必ず長さ3の数値配列に補完しつつ平坦化する
   function flattenKeypoints(points: number[][]): number[] {
     return points
-      .map(pt => {
+      .map((pt) => {
+        if (!pt || pt.length < 3) {
+          return undefined; // 後で undefined チェックするため
+        }
+        return pt;
+      })
+      .filter((pt): pt is number[] => pt !== undefined)
+      .map((pt) => {
         if (pt.length < 3) {
           return [...pt, ...Array(3 - pt.length).fill(0)];
         }
@@ -94,7 +116,7 @@ export function detectGesture(
       .flat();
   }
 
-  // ヘルパー関数：2つの点群間のユークリッド距離を計算
+  // 2つの点群間のユークリッド距離を計算
   function calcDistance(ptsA: number[][], ptsB: number[][]): number {
     let sum = 0;
     for (let i = 0; i < ptsA.length; i++) {
@@ -106,25 +128,31 @@ export function detectGesture(
     return sum;
   }
 
-  // 各候補ジェスチャーについて評価する
+  // 各候補ジェスチャーについて評価
   for (const gesture of gestures) {
     let fingerScores: number[] = [];
 
     for (const group of fingerGroups) {
       const subA = getFingerPoints(keypoints, group);
       const subB = getFingerPoints(gesture.landmarks, group);
-      if (subA.length !== group.length || subB.length !== group.length) {
+      // もしどちらかのグループに undefined が含まれていたら警告し、このジェスチャーは評価対象外
+      if (
+        subA.some((pt) => pt === undefined) ||
+        subB.some((pt) => pt === undefined)
+      ) {
         console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
+        // この指グループはスコア計算せずスキップ
         continue;
       }
+      // subA, subB は必ず4要素となる前提
 
-      // ユークリッド距離によるスコア
-      const dist = calcDistance(subA, subB);
+      // ユークリッド距離スコア
+      const dist = calcDistance(subA as number[][], subB as number[][]);
       const scoreEuclidean = scoreFromDistance(dist);
 
-      // コサイン類似度によるスコア
-      const flatA = flattenKeypoints(subA);
-      const flatB = flattenKeypoints(subB);
+      // コサイン類似度スコア
+      const flatA = flattenKeypoints(subA as number[][]);
+      const flatB = flattenKeypoints(subB as number[][]);
       if (flatA.length !== flatB.length) {
         console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
         continue;
@@ -142,32 +170,29 @@ export function detectGesture(
       }
       const scoreCosine = (cosine + 1) / 2;
 
-      // 角度によるスコア
-      // ここでは、各指グループの「指根」と「指先」をそれぞれグループの最初と最後の点とする
-      const baseA = subA[0];
-      const tipA = subA[subA.length - 1];
-      const baseB = subB[0];
-      const tipB = subB[subB.length - 1];
+      // 角度スコア：各指グループの「指根」と「指先」
+      const baseA = subA[0] as number[];
+      const tipA = subA[subA.length - 1] as number[];
+      const baseB = subB[0] as number[];
+      const tipB = subB[subB.length - 1] as number[];
 
-      // ベクトル計算
+      // 2次元ベクトル（x,yのみ）で角度を計算
       const vecA = [tipA[0] - baseA[0], tipA[1] - baseA[1]];
       const vecB = [tipB[0] - baseB[0], tipB[1] - baseB[1]];
-
-      const magA = Math.sqrt(vecA[0] * vecA[0] + vecA[1] * vecA[1]);
-      const magB = Math.sqrt(vecB[0] * vecB[0] + vecB[1] * vecB[1]);
-
-      let angleSim = 1; // もしどちらかの指が無効（大きさが0）なら角度は一致とみなす
+      const magA = Math.sqrt(vecA[0] ** 2 + vecA[1] ** 2);
+      const magB = Math.sqrt(vecB[0] ** 2 + vecB[1] ** 2);
+      let angleSim = 1;
       if (magA > 0 && magB > 0) {
         const angleA = Math.atan2(vecA[1], vecA[0]);
         const angleB = Math.atan2(vecB[1], vecB[0]);
         let diff = Math.abs(angleA - angleB);
-        // 角度差を [0, π] の範囲にする
         if (diff > Math.PI) {
           diff = 2 * Math.PI - diff;
         }
-        angleSim = 1 - diff / Math.PI; // 0～1のスコア（完全一致なら1, 180°ずれていれば0）
+        angleSim = 1 - diff / Math.PI;
       }
 
+      // 統合スコア
       const fingerScore =
         weightEuclidean * scoreEuclidean +
         weightCosine * scoreCosine +
@@ -175,12 +200,16 @@ export function detectGesture(
       fingerScores.push(fingerScore);
     }
 
-    // 各指のスコアのうち最も低い値を、そのジェスチャーの評価スコアとする
+    // fingerScores が空の場合は、このジェスチャーは評価対象外
+    if (fingerScores.length === 0) {
+      continue;
+    }
+
+    // 各指グループのうち最も低いスコアをそのジェスチャーの評価スコアとする
     const overallScore = Math.min(...fingerScores);
     console.log(
-      `Gesture "${gesture.name}": Min Finger Score = ${overallScore.toFixed(3)}`
+      `Gesture "${gesture.name}": Min Finger Score = ${overallScore.toFixed(3)}`,
     );
-
     if (overallScore > bestMinScore) {
       bestMinScore = overallScore;
       bestGesture = gesture.name;
