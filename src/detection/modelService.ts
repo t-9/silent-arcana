@@ -1,5 +1,5 @@
 // modelService.ts
-import { HandDetector } from '@tensorflow-models/hand-pose-detection';
+import { HandDetector, Hand } from '@tensorflow-models/hand-pose-detection';
 import { createHandDetector } from './detectionModule';
 import { Gesture, loadGestureData, detectGesture } from '../gestureService';
 import { getGameState } from '../gameService'; // ★追加: ゲーム状態を参照
@@ -75,10 +75,14 @@ async function handleGameDetection(
 ): Promise<void> {
   const hands = await detector?.estimateHands(videoEl);
   if (hands && hands.length > 0) {
-    const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
+    const hand = hands[0] as Hand & {
+      keypoints3D?: { x: number; y: number; z?: number }[];
+    };
+    const normalizedKeypoints = toRelativeLandmarks(
+      hand.keypoints3D ?? hand.keypoints,
+    );
     await handleGestureDetection(normalizedKeypoints);
   }
-  // ゲーム中はメッセージ表示を行わない
   setLoadingText(messageEl, '');
 }
 
@@ -91,7 +95,12 @@ async function handleNonGameDetection(
 ): Promise<void> {
   const hands = await detector?.estimateHands(videoEl);
   if (hands && hands.length > 0) {
-    const normalizedKeypoints = toRelativeLandmarks(hands[0].keypoints);
+    const hand = hands[0] as Hand & {
+      keypoints3D?: { x: number; y: number; z?: number }[];
+    };
+    const normalizedKeypoints = toRelativeLandmarks(
+      hand.keypoints3D ?? hand.keypoints,
+    );
     if (loadedGestures.length > 0) {
       const gestureName = detectGesture(normalizedKeypoints, loadedGestures);
       if (gestureName) {

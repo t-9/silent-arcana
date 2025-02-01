@@ -56,7 +56,9 @@ function calcDistance(ptsA: number[][], ptsB: number[][]): number {
   for (let i = 0; i < ptsA.length; i++) {
     const dx = ptsA[i][0] - ptsB[i][0];
     const dy = ptsA[i][1] - ptsB[i][1];
-    sum += Math.sqrt(dx * dx + dy * dy);
+    // ptsA[i][2] と ptsB[i][2] を考慮（もしどちらかが未定義の場合は 0 を補完）
+    const dz = (ptsA[i][2] ?? 0) - (ptsB[i][2] ?? 0);
+    sum += Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
   return sum;
 }

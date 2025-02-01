@@ -9,5 +9,5 @@ export interface Gesture {
   /** ジェスチャーの名前 */
   name: string;
   /** ジェスチャーのランドマーク座標の配列（[x, y, z]の配列） */
-  landmarks: number[][];
+  landmarks: [number, number, number][];
 }

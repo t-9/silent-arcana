@@ -14,8 +14,8 @@ import { toRelativeLandmarks } from './../logic'; // 正規化関数をインポ
 interface Gesture {
   /** ジェスチャーの名前 */
   name: string;
-  /** ジェスチャーのランドマーク座標の配列（[x, y]の配列） */
-  landmarks: [number, number][];
+  /** ジェスチャーのランドマーク座標の配列（[x, y, z]の配列） */
+  landmarks: [number, number, number][];
 }
 
 /**
@@ -118,9 +118,10 @@ export function normalizeGestures(
   // 正規化処理
   const normalizedGestures = gestures.map((gesture) => {
     // ランドマークに名前を割り当てる
-    const keypoints = gesture.landmarks.map(([x, y], index) => ({
+    const keypoints = gesture.landmarks.map(([x, y, z], index) => ({
       x,
       y,
+      z: z ?? 0, // z がない場合は 0 を補完
       name: KEYPOINT_ORDER[index] || `point_${index}`,
     }));
 
@@ -137,7 +138,7 @@ export function normalizeGestures(
 
     return {
       name: gesture.name,
-      landmarks: normalized as [number, number][],
+      landmarks: normalized as [number, number, number][],
     };
   });
 

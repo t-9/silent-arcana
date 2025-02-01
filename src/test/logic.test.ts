@@ -164,9 +164,10 @@ describe('logic', () => {
         { x: 3, y: 4, name: 'thumb_cmc' },
       ];
       const result = convertHandKeypointsToArray(keypoints);
-      expect(result[0]).toEqual([1, 2]); // wrist
-      expect(result[1]).toEqual([3, 4]); // thumb_cmc
-      expect(result[2]).toEqual([0, 0]); // thumb_mcp (not found)
+      // 各出力は [x, y, z] の形式になる（zがない場合は 0 が補完される）
+      expect(result[0]).toEqual([1, 2, 0]); // wrist
+      expect(result[1]).toEqual([3, 4, 0]); // thumb_cmc
+      expect(result[2]).toEqual([0, 0, 0]); // thumb_mcp (not found)
     });
   });
 
@@ -177,8 +178,11 @@ describe('logic', () => {
         { x: 200, y: 200, name: 'thumb_cmc' },
       ];
       const result = toRelativeLandmarks(keypoints);
-      expect(result[0]).toEqual([0, 0]); // wrist becomes origin
-      expect(result[1]).toEqual([1, 1]); // thumb_cmc relative to wrist and normalized
+      // convertHandKeypointsToArray で [100,100,0] と [200,200,0] となり、
+      // relativePointsはそれぞれ [0,0,0] と [100,100,0] となるので、
+      // 正規化後は [0,0,0] と [1,1,0] となる
+      expect(result[0]).toEqual([0, 0, 0]); // wrist becomes origin
+      expect(result[1]).toEqual([1, 1, 0]); // thumb_cmc relative to wrist and normalized
     });
   });
 });
