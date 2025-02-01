@@ -84,15 +84,13 @@ describe('gestureService', () => {
     });
   });
 
-  // 21個のキーポイント配列を作成するヘルパー関数
+  // ヘルパー関数: 21個のキーポイント配列を作成する
   function create21Points(
     override: { [index: number]: number[] } = {},
   ): number[][] {
-    // すべて [0,0,0] で初期化
     return Array.from({ length: 21 }, (_, i) => {
-      // override で指定されたインデックスならその値を返す（必ず3要素）
       if (i in override) {
-        // override[i] が2要素の場合は3番目を0にするなど
+        // もし2要素しかない場合は3番目を0で補完する
         return override[i].length < 3 ? [...override[i], 0] : override[i];
       }
       return [0, 0, 0];
@@ -100,20 +98,55 @@ describe('gestureService', () => {
   }
 
   describe('detectGesture', () => {
-    // テストパラメータとして、しきい値を下げて（例：combinedThreshold を 0.5 に）計算が通るようにする
-    const distanceThreshold = 10; // 小さい値でテストする
+    // テスト用のパラメータ
+    const distanceThreshold = 10;
     const combinedThreshold = 0.5;
     const weightEuclidean = 0.3;
     const weightCosine = 0.4;
     const weightAngle = 0.3;
 
-    it('should detect matching gesture', () => {
-      // keypointsMatch と gesture.landmarks を21個の要素にする
-      const keypointsMatch = create21Points({ 1: [1, 1, 1], 2: [2, 2, 2] });
+    it('should return null if keypoints or gestures are empty', () => {
+      expect(
+        detectGesture(
+          [],
+          [],
+          distanceThreshold,
+          combinedThreshold,
+          weightEuclidean,
+          weightCosine,
+          weightAngle,
+        ),
+      ).toBeNull();
+      expect(
+        detectGesture(
+          create21Points(),
+          [],
+          distanceThreshold,
+          combinedThreshold,
+          weightEuclidean,
+          weightCosine,
+          weightAngle,
+        ),
+      ).toBeNull();
+      expect(
+        detectGesture(
+          [],
+          [{ name: 'a', landmarks: create21Points() }],
+          distanceThreshold,
+          combinedThreshold,
+          weightEuclidean,
+          weightCosine,
+          weightAngle,
+        ),
+      ).toBeNull();
+    });
+
+    it('should detect matching gesture when keypoints match exactly', () => {
+      const keypoints = create21Points({ 1: [1, 1, 1], 2: [2, 2, 2] });
       const gestureLandmarks = create21Points({ 1: [1, 1, 1], 2: [2, 2, 2] });
       const gestures = [{ name: 'test-gesture', landmarks: gestureLandmarks }];
       const result = detectGesture(
-        keypointsMatch,
+        keypoints,
         gestures,
         distanceThreshold,
         combinedThreshold,
@@ -125,9 +158,9 @@ describe('gestureService', () => {
     });
 
     it('should calculate distance correctly when z values are undefined (ptsA)', () => {
-      // ptsA には2点だけ値を設定し、残りは全て [0,0,0]
+      // ptsA: override index 1 に [3,4]（zは省略＝undefined→0に補完）
       const keypointsA = create21Points({ 1: [3, 4] });
-      const keypointsB = create21Points(); // 全て [0,0,0]
+      const keypointsB = create21Points(); // すべて [0,0,0]
       const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
       const result = detectGesture(
         keypointsA,
@@ -142,7 +175,7 @@ describe('gestureService', () => {
     });
 
     it('should calculate distance correctly when z values are undefined (ptsB)', () => {
-      // ptsB には2点だけ値を設定、ptsAは全て [0,0,0]
+      // ptsB: override index 1 に [3,4]（zはundefined→0に補完）
       const keypointsA = create21Points();
       const keypointsB = create21Points({ 1: [3, 4] });
       const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
@@ -159,9 +192,13 @@ describe('gestureService', () => {
     });
 
     it('should set cosine to 1 when both norms are zero', () => {
-      // 両方とも全て [0,0,0] の配列
-      const keypoints = create21Points();
-      const gesture = { name: 'zero', landmarks: create21Points() };
+      // すべてのキーポイントが同じ値になるようにして、各サブ配列が全てゼロとなるケース
+      const keypoints = create21Points({ 1: [1, 1, 1] });
+      // 同じデータのため、各ベクトルは [0,0,0]
+      const gesture = {
+        name: 'zero',
+        landmarks: create21Points({ 1: [1, 1, 1] }),
+      };
       const result = detectGesture(
         keypoints,
         [gesture],
@@ -172,6 +209,32 @@ describe('gestureService', () => {
         weightAngle,
       );
       expect(result).toBe('zero');
+    });
+
+    // 追加：テストケースとして、各グループで「キー点数が一致しない」場合の分岐を確認する
+    it('should warn and continue if any finger group has missing keypoints', () => {
+      // keypoints の長さを意図的に短くする
+      const incompleteKeypoints = create21Points();
+      // 例えば index 2 を削除してしまう
+      incompleteKeypoints.splice(2, 1); // 長さが20になる
+      const gestures = [{ name: 'mismatch', landmarks: create21Points() }];
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+      const result = detectGesture(
+        incompleteKeypoints,
+        gestures,
+        distanceThreshold,
+        combinedThreshold,
+        weightEuclidean,
+        weightCosine,
+        weightAngle,
+      );
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        'キー点数が一致しません: gesture mismatch',
+      );
+      expect(result).toBeNull();
+      consoleWarnSpy.mockRestore();
     });
   });
 });
