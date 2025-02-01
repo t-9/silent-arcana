@@ -2,7 +2,10 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
-import { normalizeKeypoints, normalizeGestures } from '../normalizeGestures';
+import {
+  normalizeKeypoints,
+  normalizeGestures,
+} from '../services/normalizeGestures';
 import {
   defaultMockData,
   mockDataWithUnknownKeypoints,

@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
-import { toRelativeLandmarks } from './logic'; // 正規化関数をインポート
+import { toRelativeLandmarks } from './../logic'; // 正規化関数をインポート
 
 /**
  * ジェスチャーの基本情報を表すインターフェース
