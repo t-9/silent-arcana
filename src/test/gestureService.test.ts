@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { detectGesture, loadGestureData, getGestures } from '../gestureService';
 
-// グローバルなfetchのモック
+// グローバルな fetch のモック
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
@@ -127,26 +127,23 @@ describe('gestureService', () => {
       expect(result).toBeNull();
     });
 
-    it('should calculate distance correctly when z values are undefined', () => {
+    it('should calculate distance correctly when z values are undefined (ptsA)', () => {
       // ptsA は z 成分を持たない（undefined とみなされる）配列
       const keypointsA: number[][] = [
-        [0, 0], // 3番目の要素がない → (0,0,0) として扱われる
-        [3, 4], // → (3,4,0)
+        [0, 0], // → [0, 0, 0] として扱われる
+        [3, 4], // → [3, 4, 0]
       ];
-      // ptsB はすべてゼロの座標（明示的に3要素で定義）
+      // ptsB はすべて明示的に3要素で定義
       const keypointsB: number[][] = [
         [0, 0, 0],
         [0, 0, 0],
       ];
-      // この場合、calcDistance は 0 + sqrt((3-0)²+(4-0)²+(0-0)²) = 5 を返すはず
-      // ここでは detectGesture を利用して間接的に calcDistance の動作を確認します
-      // たとえば、threshold を 10 に設定すれば、計算結果 5 < 10 となるので該当ジェスチャーが選ばれるはずです
       const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
       const result = detectGesture(keypointsA, gestures, 10, 0.5);
       expect(result).toBe('testGesture');
     });
 
-    it('should calculate distance correctly when z values are undefined(ptsB)', () => {
+    it('should calculate distance correctly when z values are undefined (ptsB)', () => {
       const keypointsA: number[][] = [
         [0, 0, 0],
         [3, 4, 0],
@@ -158,6 +155,40 @@ describe('gestureService', () => {
       const gestures = [{ name: 'testGesture', landmarks: keypointsB }];
       const result = detectGesture(keypointsA, gestures, 10, 0.5);
       expect(result).toBe('testGesture');
+    });
+
+    // 追加テストケース：キー点数が一致しない場合
+    it('should warn and continue if keypoints length mismatch', () => {
+      // keypoints (A) の長さは 2 に対し、gesture の landmarks (B) の長さは 3 で不一致
+      const keypoints = [
+        [0, 0, 0],
+        [1, 1, 1],
+      ];
+      const gestureWithMismatch = {
+        name: 'mismatch',
+        landmarks: [
+          [0, 0, 0],
+          [0, 0, 0],
+          [0, 0, 0],
+        ],
+      };
+      const consoleWarnSpy = vi
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
+      const result = detectGesture(keypoints, [gestureWithMismatch], 10, 0.5);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        `キー点数が一致しません: gesture mismatch`,
+      );
+      expect(result).toBeNull();
+      consoleWarnSpy.mockRestore();
+    });
+
+    // 追加テストケース：両方のノルムが 0 の場合（cosine を 1 とする）
+    it('should set cosine to 1 when both norms are zero', () => {
+      const keypoints = [[0, 0, 0]];
+      const gesture = { name: 'zero', landmarks: [[0, 0, 0]] };
+      const result = detectGesture(keypoints, [gesture], 10, 0.5);
+      expect(result).toBe('zero');
     });
   });
 });
