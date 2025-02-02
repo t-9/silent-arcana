@@ -91,12 +91,16 @@ describe('gestureService', () => {
 
   // ヘルパー関数: 21個のキーポイント配列を作成する
   function create21Points(
-    override: { [index: number]: number[] } = {},
+    override: { [index: number]: (number | undefined)[] } = {},
   ): number[][] {
     return Array.from({ length: 21 }, (_, i) => {
       if (i in override) {
-        // もし2要素しかない場合は3番目を0で補完する
-        return override[i].length < 3 ? [...override[i], 0] : override[i];
+        // override[i] の各要素が undefined であれば 0 に変換する
+        const arr = override[i].map((x) => x ?? 0);
+        // もし要素数が3未満なら、0で補完する
+        return arr.length < 3
+          ? [...arr, ...Array(3 - arr.length).fill(0)]
+          : arr;
       }
       return [0, 0, 0];
     });
