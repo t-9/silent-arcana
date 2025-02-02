@@ -60,18 +60,23 @@ export function detectGesture(
   weightCosine = 0.4,
   weightAngle = 0.3,
 ): string | null {
-  if (!keypoints || keypoints.length === 0 || !gestures || gestures.length === 0) {
+  if (
+    !keypoints ||
+    keypoints.length === 0 ||
+    !gestures ||
+    gestures.length === 0
+  ) {
     console.log('Invalid input:', { keypoints, gestures });
     return null;
   }
 
   // 各指グループ（手首（index 0）は除く）
   const fingerGroups = [
-    [1, 2, 3, 4],    // 親指
-    [5, 6, 7, 8],    // 人差し指
+    [1, 2, 3, 4], // 親指
+    [5, 6, 7, 8], // 人差し指
     [9, 10, 11, 12], // 中指
-    [13, 14, 15, 16],// 薬指
-    [17, 18, 19, 20] // 小指
+    [13, 14, 15, 16], // 薬指
+    [17, 18, 19, 20], // 小指
   ];
 
   // 指定されたインデックス群から元の配列の値を取り出す
@@ -110,7 +115,7 @@ export function detectGesture(
       }
       scores.push(groupScore);
     }
-    return scores.length ? Math.min(...scores) : null;
+    return Math.min(...scores);
   }
 
   function computeFingerGroupScore(
@@ -156,15 +161,19 @@ export function detectGesture(
     const magB = Math.sqrt(vecB[0] ** 2 + vecB[1] ** 2);
     let angleSim = 1;
     if (magA > 0 && magB > 0) {
-      let diff = Math.abs(Math.atan2(vecA[1], vecA[0]) - Math.atan2(vecB[1], vecB[0]));
+      let diff = Math.abs(
+        Math.atan2(vecA[1], vecA[0]) - Math.atan2(vecB[1], vecB[0]),
+      );
       if (diff > Math.PI) {
         diff = 2 * Math.PI - diff;
       }
       angleSim = 1 - diff / Math.PI;
     }
-    return weightEuclidean * scoreEuclidean +
+    return (
+      weightEuclidean * scoreEuclidean +
       weightCosine * scoreCosine +
-      weightAngle * angleSim;
+      weightAngle * angleSim
+    );
   }
 
   let bestGesture: string | null = null;
@@ -180,4 +189,3 @@ export function detectGesture(
 
   return bestMinScore >= combinedThreshold ? bestGesture : null;
 }
-

@@ -1,6 +1,11 @@
 // src/test/gestureService.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { detectGesture, loadGestureData, getGestures, Gesture } from '../gestureService';
+import {
+  detectGesture,
+  loadGestureData,
+  getGestures,
+  Gesture,
+} from '../gestureService';
 
 // グローバルな fetch のモック
 const mockFetch = vi.fn();
@@ -220,7 +225,7 @@ describe('gestureService', () => {
       const gestures = [{ name: 'mismatch', landmarks: create21Points() }];
       const consoleWarnSpy = vi
         .spyOn(console, 'warn')
-        .mockImplementation(() => { });
+        .mockImplementation(() => {});
       const result = detectGesture(
         incompleteKeypoints,
         gestures,
@@ -258,7 +263,9 @@ describe('gestureService', () => {
       gestureLandmarks[1] = [0, 0, 0];
       gestureLandmarks[4] = [-1, 0, 0];
 
-      const gestures: Gesture[] = [{ name: 'testGesture', landmarks: gestureLandmarks }];
+      const gestures: Gesture[] = [
+        { name: 'testGesture', landmarks: gestureLandmarks },
+      ];
 
       // この状態では、
       // - サブ配列（指グループ）の指先の角度は
@@ -282,7 +289,7 @@ describe('gestureService', () => {
       // このテストではその挙動が確認できるかをチェックします。
 
       // ※テストケースとして、Math.atan2 の上書きを工夫して diff > Math.PI を発生させたい場合は、
-      // 　上書きロジックをさらに変更して、意図的に 2π を返すなどの工夫が必要です。
+      // 上書きロジックをさらに変更して、意図的に 2π を返すなどの工夫が必要です。
       // ここでは、上記のシナリオにおいて結果が 'testGesture' と返ることを確認します。
       const result = detectGesture(
         keypoints,
@@ -306,7 +313,9 @@ describe('gestureService', () => {
       const keypoints = create21Points({ 5: [1, 1, undefined] });
       // gesture側は全て [0,0,0] とする
       const gestureLandmarks = create21Points();
-      const gestures: Gesture[] = [{ name: 'test-undefined-A', landmarks: gestureLandmarks }];
+      const gestures: Gesture[] = [
+        { name: 'test-undefined-A', landmarks: gestureLandmarks },
+      ];
       // この場合、calcDistance 内で以下の処理が行われる:
       // ptsA[5][2] が undefined → (undefined ?? 0) で 0 が使われる
       // ptsB[5][2] は 0 (既定)
@@ -327,7 +336,9 @@ describe('gestureService', () => {
       // 今度は gestureLandmarks の index 5 の点を [1,1,undefined] にする
       const keypoints = create21Points();
       const gestureLandmarks = create21Points({ 5: [1, 1, undefined] });
-      const gestures: Gesture[] = [{ name: 'test-undefined-B', landmarks: gestureLandmarks }];
+      const gestures: Gesture[] = [
+        { name: 'test-undefined-B', landmarks: gestureLandmarks },
+      ];
       // calcDistance 内で
       // ptsA[5][2] は 0 (既定)
       // ptsB[5][2] は undefined → (undefined ?? 0) で 0 に補完される
