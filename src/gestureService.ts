@@ -1,14 +1,10 @@
 // src/gestureService.ts
 
 /**
- * ジェスチャー認識に関連する型定義とユーティリティ関数を提供するモジュール
- */
-
-/**
  * ジェスチャーを表すインターフェース
  * @interface Gesture
  * @property {string} name - ジェスチャーの名前
- * @property {number[][]} landmarks - ジェスチャーを構成する座標点の配列
+ * @property {number[][]} landmarks - ジェスチャーを構成する座標点の配列（各点は [x, y, z]）
  */
 export interface Gesture {
   name: string;
@@ -19,9 +15,6 @@ let gestures: Gesture[] = [];
 
 /**
  * 指定されたURLからジェスチャーデータを読み込む
- * @param {string} url - ジェスチャーデータのJSON URLパス
- * @returns {Promise<Gesture[]>} 読み込まれたジェスチャーデータの配列
- * @throws {Error} データの読み込みに失敗した場合
  */
 export async function loadGestureData(
   url: string = './templates/normalizedGestures.json',
@@ -39,7 +32,6 @@ export async function loadGestureData(
 
 /**
  * 現在読み込まれているジェスチャーデータを取得する
- * @returns {Gesture[]} ジェスチャーデータの配列
  */
 export function getGestures(): Gesture[] {
   return gestures;
@@ -47,15 +39,16 @@ export function getGestures(): Gesture[] {
 
 /**
  * 入力されたキーポイントに最も近いジェスチャーを検出する。
- * ユークリッド距離とコサイン類似度を組み合わせた重み付けスコアが閾値以上なら
- * ジェスチャーの名前を返す。
+ * 各指（親指、人差し指、中指、薬指、小指）ごとにユークリッド距離、コサイン類似度、角度差からスコアを計算し、
+ * 各指グループのスコアの「最小値」を全体の評価スコアとする。
  *
- * @param keypoints - 検出された手のキーポイント配列
+ * @param keypoints - 検出された手のキーポイント配列（手首を原点として正規化済み）
  * @param gestures - 比較対象のジェスチャーデータ配列
  * @param distanceThreshold - ユークリッド距離の閾値（例: 20000.0）
  * @param combinedThreshold - 合成スコアの閾値（例: 0.8）
- * @param weightEuclidean - ユークリッド距離の重み（例: 0.5）
- * @param weightCosine - コサイン類似度の重み（例: 0.5）
+ * @param weightEuclidean - ユークリッド距離スコアの重み（例: 0.3）
+ * @param weightCosine - コサイン類似度スコアの重み（例: 0.4）
+ * @param weightAngle - 角度スコアの重み（例: 0.3）
  * @returns 検出されたジェスチャーの名前、または認識失敗時は null
  */
 export function detectGesture(
@@ -63,8 +56,9 @@ export function detectGesture(
   gestures: Gesture[],
   distanceThreshold = 20000.0,
   combinedThreshold = 0.8,
-  weightEuclidean = 0.5,
-  weightCosine = 0.5,
+  weightEuclidean = 0.3,
+  weightCosine = 0.4,
+  weightAngle = 0.3,
 ): string | null {
   if (
     !keypoints ||
@@ -76,33 +70,76 @@ export function detectGesture(
     return null;
   }
 
-  let bestGesture: string | null = null;
-  let bestScore = -Infinity;
+  // 各指グループ（手首（index 0）は除く）
+  const fingerGroups = [
+    [1, 2, 3, 4], // 親指
+    [5, 6, 7, 8], // 人差し指
+    [9, 10, 11, 12], // 中指
+    [13, 14, 15, 16], // 薬指
+    [17, 18, 19, 20], // 小指
+  ];
 
-  // ユークリッド距離をスコア化する関数
-  const scoreFromDistance = (dist: number): number => {
-    return Math.max(0, (distanceThreshold - dist) / distanceThreshold);
+  // 指定されたインデックス群から元の配列の値を取り出す
+  const getFingerPoints = (points: number[][], indices: number[]) =>
+    indices.map((i) => points[i]);
+
+  // ユークリッド距離スコアを計算する
+  const scoreFromDistance = (dist: number): number =>
+    Math.max(0, (distanceThreshold - dist) / distanceThreshold);
+
+  // キーポイント配列を平坦化する（ここでは補完処理は不要と考え、既に各要素は3要素である前提）
+  const flattenKeypoints = (points: number[][]): number[] =>
+    points.filter((pt) => pt && pt.length >= 3).flat();
+
+  // 2つの点群間のユークリッド距離を計算する
+  const calcDistance = (ptsA: number[][], ptsB: number[][]): number => {
+    let sum = 0;
+    for (let i = 0; i < ptsA.length; i++) {
+      const dx = ptsA[i][0] - ptsB[i][0];
+      const dy = ptsA[i][1] - ptsB[i][1];
+      const dz = (ptsA[i][2] ?? 0) - (ptsB[i][2] ?? 0);
+      sum += Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+    return sum;
   };
 
-  // ここで、各サブ配列が必ず3要素になるように平坦化する
-  const flatA = flattenKeypoints(keypoints);
-
-  for (const gesture of gestures) {
-    // ユークリッド距離の計算
-    const euclideanDistance = calcDistance(keypoints, gesture.landmarks);
-    const scoreEuclidean = scoreFromDistance(euclideanDistance);
-
-    // キーポイントを平坦化してコサイン類似度を計算
-    const flatB = flattenKeypoints(gesture.landmarks);
-    if (flatA.length !== flatB.length) {
-      console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
-      continue;
+  // 1つのジェスチャーに対する各指グループの統合スコア（最小値）を計算する
+  function computeGestureScore(gesture: Gesture): number | null {
+    const scores: number[] = [];
+    for (const group of fingerGroups) {
+      const subA = getFingerPoints(keypoints, group);
+      const subB = getFingerPoints(gesture.landmarks, group);
+      const groupScore = computeFingerGroupScore(subA, subB, gesture.name);
+      if (groupScore === null) {
+        return null;
+      }
+      scores.push(groupScore);
     }
+    return Math.min(...scores);
+  }
+
+  function computeFingerGroupScore(
+    subA: number[][],
+    subB: number[][],
+    gestureName: string,
+  ): number | null {
+    // キーポイントの数や長さが正しくなければ無効とする
+    if (
+      subA.some((pt) => !pt || pt.length !== 3) ||
+      subB.some((pt) => !pt || pt.length !== 3)
+    ) {
+      console.warn(`キー点数が一致しません: gesture ${gestureName}`);
+      return null;
+    }
+
+    const dist = calcDistance(subA, subB);
+    const scoreEuclidean = scoreFromDistance(dist);
+
+    const flatA = flattenKeypoints(subA);
+    const flatB = flattenKeypoints(subB);
     const dot = flatA.reduce((acc, val, i) => acc + val * flatB[i], 0);
     const normA = Math.sqrt(flatA.reduce((acc, val) => acc + val * val, 0));
     const normB = Math.sqrt(flatB.reduce((acc, val) => acc + val * val, 0));
-
-    // ノルムがゼロの場合の安全処理
     let cosine: number;
     if (normA === 0 && normB === 0) {
       cosine = 1;
@@ -111,56 +148,44 @@ export function detectGesture(
     } else {
       cosine = dot / (normA * normB);
     }
-    // -1～1 の範囲を 0～1 に正規化
     const scoreCosine = (cosine + 1) / 2;
 
-    // 両方のスコアを重み付けして合成
-    const combinedScore =
-      weightEuclidean * scoreEuclidean + weightCosine * scoreCosine;
-
-    console.log(
-      `Gesture "${gesture.name}": Euclidean Score = ${scoreEuclidean.toFixed(3)}, Cosine Score = ${scoreCosine.toFixed(3)}, Combined Score = ${combinedScore.toFixed(3)}`,
+    // 角度スコア：指根と指先の角度差
+    const baseA = subA[0];
+    const tipA = subA[subA.length - 1];
+    const baseB = subB[0];
+    const tipB = subB[subB.length - 1];
+    const vecA = [tipA[0] - baseA[0], tipA[1] - baseA[1]];
+    const vecB = [tipB[0] - baseB[0], tipB[1] - baseB[1]];
+    const magA = Math.sqrt(vecA[0] ** 2 + vecA[1] ** 2);
+    const magB = Math.sqrt(vecB[0] ** 2 + vecB[1] ** 2);
+    let angleSim = 1;
+    if (magA > 0 && magB > 0) {
+      let diff = Math.abs(
+        Math.atan2(vecA[1], vecA[0]) - Math.atan2(vecB[1], vecB[0]),
+      );
+      if (diff > Math.PI) {
+        diff = 2 * Math.PI - diff;
+      }
+      angleSim = 1 - diff / Math.PI;
+    }
+    return (
+      weightEuclidean * scoreEuclidean +
+      weightCosine * scoreCosine +
+      weightAngle * angleSim
     );
+  }
 
-    if (combinedScore > bestScore) {
-      bestScore = combinedScore;
+  let bestGesture: string | null = null;
+  let bestMinScore = -Infinity;
+
+  for (const gesture of gestures) {
+    const score = computeGestureScore(gesture);
+    if (score !== null && score > bestMinScore) {
+      bestMinScore = score;
       bestGesture = gesture.name;
     }
   }
 
-  return bestScore >= combinedThreshold ? bestGesture : null;
-}
-
-/**
- * 2次元配列の各サブ配列を必ず長さ3に補完しながら平坦化するヘルパー関数
- * @param points 各キーポイントの座標配列
- * @returns 平坦化された数値の一次元配列
- */
-function flattenKeypoints(points: number[][]): number[] {
-  return points
-    .map((pt) => {
-      // 3つ未満なら足りない分を0で補完する
-      if (pt.length < 3) {
-        return [...pt, ...Array(3 - pt.length).fill(0)];
-      }
-      return pt;
-    })
-    .flat();
-}
-
-/**
- * 2つのランドマーク配列間のユークリッド距離を計算する
- * @param ptsA - 1つ目のキーポイント配列
- * @param ptsB - 2つ目のキーポイント配列
- * @returns 距離
- */
-function calcDistance(ptsA: number[][], ptsB: number[][]): number {
-  let sum = 0;
-  for (let i = 0; i < ptsA.length; i++) {
-    const dx = ptsA[i][0] - ptsB[i][0];
-    const dy = ptsA[i][1] - ptsB[i][1];
-    const dz = (ptsA[i][2] ?? 0) - (ptsB[i][2] ?? 0);
-    sum += Math.sqrt(dx * dx + dy * dy + dz * dz);
-  }
-  return sum;
+  return bestMinScore >= combinedThreshold ? bestGesture : null;
 }
