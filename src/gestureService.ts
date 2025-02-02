@@ -106,9 +106,6 @@ export function detectGesture(
       })
       .filter((pt): pt is number[] => pt !== undefined)
       .map((pt) => {
-        if (pt.length < 3) {
-          return [...pt, ...Array(3 - pt.length).fill(0)];
-        }
         return pt;
       })
       .flat();
