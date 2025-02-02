@@ -101,68 +101,74 @@ export function detectGesture(
   // 1つのジェスチャーに対する各指グループの統合スコア（最小値）を計算する
   function computeGestureScore(gesture: Gesture): number | null {
     const scores: number[] = [];
-
     for (const group of fingerGroups) {
       const subA = getFingerPoints(keypoints, group);
       const subB = getFingerPoints(gesture.landmarks, group);
-      // キーポイントが不足している場合はジェスチャー全体を無効とする
-      if (
-        subA.some((pt) => !pt || pt.length !== 3) ||
-        subB.some((pt) => !pt || pt.length !== 3)
-      ) {
-        console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
+      const groupScore = computeFingerGroupScore(subA, subB, gesture.name);
+      if (groupScore === null) {
         return null;
       }
-
-      // ユークリッド距離スコア
-      const dist = calcDistance(subA, subB);
-      const scoreEuclidean = scoreFromDistance(dist);
-
-      // コサイン類似度スコア
-      const flatA = flattenKeypoints(subA);
-      const flatB = flattenKeypoints(subB);
-      if (flatA.length !== flatB.length) {
-        console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
-        return null;
-      }
-      const dot = flatA.reduce((acc, val, i) => acc + val * flatB[i], 0);
-      const normA = Math.sqrt(flatA.reduce((acc, val) => acc + val * val, 0));
-      const normB = Math.sqrt(flatB.reduce((acc, val) => acc + val * val, 0));
-      let cosine: number;
-      if (normA === 0 && normB === 0) {
-        cosine = 1;
-      } else if (normA === 0 || normB === 0) {
-        cosine = 0;
-      } else {
-        cosine = dot / (normA * normB);
-      }
-      const scoreCosine = (cosine + 1) / 2;
-
-      // 角度スコア：指根と指先の角度差
-      const baseA = subA[0];
-      const tipA = subA[subA.length - 1];
-      const baseB = subB[0];
-      const tipB = subB[subB.length - 1];
-      const vecA = [tipA[0] - baseA[0], tipA[1] - baseA[1]];
-      const vecB = [tipB[0] - baseB[0], tipB[1] - baseB[1]];
-      const magA = Math.sqrt(vecA[0] ** 2 + vecA[1] ** 2);
-      const magB = Math.sqrt(vecB[0] ** 2 + vecB[1] ** 2);
-      let angleSim = 1;
-      if (magA > 0 && magB > 0) {
-        let diff = Math.abs(Math.atan2(vecA[1], vecA[0]) - Math.atan2(vecB[1], vecB[0]));
-        if (diff > Math.PI) {
-          diff = 2 * Math.PI - diff;
-        }
-        angleSim = 1 - diff / Math.PI;
-      }
-
-      scores.push(
-        weightEuclidean * scoreEuclidean +
-        weightCosine * scoreCosine +
-        weightAngle * angleSim
-      );
+      scores.push(groupScore);
     }
-    return scores.length > 0 ? Math.min(...scores) : null;
+    return scores.length ? Math.min(...scores) : null;
+  }
+
+  function computeFingerGroupScore(
+    subA: number[][],
+    subB: number[][],
+    gestureName: string,
+  ): number | null {
+    // キーポイントの数や長さが正しくなければ無効とする
+    if (
+      subA.some((pt) => !pt || pt.length !== 3) ||
+      subB.some((pt) => !pt || pt.length !== 3)
+    ) {
+      console.warn(`キー点数が一致しません: gesture ${gestureName}`);
+      return null;
+    }
+
+    const dist = calcDistance(subA, subB);
+    const scoreEuclidean = scoreFromDistance(dist);
+
+    const flatA = flattenKeypoints(subA);
+    const flatB = flattenKeypoints(subB);
+    if (flatA.length !== flatB.length) {
+      console.warn(`キー点数が一致しません: gesture ${gestureName}`);
+      return null;
+    }
+    const dot = flatA.reduce((acc, val, i) => acc + val * flatB[i], 0);
+    const normA = Math.sqrt(flatA.reduce((acc, val) => acc + val * val, 0));
+    const normB = Math.sqrt(flatB.reduce((acc, val) => acc + val * val, 0));
+    let cosine: number;
+    if (normA === 0 && normB === 0) {
+      cosine = 1;
+    } else if (normA === 0 || normB === 0) {
+      cosine = 0;
+    } else {
+      cosine = dot / (normA * normB);
+    }
+    const scoreCosine = (cosine + 1) / 2;
+
+    // 角度スコア：指根と指先の角度差
+    const baseA = subA[0];
+    const tipA = subA[subA.length - 1];
+    const baseB = subB[0];
+    const tipB = subB[subB.length - 1];
+    const vecA = [tipA[0] - baseA[0], tipA[1] - baseA[1]];
+    const vecB = [tipB[0] - baseB[0], tipB[1] - baseB[1]];
+    const magA = Math.sqrt(vecA[0] ** 2 + vecA[1] ** 2);
+    const magB = Math.sqrt(vecB[0] ** 2 + vecB[1] ** 2);
+    let angleSim = 1;
+    if (magA > 0 && magB > 0) {
+      let diff = Math.abs(Math.atan2(vecA[1], vecA[0]) - Math.atan2(vecB[1], vecB[0]));
+      if (diff > Math.PI) {
+        diff = 2 * Math.PI - diff;
+      }
+      angleSim = 1 - diff / Math.PI;
+    }
+    return weightEuclidean * scoreEuclidean +
+      weightCosine * scoreCosine +
+      weightAngle * angleSim;
   }
 
   let bestGesture: string | null = null;
