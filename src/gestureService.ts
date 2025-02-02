@@ -148,11 +148,6 @@ export function detectGesture(
       // 平坦化してコサイン類似度を計算
       const flatA = flattenKeypoints(subA as number[][]);
       const flatB = flattenKeypoints(subB as number[][]);
-      if (flatA.length !== flatB.length) {
-        console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
-        validGesture = false;
-        break;
-      }
       const dot = flatA.reduce((acc, val, i) => acc + val * flatB[i], 0);
       const normA = Math.sqrt(flatA.reduce((acc, val) => acc + val * val, 0));
       const normB = Math.sqrt(flatB.reduce((acc, val) => acc + val * val, 0));
