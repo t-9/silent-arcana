@@ -60,59 +60,34 @@ export function detectGesture(
   weightCosine = 0.4,
   weightAngle = 0.3,
 ): string | null {
-  if (
-    !keypoints ||
-    keypoints.length === 0 ||
-    !gestures ||
-    gestures.length === 0
-  ) {
+  if (!keypoints || keypoints.length === 0 || !gestures || gestures.length === 0) {
     console.log('Invalid input:', { keypoints, gestures });
     return null;
   }
 
   // 各指グループ（手首（index 0）は除く）
   const fingerGroups = [
-    [1, 2, 3, 4], // 親指
-    [5, 6, 7, 8], // 人差し指
+    [1, 2, 3, 4],    // 親指
+    [5, 6, 7, 8],    // 人差し指
     [9, 10, 11, 12], // 中指
-    [13, 14, 15, 16], // 薬指
-    [17, 18, 19, 20], // 小指
+    [13, 14, 15, 16],// 薬指
+    [17, 18, 19, 20] // 小指
   ];
 
-  let bestGesture: string | null = null;
-  let bestMinScore = -Infinity;
+  // 指定されたインデックス群から元の配列の値を取り出す
+  const getFingerPoints = (points: number[][], indices: number[]) =>
+    indices.map((i) => points[i]);
 
-  // 指定されたインデックス群から元の配列の値を取り出す関数
-  function getFingerPoints(
-    points: number[][],
-    indices: number[],
-  ): (number[] | undefined)[] {
-    return indices.map((i) => points[i]);
-  }
+  // ユークリッド距離スコアを計算する
+  const scoreFromDistance = (dist: number): number =>
+    Math.max(0, (distanceThreshold - dist) / distanceThreshold);
 
-  // ユークリッド距離からスコアを算出
-  const scoreFromDistance = (dist: number): number => {
-    return Math.max(0, (distanceThreshold - dist) / distanceThreshold);
-  };
+  // キーポイント配列を平坦化する（ここでは補完処理は不要と考え、既に各要素は3要素である前提）
+  const flattenKeypoints = (points: number[][]): number[] =>
+    points.filter((pt) => pt && pt.length >= 3).flat();
 
-  // 各サブ配列を必ず長さ3の数値配列に補完しつつ平坦化する
-  function flattenKeypoints(points: number[][]): number[] {
-    return points
-      .map((pt) => {
-        if (!pt || pt.length < 3) {
-          return undefined; // 不正な点の場合は undefined にする
-        }
-        return pt;
-      })
-      .filter((pt): pt is number[] => pt !== undefined)
-      .map((pt) => {
-        return pt;
-      })
-      .flat();
-  }
-
-  // 2つの点群間のユークリッド距離を計算
-  function calcDistance(ptsA: number[][], ptsB: number[][]): number {
+  // 2つの点群間のユークリッド距離を計算する
+  const calcDistance = (ptsA: number[][], ptsB: number[][]): number => {
     let sum = 0;
     for (let i = 0; i < ptsA.length; i++) {
       const dx = ptsA[i][0] - ptsB[i][0];
@@ -121,12 +96,11 @@ export function detectGesture(
       sum += Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
     return sum;
-  }
+  };
 
-  // 各候補ジェスチャーについて評価
-  for (const gesture of gestures) {
-    let validGesture = true; // このジェスチャーが全グループとも有効かどうか
-    let fingerScores: number[] = [];
+  // 1つのジェスチャーに対する各指グループの統合スコア（最小値）を計算する
+  function computeGestureScore(gesture: Gesture): number | null {
+    const scores: number[] = [];
 
     for (const group of fingerGroups) {
       const subA = getFingerPoints(keypoints, group);
@@ -137,17 +111,20 @@ export function detectGesture(
         subB.some((pt) => !pt || pt.length !== 3)
       ) {
         console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
-        validGesture = false;
-        break;
+        return null;
       }
 
-      // ユークリッド距離
-      const dist = calcDistance(subA as number[][], subB as number[][]);
+      // ユークリッド距離スコア
+      const dist = calcDistance(subA, subB);
       const scoreEuclidean = scoreFromDistance(dist);
 
-      // 平坦化してコサイン類似度を計算
-      const flatA = flattenKeypoints(subA as number[][]);
-      const flatB = flattenKeypoints(subB as number[][]);
+      // コサイン類似度スコア
+      const flatA = flattenKeypoints(subA);
+      const flatB = flattenKeypoints(subB);
+      if (flatA.length !== flatB.length) {
+        console.warn(`キー点数が一致しません: gesture ${gesture.name}`);
+        return null;
+      }
       const dot = flatA.reduce((acc, val, i) => acc + val * flatB[i], 0);
       const normA = Math.sqrt(flatA.reduce((acc, val) => acc + val * val, 0));
       const normB = Math.sqrt(flatB.reduce((acc, val) => acc + val * val, 0));
@@ -161,48 +138,44 @@ export function detectGesture(
       }
       const scoreCosine = (cosine + 1) / 2;
 
-      // 角度スコア：指根と指先
-      const baseA = subA[0] as number[];
-      const tipA = subA[subA.length - 1] as number[];
-      const baseB = subB[0] as number[];
-      const tipB = subB[subB.length - 1] as number[];
+      // 角度スコア：指根と指先の角度差
+      const baseA = subA[0];
+      const tipA = subA[subA.length - 1];
+      const baseB = subB[0];
+      const tipB = subB[subB.length - 1];
       const vecA = [tipA[0] - baseA[0], tipA[1] - baseA[1]];
       const vecB = [tipB[0] - baseB[0], tipB[1] - baseB[1]];
       const magA = Math.sqrt(vecA[0] ** 2 + vecA[1] ** 2);
       const magB = Math.sqrt(vecB[0] ** 2 + vecB[1] ** 2);
       let angleSim = 1;
       if (magA > 0 && magB > 0) {
-        const angleA = Math.atan2(vecA[1], vecA[0]);
-        const angleB = Math.atan2(vecB[1], vecB[0]);
-        let diff = Math.abs(angleA - angleB);
+        let diff = Math.abs(Math.atan2(vecA[1], vecA[0]) - Math.atan2(vecB[1], vecB[0]));
         if (diff > Math.PI) {
           diff = 2 * Math.PI - diff;
         }
         angleSim = 1 - diff / Math.PI;
       }
 
-      // 各指グループの統合スコア
-      const fingerScore =
+      scores.push(
         weightEuclidean * scoreEuclidean +
         weightCosine * scoreCosine +
-        weightAngle * angleSim;
-      fingerScores.push(fingerScore);
+        weightAngle * angleSim
+      );
     }
+    return scores.length > 0 ? Math.min(...scores) : null;
+  }
 
-    // このジェスチャー内で1つでもグループが不正なら評価しない
-    if (!validGesture || fingerScores.length === 0) {
-      continue;
-    }
+  let bestGesture: string | null = null;
+  let bestMinScore = -Infinity;
 
-    const overallScore = Math.min(...fingerScores);
-    console.log(
-      `Gesture "${gesture.name}": Min Finger Score = ${overallScore.toFixed(3)}`,
-    );
-    if (overallScore > bestMinScore) {
-      bestMinScore = overallScore;
+  for (const gesture of gestures) {
+    const score = computeGestureScore(gesture);
+    if (score !== null && score > bestMinScore) {
+      bestMinScore = score;
       bestGesture = gesture.name;
     }
   }
 
   return bestMinScore >= combinedThreshold ? bestGesture : null;
 }
+
