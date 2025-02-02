@@ -132,10 +132,6 @@ export function detectGesture(
 
     const flatA = flattenKeypoints(subA);
     const flatB = flattenKeypoints(subB);
-    if (flatA.length !== flatB.length) {
-      console.warn(`キー点数が一致しません: gesture ${gestureName}`);
-      return null;
-    }
     const dot = flatA.reduce((acc, val, i) => acc + val * flatB[i], 0);
     const normA = Math.sqrt(flatA.reduce((acc, val) => acc + val * val, 0));
     const normB = Math.sqrt(flatB.reduce((acc, val) => acc + val * val, 0));
