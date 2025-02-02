@@ -298,5 +298,50 @@ describe('gestureService', () => {
       // 後始末
       Math.atan2 = originalAtan2;
     });
+
+    it('should correctly handle undefined z-value in keypoints (ptsA)', () => {
+      // ptsA の index 5 の点は [1,1,undefined] とする（第三要素が明示的に undefined）
+      // ※helper関数 create21Points は override で渡された配列の長さが 3 以上ならそのまま返すので、
+      // この場合は [1,1,undefined] がそのまま採用される
+      const keypoints = create21Points({ 5: [1, 1, undefined] });
+      // gesture側は全て [0,0,0] とする
+      const gestureLandmarks = create21Points();
+      const gestures: Gesture[] = [{ name: 'test-undefined-A', landmarks: gestureLandmarks }];
+      // この場合、calcDistance 内で以下の処理が行われる:
+      // ptsA[5][2] が undefined → (undefined ?? 0) で 0 が使われる
+      // ptsB[5][2] は 0 (既定)
+      // よって、差分 dz は 0 - 0 = 0 となり、計算は問題なく進むはず
+      const result = detectGesture(
+        keypoints,
+        gestures,
+        distanceThreshold,
+        combinedThreshold,
+        weightEuclidean,
+        weightCosine,
+        weightAngle,
+      );
+      expect(result).toBe('test-undefined-A');
+    });
+
+    it('should correctly handle undefined z-value in gesture landmarks (ptsB)', () => {
+      // 今度は gestureLandmarks の index 5 の点を [1,1,undefined] にする
+      const keypoints = create21Points();
+      const gestureLandmarks = create21Points({ 5: [1, 1, undefined] });
+      const gestures: Gesture[] = [{ name: 'test-undefined-B', landmarks: gestureLandmarks }];
+      // calcDistance 内で
+      // ptsA[5][2] は 0 (既定)
+      // ptsB[5][2] は undefined → (undefined ?? 0) で 0 に補完される
+      // よって、dz は 0 - 0 = 0 となる
+      const result = detectGesture(
+        keypoints,
+        gestures,
+        distanceThreshold,
+        combinedThreshold,
+        weightEuclidean,
+        weightCosine,
+        weightAngle,
+      );
+      expect(result).toBe('test-undefined-B');
+    });
   });
 });
