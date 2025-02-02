@@ -190,11 +190,7 @@ export function detectGesture(
     }
 
     // このジェスチャー内で1つでもグループが不正なら評価しない
-    if (!validGesture) {
-      continue;
-    }
-
-    if (fingerScores.length === 0) {
+    if (!validGesture || fingerScores.length === 0) {
       continue;
     }
 
