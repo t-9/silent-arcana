@@ -49,17 +49,24 @@ export function getGestures(): Gesture[] {
  * @param weightEuclidean - ユークリッド距離スコアの重み（例: 0.3）
  * @param weightCosine - コサイン類似度スコアの重み（例: 0.4）
  * @param weightAngle - 角度スコアの重み（例: 0.3）
- * @returns 検出されたジェスチャーの名前、または認識失敗時は null
+ * @returns 検出結果を含むオブジェクト
  */
+export interface GestureDetectionResult {
+  gesture: string | null;
+  score: number;
+  threshold: number;
+  message: string;
+}
+
 export function detectGesture(
   keypoints: number[][],
   gestures: Gesture[],
-  distanceThreshold = 30000.0,
+  distanceThreshold = 300000.0,
   combinedThreshold = 0.2,
   weightEuclidean = 0.3,
   weightCosine = 0.4,
   weightAngle = 0.3,
-): string | null {
+): GestureDetectionResult {
   if (
     !keypoints ||
     keypoints.length === 0 ||
@@ -67,7 +74,12 @@ export function detectGesture(
     gestures.length === 0
   ) {
     console.log('Invalid input:', { keypoints, gestures });
-    return null;
+    return {
+      gesture: null,
+      score: 0,
+      threshold: combinedThreshold,
+      message: '入力が無効です'
+    };
   }
 
   // 各指グループ（手首（index 0）は除く）
@@ -187,5 +199,19 @@ export function detectGesture(
     }
   }
 
-  return bestMinScore >= combinedThreshold ? bestGesture : null;
+  if (bestMinScore >= combinedThreshold) {
+    return {
+      gesture: bestGesture,
+      score: bestMinScore,
+      threshold: combinedThreshold,
+      message: `ジェスチャー「${bestGesture}」を検出しました（スコア: ${bestMinScore.toFixed(3)}）`
+    };
+  } else {
+    return {
+      gesture: null,
+      score: bestMinScore,
+      threshold: combinedThreshold,
+      message: `ジェスチャー認識失敗: スコア ${bestMinScore.toFixed(3)} < 閾値 ${combinedThreshold}`
+    };
+  }
 }
