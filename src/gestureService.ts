@@ -55,7 +55,7 @@ export function detectGesture(
   keypoints: number[][],
   gestures: Gesture[],
   distanceThreshold = 30000.0,
-  combinedThreshold = 0.6,
+  combinedThreshold = 0.2,
   weightEuclidean = 0.3,
   weightCosine = 0.4,
   weightAngle = 0.3,
