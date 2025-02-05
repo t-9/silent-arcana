@@ -54,8 +54,8 @@ export function getGestures(): Gesture[] {
 export function detectGesture(
   keypoints: number[][],
   gestures: Gesture[],
-  distanceThreshold = 20000.0,
-  combinedThreshold = 0.8,
+  distanceThreshold = 30000.0,
+  combinedThreshold = 0.6,
   weightEuclidean = 0.3,
   weightCosine = 0.4,
   weightAngle = 0.3,
